@@ -19,20 +19,16 @@ matrix:
 - OQSKEM-DEFAULT-ECDHE-ECDSA-AES128-GCM-SHA256
 - OQSKEM-DEFAULT-ECDHE-ECDSA-AES256-GCM-SHA384
 
-Testing matrix and finalr esults are shown as follows after the run besides
+Testing matrix and final results are shown as follows after the run besides
 other informations:
 
-                       +--------------------------+--------------------------+
-                       | OQS-OpenSSL_1_0_2-stable   OQS-OpenSSL_1_1_1-stable |
-    +------------------+--------------------------+--------------------------+
-    |liboqs nist-branch|     success              |     success              |    
-    +------------------+--------------------------+--------------------------+
-    |liboqs master     |     success              |     success              |    
-    +------------------+--------------------------+--------------------------+
-
-
-
-
+                       +--------------------------+---------------------------+
+                       | OQS-OpenSSL_1_0_2-stable |  OQS-OpenSSL_1_1_1-stable |
+    +------------------+--------------------------+---------------------------+
+    |liboqs nist-branch|     success              |     success               |    
+    +------------------+--------------------------+---------------------------+
+    |liboqs master     |     success              |     success               |    
+    +------------------+--------------------------+---------------------------+
 
 
 Run
