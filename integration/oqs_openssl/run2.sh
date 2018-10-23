@@ -52,11 +52,6 @@ cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-master"
 cd "${BASEDIR}/openssl-1_1_1-master"
 git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
 
-rm -rf "${BASEDIR}/openssl-1_1_1-nist"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-nist"
-cd "${BASEDIR}/openssl-1_1_1-nist"
-git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
-
 echo "=============================="
 echo "Cloning liboqs-master"
 if [ ! -d "${BASEDIR}/liboqs-master" ] ; then
@@ -69,11 +64,16 @@ cd "${BASEDIR}/liboqs-master"
 git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
 autoreconf -i >> $LOGS 2>&1
-./configure --prefix="${BASEDIR}/openssl-1_0_2-master/oqs" --enable-shared=no >> $LOGS 2>&1
+case "$OSTYPE" in
+  darwin*)  OPENSSL_DIR=/usr/local/opt/openssl ;;
+  linux*)   OPENSSL_DIR=/usr ;;
+  *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
+esac
+./configure --prefix="${BASEDIR}/openssl-1_0_2-master/oqs" --enable-shared=no --enable-openssl --with-openssl-dir=${OPENSSL_DIR} >> $LOGS 2>&1
 make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 make install >> $LOGS 2>&1
-./configure --prefix="${BASEDIR}/openssl-1_1_1-master/oqs" --enable-shared=no >> $LOGS 2>&1
+./configure --prefix="${BASEDIR}/openssl-1_1_1-master/oqs" --enable-shared=no --enable-openssl --with-openssl-dir=${OPENSSL_DIR} >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 make install >> $LOGS 2>&1
 
@@ -157,7 +157,9 @@ for SIGALG in rsa ecdsa picnicl1fs qteslaI qteslaIIIsize qteslaIIIspeed ; do
     else
         apps/openssl req -x509 -new -newkey ${SIGALG} -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
     fi
-    for KEXALG in sike503 sike751 sidh503 sidh751 frodo640aes frodo640cshake frodo976aes frodo976cshake  newhope512cca newhope1024cca ; do
+    # FIXMEOQS temporarily don't test BIKE ciphersuites since they intermittently fail
+    # for KEXALG in bike1l1 bike1l3 bike1l5 bike2l1 bike2l3 bike2l5 bike3l1 bike3l3 bike3l5 frodo640aes frodo640cshake frodo976aes frodo976cshake  newhope512cca newhope1024cca sidh503 sidh751 sike503 sike751 ; do
+    for KEXALG in frodo640aes frodo640cshake frodo976aes frodo976cshake  newhope512cca newhope1024cca sidh503 sidh751 sike503 sike751 ; do
         echo "=============================="
         pwd | sed -e 's/.*\///'
         echo "sig=${SIGALG},kex=${KEXALG}"
