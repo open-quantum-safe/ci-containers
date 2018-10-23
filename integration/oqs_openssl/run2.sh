@@ -1,5 +1,20 @@
 #!/bin/bash
 
+CC_OVERRIDE=`which clang`
+if [ $? -eq 1 ] ; then
+    CC_OVERRIDE=`which gcc-7`
+    if [ $? -eq 1 ] ; then
+        CC_OVERRIDE=`which gcc-6`
+        if [ $? -eq 1 ] ; then
+            CC_OVERRIDE=`which gcc-5`
+            if [ $? -eq 1 ] ; then
+                echo "Need gcc >= 5 to build liboqs-nist"
+                exit 1
+            fi
+        fi
+    fi
+fi
+
 set -e
 
 mkdir -p tmp
@@ -74,7 +89,7 @@ cd "${BASEDIR}/liboqs-nist"
 git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
 make clean >> $LOGS 2>&1
-make -j >> $LOGS 2>&1
+make -j CC=${CC_OVERRIDE} >> $LOGS 2>&1
 make install PREFIX="${BASEDIR}/openssl-1_0_2-nist/oqs" >> $LOGS 2>&1
 make install PREFIX="${BASEDIR}/openssl-1_1_1-nist/oqs" >> $LOGS 2>&1
 
@@ -107,7 +122,7 @@ echo "Building OQS-OpenSSL_1_0_2-stable with liboqs-nist"
 cd "${BASEDIR}/openssl-1_0_2-nist"
 case "$OSTYPE" in
   darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 >> $LOGS 2>&1 ;;
+  linux*)   ./Configure no-shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
