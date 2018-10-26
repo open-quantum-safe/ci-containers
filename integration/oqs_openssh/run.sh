@@ -1,5 +1,80 @@
 #!/bin/bash
 
+run_ssh_sshd() {
+  echo
+  echo  "$1" 
+  echo  "$2"
+  for a in $3; do
+  echo "    - KEX: $a"
+  $BASEDIR/install/sbin/sshd -q -p 2222  -d -o "KexAlgorithms=$a" -f $BASEDIR/install/sshd_config -h $BASEDIR/install/ssh_host_ed25519_key >> $LOGS 2>&1 &
+  $BASEDIR/install/bin/ssh   -l $USER -p 2222 -o "KexAlgorithms="$a"" $HOST -F $BASEDIR/install/ssh_config -o StrictHostKeyChecking=no "exit" >> $LOGS 2>&1 
+  A=`cat $LOGS| grep SSH_CONNECTION`
+  if [ $? -eq 0 ];then
+    echo "    - Result: SUCCESS"
+  else
+    echo "    - Result: FAILURE"
+  fi
+  echo
+  done
+}
+
+build_openssl() {
+	echo "=============================="
+	echo "Building openssl"
+	cd "${BASEDIR}/openssl"
+	CFLAGS=-fPIC ./config shared --prefix=${BASEDIR}/install >> $1 2>&1 
+	make clean >> $1 2>&1 
+	make -j8 >> $1 2>&1 
+	make depend >> $1 2>&1 
+	make install>> $1 2>&1
+}
+
+build_liboqs_master() {
+	echo "=============================="
+	echo "Building liboqs-master"
+	cd "${BASEDIR}/liboqs-master"
+	git clean -d -f -x >> $1 2>&1
+	git checkout -- . >> $1 2>&1
+	autoreconf -i >> $1 2>&1
+	./configure --prefix="${BASEDIR}/install" --with-pic=yes --enable-openssl --with-openssl-dir="${BASEDIR}/install" >> $1 2>&1
+	make clean >> $1 2>&1
+	make -j >> $1 2>&1
+	make install >> $1 2>&1
+}
+
+build_liboqs_nist() {
+	echo "=============================="
+	echo "Building liboqs-nist"
+	cd "${BASEDIR}/liboqs-nist"
+	git clean -d -f -x >> $1 2>&1
+	git checkout -- . >> $1 2>&1
+	make clean >> $1 2>&1
+	make -j CC=${CC_OVERRIDE} >> $1 2>&1
+	make install PREFIX="${BASEDIR}/install" >> $1 2>&1 
+}
+
+build_openssh-portable() {
+	echo "=============================="
+	echo "Building openssh-portable"
+	cd "${BASEDIR}/openssh-portable"
+	git clean -d -f -x >> $1 2>&1
+	git checkout -- . >> $1 2>&1
+	autoreconf -i >> $1 2>&1
+	./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex --with-ldflags="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-libs=-lm --with-ssl-dir=${BASEDIR}/install/  --with-liboqs-dir="${BASEDIR}/install" --sysconfdir="${BASEDIR}/install"  >> $1 2>&1
+	make clean >> $1 2>&1
+	make -j  >> $1 2>&1
+	make install >> $1 2>&1
+}
+
+generate_keys() {
+	rm -f $HOME/.ssh/authorized_keys
+	rm -f  $HOME/.ssh/id_ed25519
+	rm -f  $HOME/.ssh/id_ed25519.pub 
+	${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $1 2>&1 
+	cat $HOME/.ssh/id_ed25519.pub >> $HOME/.ssh/authorized_keys
+	chmod 640 $HOME/.ssh/authorized_keys
+}
+
 CC_OVERRIDE=`which clang`
 if [ $? -eq 1 ] ; then
     CC_OVERRIDE=`which gcc-7`
@@ -52,71 +127,16 @@ if [ ! -d "${BASEDIR}/openssh-portable" ] ; then
     git clone --branch OQS-master https://github.com/open-quantum-safe/openssh-portable.git  >> $LOGS 2>&1
 fi
 
-
 rm -rf ${BASEDIR}/install
-
-echo "=============================="
-echo "Building openssl"
-cd "${BASEDIR}/openssl"
-CFLAGS=-fPIC ./config shared --prefix=${BASEDIR}/install >> $LOGS 2>&1 
-make clean >> $LOGS 2>&1 
-make -j8 >> $LOGS 2>&1 
-make depend >> $LOGS 2>&1 
-make install>> $LOGS 2>&1
-
-
-echo "=============================="
-echo "Building liboqs-master"
-cd "${BASEDIR}/liboqs-master"
-git clean -d -f -x >> $LOGS 2>&1
-git checkout -- . >> $LOGS 2>&1
-autoreconf -i >> $LOGS 2>&1
-./configure --prefix="${BASEDIR}/install" --with-pic=yes --enable-openssl --with-openssl-dir="${BASEDIR}/install" >> $LOGS 2>&1
-make clean >> $LOGS 2>&1
-make -j >> $LOGS 2>&1
-make install >> $LOGS 2>&1
-
-echo "=============================="
-echo "Building openssh-portable"
-cd "${BASEDIR}/openssh-portable"
-git clean -d -f -x >> $LOGS 2>&1
-git checkout -- . >> $LOGS 2>&1
-autoreconf -i >> $LOGS 2>&1
-./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex LDFLAGS="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-ssl-dir=${BASEDIR}/install/  --with-liboqs-dir="${BASEDIR}/install" --sysconfdir="${BASEDIR}/install"  >> $LOGS 2>&1
-make clean >> $LOGS 2>&1
-make -j  >> $LOGS 2>&1
-make install >> $LOGS 2>&1
-
-
-rm -f $HOME/.ssh/authorized_keys
-rm -f  $HOME/.ssh/id_ed25519
-rm -f  $HOME/.ssh/id_ed25519.pub 
-${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $LOGS 2>&1 
-cat $HOME/.ssh/id_ed25519.pub >> $HOME/.ssh/authorized_keys
-chmod 640 $HOME/.ssh/authorized_keys
-
+build_openssl $LOGS
+build_liboqs_master $LOGS
+build_openssh-portable $LOGS
+generate_keys $LOGS
 
 HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-sha384@openquantumsafe.org ecdh-nistp384-bike1-L5-sha384@openquantumsafe.org ecdh-nistp384-frodo-640-aes-sha384@openquantumsafe.org ecdh-nistp384-frodo-976-aes-sha384@openquantumsafe.org ecdh-nistp384-sike-503-sha384@openquantumsafe.org ecdh-nistp384-sike-751-sha384@openquantumsafe.org ecdh-nistp384-oqsdefault-sha384@openquantumsafe.org'
 
 PQKEX='bike1-L1-sha384@openquantumsafe.org bike1-L3-sha384@openquantumsafe.org bike1-L5-sha384@openquantumsafe.org frodo-640-aes-sha384@openquantumsafe.org frodo-976-aes-sha384@openquantumsafe.org sike-503-sha384@openquantumsafe.org sike-751-sha384@openquantumsafe.org oqsdefault-sha384@openquantumsafe.org'
 
-run_ssh_sshd() {
-  echo
-  echo  "$1" 
-  echo  "$2"
-  for a in $3; do
-  echo "    - KEX: $a"
-  $BASEDIR/install/sbin/sshd -q -p 2222  -d -o "KexAlgorithms=$a" -f $BASEDIR/install/sshd_config -h $BASEDIR/install/ssh_host_ed25519_key >> $LOGS 2>&1 &
-  $BASEDIR/install/bin/ssh   -l $USER -p 2222 -o "KexAlgorithms="$a"" $HOST -F $BASEDIR/install/ssh_config -o StrictHostKeyChecking=no "exit" >> $LOGS 2>&1 
-  A=`cat $LOGS| grep SSH_CONNECTION`
-  if [ $? -eq 0 ];then
-    echo "    - Result: SUCCESS"
-  else
-    echo "    - Result: FAILURE"
-  fi
-  echo
-  done
-}
 
 echo
 echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable(OQS master) "
@@ -124,69 +144,16 @@ echo "==========================================================================
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX"
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX"
 
-
-<< 'EOF'
 rm -rf ${BASEDIR}/install
+build_openssl $LOGS
+build_liboqs_nist $LOGS
+build_openssh-portable $LOGS
 
-echo "=============================="
-echo "Building openssl"
-cd "${BASEDIR}/openssl"
-CFLAGS=-fPIC ./config shared --prefix=${BASEDIR}/install >> $LOGS 2>&1 
-#./config  --prefix=${BASEDIR}/install >> $LOGS 2>&1 
-make clean >> $LOGS 2>&1 
-make -j8 >> $LOGS 2>&1 
-make depend >> $LOGS 2>&1 
-make install>> $LOGS 2>&1
-
-
-echo "=============================="
-echo "Building liboqs-nist"
-cd "${BASEDIR}/liboqs-nist"
-git clean -d -f -x >> $LOGS 2>&1
-git checkout -- . >> $LOGS 2>&1
-make clean >> $LOGS 2>&1
-make -j >> $LOGS 2>&1
-make install PREFIX="${BASEDIR}/install"
-#rm -f ${BASEDIR}/install/lib/liboqs.so
-
-echo "=============================="
-echo "Building openssh-portable"
-cd "${BASEDIR}/openssh-portable"
-git clean -d -f -x >> $LOGS 2>&1
-git checkout -- . >> $LOGS 2>&1
-autoreconf -i >> $LOGS 2>&1
-./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex LDFLAGS="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-ssl-dir=${BASEDIR}/install/  --with-liboqs-dir="${BASEDIR}/install" --sysconfdir="${BASEDIR}/install"  >> $LOGS 2>&1
-make clean >> $LOGS 2>&1
-make -j  >> $LOGS 2>&1
-make install >> $LOGS 2>&1
-
-
-run_ssh_sshd() {
-  echo
-  echo  "$1" 
-  echo  "$2"
-  for a in $3; do
-  echo "    - KEX: $a"
-  $BASEDIR/install/sbin/sshd -q -p 2222  -d -o "KexAlgorithms=$a" -f $BASEDIR/install/sshd_config -h $BASEDIR/install/ssh_host_ed25519_key >> $LOGS 2>&1 &
-  $BASEDIR/install/bin/ssh   -l $USER -p 2222 -o "KexAlgorithms="$a"" $HOST -F $BASEDIR/install/ssh_config -o StrictHostKeyChecking=no "exit" >> $LOGS 2>&1 
-  A=`cat $LOGS| grep SSH_CONNECTION`
-  if [ $? -eq 0 ];then
-    echo "    - Result: SUCCESS"
-  else
-    echo "    - Result: FAILURE"
-  fi
-  echo
-  done
-}
-
-
-echo
 echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable(OQS master) "
 echo "============================================================================================="
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX"
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX"
 
 
-EOF
 
 
