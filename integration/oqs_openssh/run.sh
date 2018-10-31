@@ -89,18 +89,18 @@ BASEDIR=`pwd`
 DATE=`date '+%Y-%m-%d-%H%M%S'`
 LOGS="${BASEDIR}/log-${DATE}.txt"
 HOST=`hostname`
-CC_OVERRIDE=`which clang`
+CC_OVERRIDE=`which clang >> $LOGS 2>&1`
 
 if [ $? -eq 1 ] ; then
-    CC_OVERRIDE=`which gcc-7`
+    CC_OVERRIDE=`which gcc-7 >> $LOGS 2>&1`
     if [ $? -eq 1 ] ; then
-        CC_OVERRIDE=`which gcc-6`
+        CC_OVERRIDE=`which gcc-6 >> $LOGS 2>&1`
         if [ $? -eq 1 ] ; then
-            CC_OVERRIDE=`which gcc-5`
+            CC_OVERRIDE=`which gcc-5 >> $LOGS 2>&1`
             if [ $? -eq 1 ] ; then
 	        A=`gcc --version | grep gcc| cut -b 11`
 		if [ $A -ge 5 ];then
-            	    CC_OVERRIDE=`which gcc`
+            	    CC_OVERRIDE=`which gcc >> $LOGS 2>&1`
                     echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS    
 		else 
                     echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
