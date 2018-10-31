@@ -98,8 +98,14 @@ if [ $? -eq 1 ] ; then
         if [ $? -eq 1 ] ; then
             CC_OVERRIDE=`which gcc-5`
             if [ $? -eq 1 ] ; then
-                echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
-                exit 1
+	        A=`gcc --version | grep gcc| cut -b 11`
+		if [ $A -ge 5 ];then
+            	    CC_OVERRIDE=`which gcc`
+                    echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS    
+		else 
+                    echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
+                    exit 1
+		fi
             fi
         fi
     fi
@@ -114,7 +120,6 @@ echo "==============================" 2>&1 | tee -a $LOGS
 echo "Cloning openssl" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/openssl" ] ; then
     git clone -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git >> $LOGS 2>&1
-#git clone -b OpenSSL_1_0_2-stable https://github.com/open-quantum-safe/openssl.git >> $LOGS 2>&1
 fi
 
 echo "==============================" 2>&1 | tee -a $LOGS
@@ -141,7 +146,6 @@ build_liboqs_master $LOGS
 build_openssh-portable $LOGS
 generate_keys $LOGS
 
-
 echo 2>&1 | tee -a $LOGS
 echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable(OQS master) " 2>&1 | tee -a $LOGS 
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
@@ -157,3 +161,4 @@ echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-porta
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+
