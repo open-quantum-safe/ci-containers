@@ -7,8 +7,8 @@ Please follow the README for details, under the respective directories, on how t
 Dependencies
 ------------
 
-  ### APT :
-  For APT based systems like UBUNTU, please install following packages before proceeding with running any tests.
+### APT (UBUNTU):
+  Please install following packages before proceeding with running any tests.
   - sudo apt update
   - sudo apt install build-essential
   - sudo apt install autotools-dev
@@ -19,11 +19,21 @@ Dependencies
   - sudo apt install xsltproc
 
 
-  ### YUM :
-  For YUM based systems like CentOS, please install following packages before proceeding with running any tests.
+### YUM (CENTOS):
+  Please install following packages before proceeding with running any tests.
 
-  - sudo yum groupinstall 'Development Tool'
+  - sudo yum groupinstall 'Development Tools'
   - sudo yum install centos-release-scl
   - sudo yum install devtoolset-7-gcc-c++
   - sudo scl enable devtoolset-7 bash  (IMPORTANT: Make sure to enable the toolset)
   - sudo yum install libtool
+
+### YUM (Amazon Linux 2):
+  Please install following packages before proceeding with running any tests.
+
+  - sudo yum install gcc-c++
+  - sudo yum install automake
+  - sudo yum install libtool
+  - sudo yum install libxslt
+  - sudo yum install git
+  - sudo yum install zlib-devel
