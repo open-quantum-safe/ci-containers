@@ -70,23 +70,30 @@ build_openssh-portable() {
 	make install >> $1 2>&1
 }
 
+backup_keys() {
+  if [ -d $HOME/.ssh/ ];then
+    if [ ! -d $HOME/.ssh_oqs_bkup/ ];then
+      mv $HOME/.ssh/ $HOME/.ssh_oqs_bkup
+    fi
+  fi
+}
+
+restore_keys() {
+  if [ -d $HOME/.ssh_oqs_bkup/ ];then
+    if [ -d $HOME/.ssh/ ];then
+      rm -rf $HOME/.ssh/;
+    fi
+    mv $HOME/.ssh_oqs_bkup $HOME/.ssh/
+  fi  
+}
+
 generate_keys() {
-  mkdir -p ${BASEDIR}/install/.ssh
-  rm -f ${BASEDIR}/install/.ssh/*
-  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $BASEDIR/install/.ssh/id_ed25519 >> $1 2>&1 
-	cat $BASEDIR/install/.ssh/id_ed25519.pub >> $BASEDIR/install/.ssh/authorized_keys
-	chmod 640 $BASEDIR/install/.ssh/authorized_keys
-    case "$OSTYPE" in
-    darwin*)
-      sed -i '' "s|\(AuthorizedKeysFile\).*|\1 "$BASEDIR"/install/.ssh/authorized_keys|g" $BASEDIR/install/sshd_config
-      sed -i '' "s|#   IdentityFile ~/.ssh/id_ed25519|    IdentityFile "$BASEDIR"/install/.ssh/id_ed25519|g" $BASEDIR/install/ssh_config
-      ;;
-    linux*) 
-      sed -i "s|\(AuthorizedKeysFile\).*|\1 "$BASEDIR"/install/.ssh/authorized_keys|g" $BASEDIR/install/sshd_config
-      sed -i "s|#   IdentityFile ~/.ssh/id_ed25519|    IdentityFile "$BASEDIR"/install/.ssh/id_ed25519|g" $BASEDIR/install/ssh_config
-      ;;
-    *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
-    esac
+  backup_keys
+  mkdir $HOME/.ssh
+  chmod 700  $HOME/.ssh
+  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $1 2>&1 
+  cat $HOME/.ssh/id_ed25519.pub >> $HOME/.ssh/authorized_keys
+  chmod 640 $HOME/.ssh/authorized_keys
 }
 
 HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-sha384@openquantumsafe.org ecdh-nistp384-bike1-L5-sha384@openquantumsafe.org ecdh-nistp384-frodo-640-aes-sha384@openquantumsafe.org ecdh-nistp384-frodo-976-aes-sha384@openquantumsafe.org ecdh-nistp384-sike-503-sha384@openquantumsafe.org ecdh-nistp384-sike-751-sha384@openquantumsafe.org ecdh-nistp384-oqsdefault-sha384@openquantumsafe.org'
@@ -102,23 +109,23 @@ HOST=`hostname`
 CC_OVERRIDE=`which clang`
 
 if [ $? -eq 1 ] ; then
-    CC_OVERRIDE=`which gcc-7`
+  CC_OVERRIDE=`which gcc-7`
+  if [ $? -eq 1 ] ; then
+    CC_OVERRIDE=`which gcc-6`
     if [ $? -eq 1 ] ; then
-        CC_OVERRIDE=`which gcc-6`
-        if [ $? -eq 1 ] ; then
-            CC_OVERRIDE=`which gcc-5`
-            if [ $? -eq 1 ] ; then
-	              A=`gcc --version | grep gcc| cut -b 11`
-		            if [ $A -ge 5 ];then
-                    CC_OVERRIDE=`which gcc`
-                    echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS    
-		            else 
-                    echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
-                    exit 1
-		            fi
-            fi
+      CC_OVERRIDE=`which gcc-5`
+      if [ $? -eq 1 ] ; then
+        A=`gcc --version | grep gcc| cut -b 11`
+        if [ $A -ge 5 ];then
+          CC_OVERRIDE=`which gcc`
+          echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS    
+        else 
+          echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
+          exit 1
         fi
+      fi
     fi
+  fi
 fi
 
 
@@ -161,14 +168,17 @@ echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-por
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+restore_keys
 
 rm -rf ${BASEDIR}/install
 build_openssl $LOGS
 build_liboqs_nist $LOGS
 build_openssh-portable $LOGS
+generate_keys $LOGS
 
 echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable(OQS master) " 2>&1 | tee -a $LOGS
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+restore_keys
 
