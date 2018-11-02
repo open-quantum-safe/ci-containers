@@ -71,12 +71,22 @@ build_openssh-portable() {
 }
 
 generate_keys() {
-	rm -f $HOME/.ssh/authorized_keys
-	rm -f  $HOME/.ssh/id_ed25519
-	rm -f  $HOME/.ssh/id_ed25519.pub 
-	${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $1 2>&1 
-	cat $HOME/.ssh/id_ed25519.pub >> $HOME/.ssh/authorized_keys
-	chmod 640 $HOME/.ssh/authorized_keys
+  mkdir -p ${BASEDIR}/install/.ssh
+  rm -f ${BASEDIR}/install/.ssh/*
+  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $BASEDIR/install/.ssh/id_ed25519 >> $1 2>&1 
+	cat $BASEDIR/install/.ssh/id_ed25519.pub >> $BASEDIR/install/.ssh/authorized_keys
+	chmod 640 $BASEDIR/install/.ssh/authorized_keys
+    case "$OSTYPE" in
+    darwin*)
+      sed -i '' "s|\(AuthorizedKeysFile\).*|\1 "$BASEDIR"/install/.ssh/authorized_keys|g" $BASEDIR/install/sshd_config
+      sed -i '' "s|#   IdentityFile ~/.ssh/id_ed25519|    IdentityFile "$BASEDIR"/install/.ssh/id_ed25519|g" $BASEDIR/install/ssh_config
+      ;;
+    linux*) 
+      sed -i "s|\(AuthorizedKeysFile\).*|\1 "$BASEDIR"/install/.ssh/authorized_keys|g" $BASEDIR/install/sshd_config
+      sed -i "s|#   IdentityFile ~/.ssh/id_ed25519|    IdentityFile "$BASEDIR"/install/.ssh/id_ed25519|g" $BASEDIR/install/ssh_config
+      ;;
+    *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
+    esac
 }
 
 HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-sha384@openquantumsafe.org ecdh-nistp384-bike1-L5-sha384@openquantumsafe.org ecdh-nistp384-frodo-640-aes-sha384@openquantumsafe.org ecdh-nistp384-frodo-976-aes-sha384@openquantumsafe.org ecdh-nistp384-sike-503-sha384@openquantumsafe.org ecdh-nistp384-sike-751-sha384@openquantumsafe.org ecdh-nistp384-oqsdefault-sha384@openquantumsafe.org'
@@ -98,14 +108,14 @@ if [ $? -eq 1 ] ; then
         if [ $? -eq 1 ] ; then
             CC_OVERRIDE=`which gcc-5 >> $LOGS 2>&1`
             if [ $? -eq 1 ] ; then
-	        A=`gcc --version | grep gcc| cut -b 11`
-		if [ $A -ge 5 ];then
-            	    CC_OVERRIDE=`which gcc >> $LOGS 2>&1`
+	              A=`gcc --version | grep gcc| cut -b 11`
+		            if [ $A -ge 5 ];then
+            	      CC_OVERRIDE=`which gcc >> $LOGS 2>&1`
                     echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS    
-		else 
+		            else 
                     echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
                     exit 1
-		fi
+		            fi
             fi
         fi
     fi
