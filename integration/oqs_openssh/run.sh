@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OKAY=1
+
 run_ssh_sshd() {
   echo
   echo  "$1"  2>&1 | tee -a $4
@@ -13,6 +15,7 @@ run_ssh_sshd() {
     echo "    - Result: SUCCESS" 2>&1 | tee -a $4
   else
     echo "    - Result: FAILURE" 2>&1 | tee -a $4
+    OKAY=0
   fi
   echo 2>&1 | tee -a $4
   done
@@ -184,7 +187,11 @@ restore_keys
 
 echo ""
 echo "=============================="
-echo "All tests completed successfully."
+if [ ${OKAY} -eq 1 ] ; then
+    echo "All tests completed successfully."
+else
+    echo "SOME TESTS FAILED."
+fi
 echo ""
 echo "    DATE: ${DATE}"
 echo "    OSTYPE: ${OSTYPE}"
