@@ -1,44 +1,28 @@
-OQS OpenSSL Integration Testing
+OQS-OpenSSL Integration Testing
 ===============================
 
-run script tests openssl with liboqs master and nist-branch branches.
-Curently,  following versions of openssl are being tested:
+This directory contains a script for testing the OQS fork(s) of OpenSSL with liboqs.
 
-OQS-OpenSSL_1_0_2-stable
-OQS-OpenSSL_1_1_1-stable
+Currently, the following combinations are tested:
 
-Following cipher suites are being tested with oqs openssl builds as shown below
-matrix:
+- liboqs master branch with OQS-OpenSSL\_1\_0\_2-stable
+- liboqs nist branch with OQS-OpenSSL\_1\_0\_2-stable
+- liboqs master branch with OQS-OpenSSL\_1\_1\_1-stable
+- liboqs nist branch with OQS-OpenSSL\_1\_1\_1-stable
 
-- OQSKEM-DEFAULT-RSA-AES128-GCM-SHA256
-- OQSKEM-DEFAULT-RSA-AES256-GCM-SHA384
-- OQSKEM-DEFAULT-ECDHE-RSA-AES128-GCM-SHA256
-- OQSKEM-DEFAULT-ECDHE-RSA-AES256-GCM-SHA384
-- OQSKEM-DEFAULT-ECDSA-AES128-GCM-SHA256
-- OQSKEM-DEFAULT-ECDSA-AES256-GCM-SHA384
-- OQSKEM-DEFAULT-ECDHE-ECDSA-AES128-GCM-SHA256
-- OQSKEM-DEFAULT-ECDHE-ECDSA-AES256-GCM-SHA384
+The scripts have been tested on macOS 10.14.
 
-Testing matrix and final results are shown as follows after the run besides
-other informations:
+Running
+-------
 
-                       +--------------------------+---------------------------+
-                       | OQS-OpenSSL_1_0_2-stable |  OQS-OpenSSL_1_1_1-stable |
-    +------------------+--------------------------+---------------------------+
-    |liboqs nist-branch|     success              |     success               |    
-    +------------------+--------------------------+---------------------------+
-    |liboqs master     |     success              |     success               |    
-    +------------------+--------------------------+---------------------------+
+First make sure you have installed the dependencies as indicated in the [top-level testing README](https://github.com/open-quantum-safe/testing/blob/master/README.md).
 
+Then run:
 
-Run
-===
+	git clone https://github.com/open-quantum-safe/testing.git
+	cd testing/integration/oqs_openssl
+	./run2.sh
 
-1. Create a testing directory e.g.
-   mkdir test_oqs_openssl
-2. Copy the run script there.
-3. chmod +x run
-4. ./run
+A file named 'logs' is created under the direcory created above showing detailed output not shown in stdout or stderr for debugging purposes.  
 
-A file named 'logs' is created under the direcory created above showing
-detailed output not shown in stdout or stderr for debugging purposes.  
+OQS developers should record their test results on the OQS [test coverage wiki page](https://github.com/open-quantum-safe/testing/wiki/Configurations-test-coverage).
