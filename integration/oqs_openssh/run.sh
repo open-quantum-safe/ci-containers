@@ -7,7 +7,7 @@ run_ssh_sshd() {
   for a in $3; do
   echo "    - KEX: $a"  2>&1 | tee -a $4
   $BASEDIR/install/sbin/sshd -q -p 2222  -d -o "KexAlgorithms=$a" -f $BASEDIR/install/sshd_config -h $BASEDIR/install/ssh_host_ed25519_key >> $4 2>&1 &
-  $BASEDIR/install/bin/ssh   -l ${USER} -p 2222 -o "KexAlgorithms="$a"" ${HOST} -F $BASEDIR/install/ssh_config -o StrictHostKeyChecking=no "exit" >> $4 2>&1 
+  $BASEDIR/install/bin/ssh   -l ${USER} -p 2222 -o "KexAlgorithms="$a"" ${HOST} -F $BASEDIR/install/ssh_config -o StrictHostKeyChecking=no "exit" >> $4 2>&1
   A=`cat $LOGS| grep SSH_CONNECTION`
   if [ $? -eq 0 ];then
     echo "    - Result: SUCCESS" 2>&1 | tee -a $4
@@ -19,17 +19,17 @@ run_ssh_sshd() {
 }
 
 build_openssl() {
-  echo "==============================" 2>&1 | tee -a $1 
-  echo "Building OpenSSL_1_0_2-stable"  2>&1 | tee -a $1 
+  echo "==============================" 2>&1 | tee -a $1
+  echo "Building OpenSSL_1_0_2-stable"  2>&1 | tee -a $1
   cd "${BASEDIR}/openssl"
   case "$OSTYPE" in
     darwin*) env CFLAGS=-fPIC ./Configure shared darwin64-x86_64-cc --prefix=${BASEDIR}/install >> $1 2>&1 ;;
     linux*) CFLAGS=-fPIC  ./Configure shared linux-x86_64 --prefix=${BASEDIR}/install >> $1 2>&1 ;;
     *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
   esac
-	make clean >> $1 2>&1 
-	make -j8 >> $1 2>&1 
-	make depend >> $1 2>&1 
+	make clean >> $1 2>&1
+	make -j8 >> $1 2>&1
+	make depend >> $1 2>&1
 	make install>> $1 2>&1
 }
 
@@ -54,7 +54,7 @@ build_liboqs_nist() {
 	git checkout -- . >> $1 2>&1
 	make clean >> $1 2>&1
 	make -j OPENSSL_INCLUDE_DIR="${BASEDIR}/install/include" OPENSSL_LIB_DIR="${BASEDIR}/install/lib" PREFIX="${BASEDIR}/install"  CC=${CC_OVERRIDE} >> $1 2>&1
-	make install PREFIX="${BASEDIR}/install" >> $1 2>&1 
+	make install PREFIX="${BASEDIR}/install" >> $1 2>&1
 }
 
 build_openssh-portable() {
@@ -84,14 +84,14 @@ restore_keys() {
       rm -rf $HOME/.ssh/;
     fi
     mv $HOME/.ssh_oqs_bkup $HOME/.ssh/
-  fi  
+  fi
 }
 
 generate_keys() {
   backup_keys
   mkdir $HOME/.ssh
   chmod 700  $HOME/.ssh
-  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $1 2>&1 
+  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $1 2>&1
   cat $HOME/.ssh/id_ed25519.pub >> $HOME/.ssh/authorized_keys
   chmod 640 $HOME/.ssh/authorized_keys
 }
@@ -118,8 +118,8 @@ if [ $? -eq 1 ] ; then
         A=`gcc --version | grep gcc| cut -b 11`
         if [ $A -ge 5 ];then
           CC_OVERRIDE=`which gcc`
-          echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS    
-        else 
+          echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS
+        else
           echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
           exit 1
         fi
@@ -164,7 +164,7 @@ build_openssh-portable $LOGS
 generate_keys $LOGS
 
 echo 2>&1 | tee -a $LOGS
-echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable(OQS master) " 2>&1 | tee -a $LOGS 
+echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable(OQS master) " 2>&1 | tee -a $LOGS
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
@@ -182,3 +182,22 @@ run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  =====
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
 restore_keys
 
+echo ""
+echo "=============================="
+echo "All tests completed successfully."
+echo ""
+echo "    DATE: ${DATE}"
+echo "    OSTYPE: ${OSTYPE}"
+echo -n "    Compiler: ${CC_OVERRIDE} "
+${CC_OVERRIDE} --version | head -n 1
+echo -n "    liboqs-master "
+cd "${BASEDIR}/liboqs-master"
+git log | head -n 1
+echo -n "    liboqs-nist "
+cd "${BASEDIR}/liboqs-nist"
+git log | head -n 1
+echo -n "    OpenSSL "
+cd "${BASEDIR}/openssl"
+git log | head -n 1
+echo "    PQKEX=${PQKEX}"
+echo "    HKEX=${HKEX}"

@@ -1,36 +1,39 @@
-OQS OpenSSH Integration Testing
+OQS-OpenSSH Integration Testing
 ===============================
 
-run script tests openssh-portable (OQS-master) with liboqs master and nist-branch branches.
-Curently,  following versions of openssl are being tested:
+This directory contains a script for testing the OQS fork of OpenSSH with liboqs.
 
-OQS-OpenSSL_1_0_2-stable
+Currently, the following combinations are tested:
 
-Please go through the README at https://github.com/open-quantum-safe/openssh-portable for detailed information about various key exchange methods supported and being tested through the run script.
+- liboqs master branch with OQS-master
+- liboqs nist branch with OQS-master
 
-IMPORTANT
----------
-Before running the script, please do the following:
+The scripts have been tested on Ubuntu 14.04 and Ubuntu 16.04.  
 
-On Linux:
+The [README.md](https://github.com/open-quantum-safe/openssh-portable/blob/OQS-master/README.md) file for the OQS-OpenSSH fork describes the various key exchange mechanisms supported by each configuration.
 
-- Create the privilege separation directory:
+Running
+-------
 
-      sudo mkdir -p -m 0755 /var/empty
+First make sure you have **installed the dependencies** as indicated in the [top-level testing README](https://github.com/open-quantum-safe/testing/blob/master/README.md).
 
-- Create the privilege separation user:
+Before running the script on Linux, please do the following:
 
-      sudo groupadd sshd
-      sudo useradd -g sshd -c 'sshd privsep' -d /var/empty -s /bin/false sshd
+1. Create the privilege separation directory:
 
+		sudo mkdir -p -m 0755 /var/empty
 
+2. Create the privilege separation user:
 
+		sudo groupadd sshd
+		sudo useradd -g sshd -c 'sshd privsep' -d /var/empty -s /bin/false sshd
 
-Run
-===
+Then run:
 
-In order to run the script:
+	git clone https://github.com/open-quantum-safe/testing.git
+	cd testing/integration/oqs_openssh
+	./run.sh
 
-./run.sh
+A file named 'logs' is created under the `tmp` direcory showing detailed output not shown in stdout or stderr for debugging purposes.  
 
-A scratch directory called tmp is created where everything is checked out, built and tested. Every run of the script creates a log file which can be viewed for more detailed information.
+OQS developers should record their test results on the OQS [test coverage wiki page](https://github.com/open-quantum-safe/testing/wiki/Configurations-test-coverage).
