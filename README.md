@@ -17,7 +17,13 @@ You must install the relevant dependices before proceeding with running any test
 **Debian/Ubuntu (apt)**
 
 	sudo apt update
-	sudo apt install build-essential autotools-dev autoconf libtool  xsltproc zlib1g-dev zip
+	sudo apt install build-essential autotools-dev autoconf git libssl-dev libtool xsltproc zlib1g-dev zip
+	
+On Ubuntu 14.04, you need to also:
+
+	sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+	sudo apt update
+	sudo apt install gcc-5
 
 **Centos (yum)**
 
