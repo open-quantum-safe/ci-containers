@@ -52,21 +52,25 @@ rm -rf "${BASEDIR}/openssl-1_0_2-master"
 cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_0_2-master"
 cd "${BASEDIR}/openssl-1_0_2-master"
 git checkout OQS-OpenSSL_1_0_2-stable >> $LOGS 2>&1
+git pull >> $LOGS 2>&1
 
 rm -rf "${BASEDIR}/openssl-1_0_2-nist"
 cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_0_2-nist"
 cd "${BASEDIR}/openssl-1_0_2-nist"
 git checkout OQS-OpenSSL_1_0_2-stable >> $LOGS 2>&1
+git pull >> $LOGS 2>&1
 
 rm -rf "${BASEDIR}/openssl-1_1_1-master"
 cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-master"
 cd "${BASEDIR}/openssl-1_1_1-master"
 git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
+git pull >> $LOGS 2>&1
 
 rm -rf "${BASEDIR}/openssl-1_1_1-nist"
 cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-nist"
 cd "${BASEDIR}/openssl-1_1_1-nist"
 git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
+git pull >> $LOGS 2>&1
 
 echo "=============================="
 echo "Cloning liboqs-master"
@@ -79,6 +83,7 @@ echo "Building liboqs-master"
 cd "${BASEDIR}/liboqs-master"
 git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
+git pull >> $LOGS 2>&1
 autoreconf -i >> $LOGS 2>&1
 case "$OSTYPE" in
   darwin*)  OPENSSL_DIR=/usr/local/opt/openssl ;;
@@ -104,6 +109,7 @@ echo "Building liboqs-nist"
 cd "${BASEDIR}/liboqs-nist"
 git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
+git pull >> $LOGS 2>&1
 make clean >> $LOGS 2>&1
 make -j CC=${CC_OVERRIDE} >> $LOGS 2>&1
 make install-noshared PREFIX="${BASEDIR}/openssl-1_0_2-nist/oqs" >> $LOGS 2>&1
@@ -162,7 +168,7 @@ echo "Building OQS-OpenSSL_1_1_1-stable with liboqs-master"
 cd "${BASEDIR}/openssl-1_1_1-master"
 case "$OSTYPE" in
   darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 >> $LOGS 2>&1 ;;
+  linux*)   ./Configure no-shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
@@ -192,7 +198,7 @@ echo "Building OQS-OpenSSL_1_1_1-stable with liboqs-nist"
 cd "${BASEDIR}/openssl-1_1_1-nist"
 case "$OSTYPE" in
   darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 >> $LOGS 2>&1 ;;
+  linux*)   ./Configure no-shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
