@@ -21,7 +21,7 @@ Then run:
 
 	git clone https://github.com/open-quantum-safe/testing.git
 	cd testing/integration/oqs_openssl
-	./run2.sh
+	./run.sh 2>/dev/null
 
 A file named 'logs' is created under the direcory created above showing detailed output not shown in stdout or stderr for debugging purposes.  
 
