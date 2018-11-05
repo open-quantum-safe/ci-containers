@@ -8,32 +8,27 @@ Dependencies
 ------------
 
 ### APT (UBUNTU):
-  Please install following packages before proceeding with running any tests.
-  - sudo apt update
-  - sudo apt install build-essential
-  - sudo apt install autotools-dev
-  - sudo apt install autoconf
-  - sudo apt install libtool
-  - sudo apt install zlib1g-dev
-  - sudo apt install zip
-  - sudo apt install xsltproc
+Please run and install following packages before proceeding with running any tests.
 
+```bash
+sudo apt update
+sudo apt install build-essential autotools-dev autoconf libtool \
+                 zlib1g-dev zip xsltproc
+```
 
 ### YUM (CENTOS):
-  Please install following packages before proceeding with running any tests.
+Please install following packages before proceeding with running any tests.
 
-  - sudo yum groupinstall 'Development Tools'
-  - sudo yum install centos-release-scl
-  - sudo yum install devtoolset-7-gcc-c++
-  - sudo scl enable devtoolset-7 bash  (IMPORTANT: Make sure to enable the toolset)
-  - sudo yum install libtool
+```bash
+sudo yum groupinstall 'Development Tools'
+sudo yum install centos-release-scl devtoolset-7-gcc-c++
+sudo scl enable devtoolset-7 bash # IMPORTANT: ensure toolset is enabled!
+sudo yum install libtool
+```
 
 ### YUM (Amazon Linux 2):
-  Please install following packages before proceeding with running any tests.
+Please install following packages before proceeding with running any tests.
 
-  - sudo yum install gcc-c++
-  - sudo yum install automake
-  - sudo yum install libtool
-  - sudo yum install libxslt
-  - sudo yum install git
-  - sudo yum install zlib-devel
+```bash
+sudo yum install gcc-c++ automake libtool libxslt git zlib-devel
+```
