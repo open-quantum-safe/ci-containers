@@ -8,7 +8,7 @@ Currently, the following combinations are tested:
 - liboqs master branch with OQS-master
 - liboqs nist branch with OQS-master
 
-The scripts have been tested on Ubuntu 14.04 and Ubuntu 16.04.  
+The scripts have been tested on Ubuntu 14.04 and Ubuntu 16.04.  Currently the integration testing script does not run on Ubuntu 18.04 (but the OQS-OpenSSH integration does run on Ubuntu 18.04, see special build instructions in the OQS-OpenSSL README.md).
 
 The [README.md](https://github.com/open-quantum-safe/openssh-portable/blob/OQS-master/README.md) file for the OQS-OpenSSH fork describes the various key exchange mechanisms supported by each configuration.
 

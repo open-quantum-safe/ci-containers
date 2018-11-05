@@ -134,7 +134,7 @@ echo "   tail -f ${LOGS}" 2>&1 | tee -a $LOGS
 echo ""
 
 echo "==============================" 2>&1 | tee -a $LOGS
-echo "Cloning openssl" 2>&1 | tee -a $LOGS
+echo "Cloning OpenSSL 1.0.2" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/openssl" ] ; then
     git clone -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git >> $LOGS 2>&1
 fi
@@ -152,7 +152,7 @@ if [ ! -d "${BASEDIR}/liboqs-nist" ] ; then
 fi
 
 echo "==============================" 2>&1 | tee -a $LOGS
-echo "Cloning Openssh OQS master" 2>&1 | tee -a $LOGS
+echo "Cloning OpenSSH OQS-master" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/openssh-portable" ] ; then
     git clone --branch OQS-master https://github.com/open-quantum-safe/openssh-portable.git  >> $LOGS 2>&1
 fi
@@ -164,7 +164,7 @@ build_openssh-portable $LOGS
 generate_keys $LOGS
 
 echo 2>&1 | tee -a $LOGS
-echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable(OQS master) " 2>&1 | tee -a $LOGS
+echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable (OQS-master) " 2>&1 | tee -a $LOGS
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
@@ -176,7 +176,7 @@ build_liboqs_nist $LOGS
 build_openssh-portable $LOGS
 generate_keys $LOGS
 
-echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable(OQS master) " 2>&1 | tee -a $LOGS
+echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable (OQS-master) " 2>&1 | tee -a $LOGS
 echo "=============================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
