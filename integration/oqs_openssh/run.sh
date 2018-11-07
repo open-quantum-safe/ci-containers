@@ -118,7 +118,7 @@ if [ $? -eq 1 ] ; then
     if [ $? -eq 1 ] ; then
       CC_OVERRIDE=`which gcc-5`
       if [ $? -eq 1 ] ; then
-        A=`gcc --version | grep gcc| cut -b 11`
+        A=`gcc -dumpversion | cut -b 1`
         if [ $A -ge 5 ];then
           CC_OVERRIDE=`which gcc`
           echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS
