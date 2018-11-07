@@ -13,18 +13,26 @@ OPENSSL111_SIGS_NIST="rsa"
 
 CC_OVERRIDE=`which clang`
 if [ $? -eq 1 ] ; then
-    CC_OVERRIDE=`which gcc-7`
+  CC_OVERRIDE=`which gcc-7`
+  if [ $? -eq 1 ] ; then
+    CC_OVERRIDE=`which gcc-6`
     if [ $? -eq 1 ] ; then
-        CC_OVERRIDE=`which gcc-6`
-        if [ $? -eq 1 ] ; then
-            CC_OVERRIDE=`which gcc-5`
-            if [ $? -eq 1 ] ; then
-                echo "Need gcc >= 5 to build liboqs-nist"
-                exit 1
-            fi
+      CC_OVERRIDE=`which gcc-5`
+      if [ $? -eq 1 ] ; then
+        A=`gcc -dumpversion | cut -b 1`
+        if [ $A -ge 5 ];then
+          CC_OVERRIDE=`which gcc`
+          echo "Found gcc >= 5 to build liboqs-nist" 2>&1 | tee -a $LOGS
+        else
+          echo "Need gcc >= 5 to build liboqs-nist"  2>&1 | tee -a $LOGS
+          exit 1
         fi
+      fi
     fi
+  fi
 fi
+
+
 
 set -e
 
