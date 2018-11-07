@@ -44,31 +44,42 @@ echo "Cloning openssl"
 if [ ! -d "${BASEDIR}/openssl" ] ; then
     git clone https://github.com/open-quantum-safe/openssl "${BASEDIR}/openssl" >> $LOGS 2>&1
 fi
+
 cd "${BASEDIR}/openssl"
 git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
 
-rm -rf "${BASEDIR}/openssl-1_0_2-master"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_0_2-master"
-cd "${BASEDIR}/openssl-1_0_2-master"
+if [ ! -d "${BASEDIR}/openssl_1_1_1-stable" ] ; then
+	git clone -b OpenSSL_1_1_1-stable https://github.com/openssl/openssl.git "${BASEDIR}/openssl_1_1_1-stable" >> $LOGS 2>&1 
+fi
+
+cd "${BASEDIR}/openssl_1_1_1-stable"
+CFLAGS=-fPIC ./Configure shared --prefix="${BASEDIR}/install-openssl_1_1_1-stable" linux-x86_64 >> $LOGS 2>&1 
+make clean >> $LOGS 2>&1
+make -j >> $LOGS 2>&1
+make install >> $LOGS 2>&1
+
+rm -rf "${BASEDIR}/openssl_1_0_2-master"
+cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl_1_0_2-master"
+cd "${BASEDIR}/openssl_1_0_2-master"
 git checkout OQS-OpenSSL_1_0_2-stable >> $LOGS 2>&1
 git pull >> $LOGS 2>&1
 
-rm -rf "${BASEDIR}/openssl-1_0_2-nist"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_0_2-nist"
-cd "${BASEDIR}/openssl-1_0_2-nist"
+rm -rf "${BASEDIR}/openssl_1_0_2-nist"
+cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl_1_0_2-nist"
+cd "${BASEDIR}/openssl_1_0_2-nist"
 git checkout OQS-OpenSSL_1_0_2-stable >> $LOGS 2>&1
 git pull >> $LOGS 2>&1
 
-rm -rf "${BASEDIR}/openssl-1_1_1-master"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-master"
-cd "${BASEDIR}/openssl-1_1_1-master"
+rm -rf "${BASEDIR}/openssl_1_1_1-master"
+cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl_1_1_1-master"
+cd "${BASEDIR}/openssl_1_1_1-master"
 git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
 git pull >> $LOGS 2>&1
 
-rm -rf "${BASEDIR}/openssl-1_1_1-nist"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-nist"
-cd "${BASEDIR}/openssl-1_1_1-nist"
+rm -rf "${BASEDIR}/openssl_1_1_1-nist"
+cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl_1_1_1-nist"
+cd "${BASEDIR}/openssl_1_1_1-nist"
 git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
 git pull >> $LOGS 2>&1
 
@@ -85,16 +96,20 @@ git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
 git pull >> $LOGS 2>&1
 autoreconf -i >> $LOGS 2>&1
+
 case "$OSTYPE" in
-  darwin*)  OPENSSL_DIR=/usr/local/opt/openssl ;;
-  linux*)   OPENSSL_DIR=/usr ;;
+  darwin*)  export LD_LIBRARY_PATH=.:./oqs/lib   ;;
+  linux*)   export DYLD_LIBRARY_PATH=.:./oqs/lib ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
-./configure --prefix="${BASEDIR}/openssl-1_0_2-master/oqs" --enable-shared=no --enable-openssl --with-openssl-dir=${OPENSSL_DIR} >> $LOGS 2>&1
+
+OPENSSL_DIR="${BASEDIR}/install-openssl_1_1_1-stable"
+
+./configure --prefix="${BASEDIR}/openssl_1_0_2-master/oqs" --enable-openssl --with-openssl-dir=${OPENSSL_DIR} >> $LOGS 2>&1
 make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 make install >> $LOGS 2>&1
-./configure --prefix="${BASEDIR}/openssl-1_1_1-master/oqs" --enable-shared=no --enable-openssl --with-openssl-dir=${OPENSSL_DIR} >> $LOGS 2>&1
+./configure --prefix="${BASEDIR}/openssl_1_1_1-master/oqs" --enable-openssl --with-openssl-dir=${OPENSSL_DIR} >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 make install >> $LOGS 2>&1
 
@@ -111,20 +126,21 @@ git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
 git pull >> $LOGS 2>&1
 make clean >> $LOGS 2>&1
-make -j CC=${CC_OVERRIDE} >> $LOGS 2>&1
-make install-noshared PREFIX="${BASEDIR}/openssl-1_0_2-nist/oqs" >> $LOGS 2>&1
-make install-noshared PREFIX="${BASEDIR}/openssl-1_1_1-nist/oqs" >> $LOGS 2>&1
-
+make -j CC=${CC_OVERRIDE} OPENSSL_INCLUDE_DIR="${OPENSSL_DIR}/include" OPENSSL_LIB_DIR="${OPENSSL_DIR}/lib" >> $LOGS 2>&1
+make install PREFIX="${BASEDIR}/openssl_1_0_2-nist/oqs" >> $LOGS 2>&1
+make install PREFIX="${BASEDIR}/openssl_1_1_1-nist/oqs" >> $LOGS 2>&1
 echo "=============================="
 echo "Building OQS-OpenSSL_1_0_2-stable with liboqs-master"
-cd "${BASEDIR}/openssl-1_0_2-master"
+cd "${BASEDIR}/openssl_1_0_2-master"
 case "$OSTYPE" in
-  darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 >> $LOGS 2>&1 ;;
+  darwin*) CFLAGS=-fPIC  ./Configure shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
+  linux*)  CFLAGS=-fPIC  ./Configure shared linux-x86_64 >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
 make >> $LOGS 2>&1
+
+
 apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.cer -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
 for CIPHER in ${OPENSSL102_KEMS_MASTER} ; do
     echo "=============================="
@@ -141,10 +157,10 @@ done
 
 echo "=============================="
 echo "Building OQS-OpenSSL_1_0_2-stable with liboqs-nist"
-cd "${BASEDIR}/openssl-1_0_2-nist"
+cd "${BASEDIR}/openssl_1_0_2-nist"
 case "$OSTYPE" in
-  darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
+  darwin*)  CFLAGS=-fPIC ./Configure shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
+  linux*)   CFLAGS=-fPIC ./Configure shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
@@ -165,10 +181,10 @@ done
 
 echo "=============================="
 echo "Building OQS-OpenSSL_1_1_1-stable with liboqs-master"
-cd "${BASEDIR}/openssl-1_1_1-master"
+cd "${BASEDIR}/openssl_1_1_1-master"
 case "$OSTYPE" in
-  darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
+  darwin*)  CFLAGS=-fPIC ./Configure shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
+  linux*)   CFLAGS=-fPIC ./Configure shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
@@ -195,10 +211,10 @@ done
 
 echo "=============================="
 echo "Building OQS-OpenSSL_1_1_1-stable with liboqs-nist"
-cd "${BASEDIR}/openssl-1_1_1-nist"
+cd "${BASEDIR}/openssl_1_1_1-nist"
 case "$OSTYPE" in
-  darwin*)  ./Configure no-shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
-  linux*)   ./Configure no-shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
+  darwin*)  CFLAGS=-fPIC ./Configure shared darwin64-x86_64-cc >> $LOGS 2>&1 ;;
+  linux*)   CFLAGS=-fPIC ./Configure shared linux-x86_64 -lm >> $LOGS 2>&1 ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
@@ -223,6 +239,7 @@ for SIGALG in ${OPENSSL111_SIGS_NIST} ; do
     done
 done
 
+
 echo ""
 echo "=============================="
 echo "All tests completed successfully."
@@ -238,10 +255,10 @@ echo -n "    liboqs-nist "
 cd "${BASEDIR}/liboqs-nist"
 git log | head -n 1
 echo -n "    OQS-OpenSSL_1_0_2 "
-cd "${BASEDIR}/openssl-1_0_2-master"
+cd "${BASEDIR}/openssl_1_0_2-master"
 git log | head -n 1
 echo -n "    OQS-OpenSSL_1_1_1 "
-cd "${BASEDIR}/openssl-1_1_1-master"
+cd "${BASEDIR}/openssl_1_1_1-master"
 git log | head -n 1
 echo "    OPENSSL102_KEMS_MASTER=${OPENSSL102_KEMS_MASTER}"
 echo "    OPENSSL102_KEMS_NIST=${OPENSSL102_KEMS_NIST}"
@@ -249,3 +266,4 @@ echo "    OPENSSL111_KEMS_MASTER=${OPENSSL111_KEMS_MASTER}"
 echo "    OPENSSL111_SIGS_MASTER=${OPENSSL111_SIGS_MASTER}"
 echo "    OPENSSL111_KEMS_NIST=${OPENSSL111_KEMS_NIST}"
 echo "    OPENSSL111_SIGS_NIST=${OPENSSL111_SIGS_NIST}"
+
