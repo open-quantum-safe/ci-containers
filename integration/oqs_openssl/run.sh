@@ -62,7 +62,11 @@ if [ ! -d "${BASEDIR}/openssl_1_1_1-stable" ] ; then
 fi
 
 cd "${BASEDIR}/openssl_1_1_1-stable"
-CFLAGS=-fPIC ./Configure shared --prefix="${BASEDIR}/install-openssl_1_1_1-stable" linux-x86_64 >> $LOGS 2>&1 
+case "$OSTYPE" in
+  darwin*) CFLAGS=-fPIC  ./Configure shared --prefix="${BASEDIR}/install-openssl_1_1_1-stable" darwin64-x86_64-cc >> $LOGS 2>&1 ;;
+  linux*)  CFLAGS=-fPIC  ./Configure shared --prefix="${BASEDIR}/install-openssl_1_1_1-stable" linux-x86_64 >> $LOGS 2>&1 ;;
+  *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
+esac
 make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 make install >> $LOGS 2>&1
@@ -106,8 +110,8 @@ git pull >> $LOGS 2>&1
 autoreconf -i >> $LOGS 2>&1
 
 case "$OSTYPE" in
-  darwin*)  export LD_LIBRARY_PATH=.:./oqs/lib   ;;
-  linux*)   export DYLD_LIBRARY_PATH=.:./oqs/lib ;;
+  darwin*)  export DYLD_LIBRARY_PATH=.:./oqs/lib   ;;
+  linux*)   export LD_LIBRARY_PATH=.:./oqs/lib ;;
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 
@@ -137,6 +141,8 @@ make clean >> $LOGS 2>&1
 make -j CC=${CC_OVERRIDE} OPENSSL_INCLUDE_DIR="${OPENSSL_DIR}/include" OPENSSL_LIB_DIR="${OPENSSL_DIR}/lib" >> $LOGS 2>&1
 make install PREFIX="${BASEDIR}/openssl_1_0_2-nist/oqs" >> $LOGS 2>&1
 make install PREFIX="${BASEDIR}/openssl_1_1_1-nist/oqs" >> $LOGS 2>&1
+
+
 echo "=============================="
 echo "Building OQS-OpenSSL_1_0_2-stable with liboqs-master"
 cd "${BASEDIR}/openssl_1_0_2-master"
@@ -146,8 +152,7 @@ case "$OSTYPE" in
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
-make >> $LOGS 2>&1
-
+make -j >> $LOGS 2>&1
 
 apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.cer -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
 for CIPHER in ${OPENSSL102_KEMS_MASTER} ; do
@@ -172,7 +177,8 @@ case "$OSTYPE" in
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 make clean >> $LOGS 2>&1
-make >> $LOGS 2>&1
+make -j >> $LOGS 2>&1
+
 apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.cer -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
 for CIPHER in ${OPENSSL102_KEMS_NIST} ; do
     echo "=============================="
@@ -197,6 +203,7 @@ case "$OSTYPE" in
 esac
 make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
+
 for SIGALG in ${OPENSSL111_SIGS_MASTER} ; do
     if [ "${SIGALG}" == "ecdsa" ] ; then
         apps/openssl req -x509 -new -newkey ec:<(apps/openssl ecparam -name secp384r1) -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
@@ -227,6 +234,7 @@ case "$OSTYPE" in
 esac
 make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
+
 for SIGALG in ${OPENSSL111_SIGS_NIST} ; do
     if [ "${SIGALG}" == "ecdsa" ] ; then
         apps/openssl req -x509 -new -newkey ec:<(apps/openssl ecparam -name secp384r1) -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
