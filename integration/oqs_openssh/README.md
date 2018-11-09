@@ -17,7 +17,7 @@ Running
 
 First make sure you have **installed the dependencies** as indicated in the [top-level testing README](https://github.com/open-quantum-safe/testing/blob/master/README.md).
 
-Before running the script on Linux, please do the following:
+Before running the script on Linux, you may need to create directories and users for OpenSSH privilege separation.  (On some Linux installations this will already exist, on others you may need to create it.)  Please try the following:
 
 1. Create the privilege separation directory:
 
