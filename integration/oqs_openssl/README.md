@@ -25,6 +25,10 @@ Then run:
 	cd testing/integration/oqs_openssl
 	./run.sh 2>/dev/null
 
-A file named 'logs' is created under the `tmp` direcory showing detailed output not shown in stdout or stderr for debugging purposes.  
+A file named 'logs' is created under the `tmp` directory showing detailed output not shown in stdout or stderr for debugging purposes.
+
+Alternatively, to log the run.sh output while following live, try:
+
+    ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`
 
 OQS developers should record their test results on the OQS [test coverage wiki page](https://github.com/open-quantum-safe/testing/wiki/Configurations-test-coverage).
