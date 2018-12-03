@@ -1,0 +1,89 @@
+language: c
+
+before_install:
+  - pwd
+  - sudo mkdir -p -m 0755 /var/empty
+
+addons:
+  apt:
+    update: true
+    packages:
+    - autoconf
+    - automake
+    - libtool
+    - libssl-dev
+    - make
+    - unzip
+    - xsltproc
+
+matrix:
+  include:
+  - os: linux
+    dist: xenial
+    sudo: required
+    addons:
+      apt:
+        packages:
+        - gcc
+  - os: linux
+    dist: xenial
+    sudo: required
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-7
+  - os: linux
+    dist: xenial
+    sudo: required
+    addons:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-8
+  - os: linux
+    dist: trusty
+    sudo: required
+    addons:
+      apt:
+        sources:
+        - gcc
+  - os: linux
+    dist: trusty
+    sudo: required
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-7
+  - os: linux
+    dist: trusty
+    sudo: required
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-8
+  - os: osx
+    compiler: clang
+    before_install:
+      - brew install doxygen
+    env:
+      - ARCH=x64
+      - CC_OVERRIDE=clang
+
+script:
+  - pwd
+  - echo "Using GGC  version:"
+  - gcc --version
+  - echo Running openssh-portable integration tests...
+  - cd integration/oqs_openssh
+  - ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
+  - cd ..
+  - echo
+  - echo Running openssl integration tests...
+  - cd oqs_openssl
+  - ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`
