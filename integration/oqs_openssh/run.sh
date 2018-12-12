@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 OKAY=1
 
 run_ssh_sshd() {
