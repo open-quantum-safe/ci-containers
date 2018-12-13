@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 OPENSSL102_KEMS_MASTER="OQSKEM-DEFAULT OQSKEM-DEFAULT-ECDHE"
 OPENSSL102_KEMS_NIST="OQSKEM-DEFAULT OQSKEM-DEFAULT-ECDHE"
 OPENSSL111_KEMS_MASTER="oqs_kem_default bike1l1 bike1l3 bike1l5 bike2l1 bike2l3 bike2l5 bike3l1 bike3l3 bike3l5 frodo640aes frodo640cshake frodo976aes frodo976cshake newhope512cca newhope1024cca sidh503 sidh751 sike503 sike751"
