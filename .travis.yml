@@ -70,10 +70,13 @@ matrix:
         - gcc-8
   - os: osx
     compiler: clang
+    install:
+    - export PATH="/usr/local/opt/ccache/libexec:$PATH"
     addons:
       homebrew:
         packages:
         - doxygen
+        - ccache
         update: false
     env:
       - ARCH=x64
