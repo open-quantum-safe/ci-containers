@@ -110,6 +110,8 @@ BASEDIR=`pwd`
 DATE=`date '+%Y-%m-%d-%H%M%S'`
 LOGS="${BASEDIR}/log-${DATE}.txt"
 HOST=`hostname`
+
+set +e
 CC_OVERRIDE=`which clang`
 
 if [ $? -eq 1 ] ; then
@@ -132,7 +134,7 @@ if [ $? -eq 1 ] ; then
   fi
 fi
 
-
+set -e
 echo "To follow along with the testing process:" 2>&1 | tee -a $LOGS
 echo "   tail -f ${LOGS}" 2>&1 | tee -a $LOGS
 echo ""

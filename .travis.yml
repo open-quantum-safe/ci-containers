@@ -1,4 +1,5 @@
 language: c
+cache: ccache
 
 before_install:
   - pwd
@@ -84,9 +85,9 @@ script:
   - gcc --version
   - echo Running openssh-portable integration tests...
   - cd integration/oqs_openssh
-  - ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
+  - ./run.sh
   - cd ..
   - echo
   - echo Running openssl integration tests...
   - cd oqs_openssl
-  - ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`
+  - ./run.sh
