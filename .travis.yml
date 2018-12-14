@@ -69,8 +69,11 @@ matrix:
         - gcc-8
   - os: osx
     compiler: clang
-    before_install:
-      - brew install doxygen
+    addons:
+      homebrew:
+        packages:
+        - doxygen
+        update: false
     env:
       - ARCH=x64
       - CC_OVERRIDE=clang
