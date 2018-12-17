@@ -88,9 +88,9 @@ script:
   - gcc --version
   - echo Running openssh-portable integration tests...
   - cd integration/oqs_openssh
-  - ./run.sh
+  - ./run.sh || travis_terminate 50;
   - cd ..
   - echo
   - echo Running openssl integration tests...
   - cd oqs_openssl
-  - ./run.sh
+  - ./run.sh  || travis_terminate 70;
