@@ -11,6 +11,15 @@ OPENSSL111_KEMS_NIST+=" kyber512 kyber768 kyber1024 ledakem_C1_N02 ledakem_C1_N0
 OPENSSL111_KEMS_NIST+=" p256-kyber512 p256-ledakem_C1_N02 p256-ledakem_C1_N04 " # FIXMEOQS p256-ledakem_C1_N03 failing on Ubuntu 14.04
 OPENSSL111_SIGS_NIST="rsa"
 
+LIBOQS_MASTER_REPO="https://github.com/open-quantum-safe/liboqs.git"
+LIBOQS_MASTER_BRANCH="master"
+LIBOQS_NIST_BRANCH_REPO="https://github.com/open-quantum-safe/liboqs.git"
+LIBOQS_NIST_BRANCH_BRANCH="nist-branch"
+OPENSSL_102_REPO="https://github.com/open-quantum-safe/openssl.git"
+OPENSSL_102_BRANCH="OQS-OpenSSL_1_0_2-stable"
+OPENSSL_111_REPO="https://github.com/open-quantum-safe/openssl.git"
+OPENSSL_111_BRANCH="OQS-OpenSSL_1_1_1-stable"
+
 CC_OVERRIDE=`which clang`
 if [ $? -eq 1 ] ; then
   CC_OVERRIDE=`which gcc-7`
@@ -32,8 +41,6 @@ if [ $? -eq 1 ] ; then
   fi
 fi
 
-
-
 set -e
 
 mkdir -p tmp
@@ -50,48 +57,32 @@ echo ""
 echo "=============================="
 echo "Cloning openssl"
 if [ ! -d "${BASEDIR}/openssl" ] ; then
-    git clone https://github.com/open-quantum-safe/openssl "${BASEDIR}/openssl" >> $LOGS 2>&1
+    git clone --branch OpenSSL_1_1_1a --single-branch https://github.com/openssl/openssl.git "${BASEDIR}/openssl" >> $LOGS 2>&1
 fi
 cd "${BASEDIR}/openssl"
 git clean -d -f -x >> $LOGS 2>&1
 git checkout -- . >> $LOGS 2>&1
 
 rm -rf "${BASEDIR}/openssl-1_0_2-master"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_0_2-master"
-cd "${BASEDIR}/openssl-1_0_2-master"
-git checkout OQS-OpenSSL_1_0_2-stable >> $LOGS 2>&1
-git pull >> $LOGS 2>&1
+git clone --branch ${OPENSSL_102_BRANCH} --single-branch ${OPENSSL_102_REPO} "${BASEDIR}/openssl-1_0_2-master" >> $LOGS 2>&1
 
 rm -rf "${BASEDIR}/openssl-1_0_2-nist"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_0_2-nist"
-cd "${BASEDIR}/openssl-1_0_2-nist"
-git checkout OQS-OpenSSL_1_0_2-stable >> $LOGS 2>&1
-git pull >> $LOGS 2>&1
+cp -pr "${BASEDIR}/openssl-1_0_2-master" "${BASEDIR}/openssl-1_0_2-nist"
 
 rm -rf "${BASEDIR}/openssl-1_1_1-master"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-master"
-cd "${BASEDIR}/openssl-1_1_1-master"
-git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
-git pull >> $LOGS 2>&1
+git clone --branch ${OPENSSL_111_BRANCH} --single-branch ${OPENSSL_111_REPO} "${BASEDIR}/openssl-1_1_1-master" >> $LOGS 2>&1
 
 rm -rf "${BASEDIR}/openssl-1_1_1-nist"
-cp -pr "${BASEDIR}/openssl" "${BASEDIR}/openssl-1_1_1-nist"
-cd "${BASEDIR}/openssl-1_1_1-nist"
-git checkout OQS-OpenSSL_1_1_1-stable >> $LOGS 2>&1
-git pull >> $LOGS 2>&1
+cp -pr "${BASEDIR}/openssl-1_1_1-master" "${BASEDIR}/openssl-1_1_1-nist"
 
 echo "=============================="
 echo "Cloning liboqs-master"
-if [ ! -d "${BASEDIR}/liboqs-master" ] ; then
-    git clone --branch master https://github.com/open-quantum-safe/liboqs.git "${BASEDIR}/liboqs-master" >> $LOGS 2>&1
-fi
+rm -rf "${BASEDIR}/liboqs-master"
+git clone --branch ${LIBOQS_MASTER_BRANCH} --single-branch ${LIBOQS_MASTER_REPO} "${BASEDIR}/liboqs-master" >> $LOGS 2>&1
 
 echo "=============================="
 echo "Building liboqs-master"
 cd "${BASEDIR}/liboqs-master"
-git clean -d -f -x >> $LOGS 2>&1
-git checkout -- . >> $LOGS 2>&1
-git pull >> $LOGS 2>&1
 autoreconf -i >> $LOGS 2>&1
 case "$OSTYPE" in
   darwin*)  OPENSSL_DIR=/usr/local/opt/openssl ;;
@@ -108,16 +99,12 @@ make install >> $LOGS 2>&1
 
 echo "=============================="
 echo "Cloning liboqs-nist"
-if [ ! -d "${BASEDIR}/liboqs-nist" ] ; then
-    git clone --branch nist-branch https://github.com/open-quantum-safe/liboqs.git "${BASEDIR}/liboqs-nist" >> $LOGS 2>&1
-fi
+rm -rf "${BASEDIR}/liboqs-nist"
+git clone --branch ${LIBOQS_NIST_BRANCH_BRANCH} --single-branch ${LIBOQS_NIST_BRANCH_REPO} "${BASEDIR}/liboqs-nist" >> $LOGS 2>&1
 
 echo "=============================="
 echo "Building liboqs-nist"
 cd "${BASEDIR}/liboqs-nist"
-git clean -d -f -x >> $LOGS 2>&1
-git checkout -- . >> $LOGS 2>&1
-git pull >> $LOGS 2>&1
 make clean >> $LOGS 2>&1
 make -j CC=${CC_OVERRIDE} >> $LOGS 2>&1
 make install-noshared PREFIX="${BASEDIR}/openssl-1_0_2-nist/oqs" >> $LOGS 2>&1
@@ -239,16 +226,16 @@ echo "    DATE: ${DATE}"
 echo "    OSTYPE: ${OSTYPE}"
 echo -n "    Compiler: ${CC_OVERRIDE} "
 ${CC_OVERRIDE} --version | head -n 1
-echo -n "    liboqs-master "
+echo -n "    liboqs-master (${LIBOQS_MASTER_REPO} ${LIBOQS_MASTER_BRANCH}) "
 cd "${BASEDIR}/liboqs-master"
 git log | head -n 1
-echo -n "    liboqs-nist "
+echo -n "    liboqs-nist (${LIBOQS_NIST_BRANCH_REPO} ${LIBOQS_NIST_BRANCH_BRANCH}) "
 cd "${BASEDIR}/liboqs-nist"
 git log | head -n 1
-echo -n "    OQS-OpenSSL_1_0_2 "
+echo -n "    OQS-OpenSSL_1_0_2 (${OPENSSL_102_REPO} ${OPENSSL_102_BRANCH}) "
 cd "${BASEDIR}/openssl-1_0_2-master"
 git log | head -n 1
-echo -n "    OQS-OpenSSL_1_1_1 "
+echo -n "    OQS-OpenSSL_1_1_1 (${OPENSSL_111_REPO} ${OPENSSL_111_BRANCH}) "
 cd "${BASEDIR}/openssl-1_1_1-master"
 git log | head -n 1
 echo "    OPENSSL102_KEMS_MASTER=${OPENSSL102_KEMS_MASTER}"
