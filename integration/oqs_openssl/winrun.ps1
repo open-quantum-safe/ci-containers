@@ -168,7 +168,7 @@ if ($test_openssl_1_1_1) {
 
     #run tests
     Write-Host "Redirecting stdout/stderr to $openssl111_path\client_std(out/err)_KEXALG_SIGALG.txt"
-    ForEach ($sigalg in 'rsa', 'picnicl1fs') {
+    ForEach ($sigalg in 'rsa', 'picnicl1fs', 'rsa3072_picnicl1fs', 'p256_picnicl1fs') {
         Write-Host "Generating $sigalg key"
         Start-Process -FilePath "$openssl111_path\apps\openssl.exe" -WorkingDirectory "$openssl111_path\" -WindowStyle Hidden -ArgumentList "req -x509 -new -newkey $sigalg -keyout $sigalg.key -out $sigalg.crt -nodes -subj `"/CN=oqstest`" -days 365 -config apps\openssl.cnf"
         Write-Host "Starting server with $sigalg cert"
