@@ -49,6 +49,7 @@ cd tmp
 BASEDIR=`pwd`
 DATE=`date '+%Y-%m-%d-%H%M%S'`
 LOGS="${BASEDIR}/log-${DATE}.txt"
+PORT=23567
 
 echo "To follow along with the testing process:"
 echo "   tail -f ${LOGS}"
@@ -125,13 +126,14 @@ for CIPHER in ${OPENSSL102_KEMS_MASTER} ; do
     echo "=============================="
     pwd | sed -e 's/.*\///'
     echo "${CIPHER}"
-    apps/openssl s_server -cert rsa.cer -key rsa.key -tls1_2 -www >> $LOGS 2>&1 &
+    apps/openssl s_server -cert rsa.cer -key rsa.key -tls1_2 -www -accept ${PORT} >> $LOGS 2>&1 &
     sleep 1
     SERVER_PID=$!
-    echo "GET /" | apps/openssl s_client -cipher "${CIPHER}" > s_client.out 2>/dev/null
+    echo "GET /" | apps/openssl s_client -cipher "${CIPHER}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
     cat s_client.out | grep "Cipher is" | grep "${CIPHER}" > /dev/null
     kill ${SERVER_PID}
     echo "Success"
+    PORT=$((${PORT} + 1))
 done
 
 echo "=============================="
@@ -149,13 +151,14 @@ for CIPHER in ${OPENSSL102_KEMS_NIST} ; do
     echo "=============================="
     pwd | sed -e 's/.*\///'
     echo "${CIPHER}"
-    apps/openssl s_server -cert rsa.cer -key rsa.key -tls1_2 -www >> $LOGS 2>&1 &
+    apps/openssl s_server -cert rsa.cer -key rsa.key -tls1_2 -www -accept ${PORT} >> $LOGS 2>&1 &
     sleep 1
     SERVER_PID=$!
-    echo "GET /" | apps/openssl s_client -cipher "${CIPHER}" > s_client.out 2>/dev/null
+    echo "GET /" | apps/openssl s_client -cipher "${CIPHER}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
     cat s_client.out | grep "Cipher is" | grep "${CIPHER}" > /dev/null
     kill ${SERVER_PID}
     echo "Success"
+    PORT=$((${PORT} + 1))
 done
 
 echo "=============================="
@@ -178,13 +181,14 @@ for SIGALG in ${OPENSSL111_SIGS_MASTER} ; do
         echo "=============================="
         pwd | sed -e 's/.*\///'
         echo "sig=${SIGALG},kex=${KEXALG}"
-        apps/openssl s_server -cert ${SIGALG}.cer -key ${SIGALG}.key -tls1_3 -www >> $LOGS 2>&1 &
+        apps/openssl s_server -cert ${SIGALG}.cer -key ${SIGALG}.key -tls1_3 -www -accept ${PORT} >> $LOGS 2>&1 &
         sleep 1
         SERVER_PID=$!
-        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" > s_client.out 2>/dev/null
+        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
         cat s_client.out | grep "Server Temp Key" | grep "${KEXALG}" > /dev/null
         kill ${SERVER_PID}
         echo "Success"
+        PORT=$((${PORT} + 1))
     done
 done
 
@@ -208,13 +212,14 @@ for SIGALG in ${OPENSSL111_SIGS_NIST} ; do
         echo "=============================="
         pwd | sed -e 's/.*\///'
         echo "sig=${SIGALG},kex=${KEXALG}"
-        apps/openssl s_server -cert ${SIGALG}.cer -key ${SIGALG}.key -tls1_3 -www >> $LOGS 2>&1 &
+        apps/openssl s_server -cert ${SIGALG}.cer -key ${SIGALG}.key -tls1_3 -www -accept ${PORT} >> $LOGS 2>&1 &
         sleep 1
         SERVER_PID=$!
-        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" > s_client.out 2>/dev/null
+        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
         cat s_client.out | grep "Server Temp Key" | grep "${KEXALG}" > /dev/null
         kill ${SERVER_PID}
         echo "Success"
+        PORT=$((${PORT} + 1))
     done
 done
 
