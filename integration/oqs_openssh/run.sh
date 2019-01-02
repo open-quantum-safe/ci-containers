@@ -1,5 +1,12 @@
 #!/bin/bash
 
+LIBOQS_MASTER_REPO="https://github.com/open-quantum-safe/liboqs.git"
+LIBOQS_MASTER_BRANCH="master"
+LIBOQS_NIST_BRANCH_REPO="https://github.com/open-quantum-safe/liboqs.git"
+LIBOQS_NIST_BRANCH_BRANCH="nist-branch"
+OPENSSH_REPO="https://github.com/open-quantum-safe/openssh-portable.git"
+OPENSSH_BRANCH="OQS-master"
+
 OKAY=1
 
 run_ssh_sshd() {
@@ -145,19 +152,19 @@ fi
 echo "==============================" 2>&1 | tee -a $LOGS
 echo "Cloning liboqs-master" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/liboqs-master" ] ; then
-    git clone --branch master https://github.com/open-quantum-safe/liboqs.git "${BASEDIR}/liboqs-master" >> $LOGS 2>&1
+    git clone --branch ${LIBOQS_MASTER_BRANCH} --single-branch ${LIBOQS_MASTER_REPO} "${BASEDIR}/liboqs-master" >> $LOGS 2>&1
 fi
 
 echo "==============================" 2>&1 | tee -a $LOGS
 echo "Cloning liboqs-nist" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/liboqs-nist" ] ; then
-    git clone --branch nist-branch https://github.com/open-quantum-safe/liboqs.git "${BASEDIR}/liboqs-nist" >> $LOGS 2>&1
+    git clone --branch ${LIBOQS_NIST_BRANCH_BRANCH} --single-branch ${LIBOQS_NIST_BRANCH_REPO} "${BASEDIR}/liboqs-nist" >> $LOGS 2>&1
 fi
 
 echo "==============================" 2>&1 | tee -a $LOGS
 echo "Cloning OpenSSH OQS-master" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/openssh-portable" ] ; then
-    git clone --branch OQS-master https://github.com/open-quantum-safe/openssh-portable.git  >> $LOGS 2>&1
+    git clone --branch ${OPENSSH_BRANCH} --single-branch ${OPENSSH_REPO} >> $LOGS 2>&1
 fi
 
 rm -rf ${BASEDIR}/install
