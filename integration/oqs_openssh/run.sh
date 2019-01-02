@@ -162,7 +162,7 @@ if [ ! -d "${BASEDIR}/liboqs-nist" ] ; then
 fi
 
 echo "==============================" 2>&1 | tee -a $LOGS
-echo "Cloning OpenSSH OQS-master" 2>&1 | tee -a $LOGS
+echo "Cloning OpenSSH" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/openssh-portable" ] ; then
     git clone --branch ${OPENSSH_BRANCH} --single-branch ${OPENSSH_REPO} >> $LOGS 2>&1
 fi
@@ -174,8 +174,8 @@ build_openssh-portable $LOGS
 generate_keys $LOGS
 
 echo 2>&1 | tee -a $LOGS
-echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable (OQS-master) " 2>&1 | tee -a $LOGS
-echo "=============================================================================================" 2>&1 | tee -a $LOGS
+echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable" 2>&1 | tee -a $LOGS
+echo "===============================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
 restore_keys
@@ -186,8 +186,8 @@ build_liboqs_nist $LOGS
 build_openssh-portable $LOGS
 generate_keys $LOGS
 
-echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable (OQS-master) " 2>&1 | tee -a $LOGS
-echo "=============================================================================================" 2>&1 | tee -a $LOGS
+echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable" 2>&1 | tee -a $LOGS
+echo "=============================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
 restore_keys
@@ -204,14 +204,17 @@ echo "    DATE: ${DATE}"
 echo "    OSTYPE: ${OSTYPE}"
 echo -n "    Compiler: ${CC_OVERRIDE} "
 ${CC_OVERRIDE} --version | head -n 1
-echo -n "    liboqs-master "
+echo -n "    liboqs-master (${LIBOQS_MASTER_REPO} ${LIBOQS_MASTER_BRANCH}) "
 cd "${BASEDIR}/liboqs-master"
 git log | head -n 1
-echo -n "    liboqs-nist "
+echo -n "    liboqs-nist (${LIBOQS_NIST_BRANCH_REPO} ${LIBOQS_NIST_BRANCH_BRANCH}) "
 cd "${BASEDIR}/liboqs-nist"
 git log | head -n 1
 echo -n "    OpenSSL "
 cd "${BASEDIR}/openssl"
+git log | head -n 1
+echo -n "    OpenSSH (${OPENSSH_REPO} ${OPENSSH_BRANCH}) "
+cd "${BASEDIR}/openssh-portable"
 git log | head -n 1
 echo "    PQKEX=${PQKEX}"
 echo "    HKEX=${HKEX}"
