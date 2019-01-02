@@ -146,7 +146,7 @@ echo ""
 echo "==============================" 2>&1 | tee -a $LOGS
 echo "Cloning OpenSSL 1.0.2" 2>&1 | tee -a $LOGS
 if [ ! -d "${BASEDIR}/openssl" ] ; then
-    git clone -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git >> $LOGS 2>&1
+    git clone --branch OpenSSL_1_0_2-stable --single-branch https://github.com/openssl/openssl.git >> $LOGS 2>&1
 fi
 
 echo "==============================" 2>&1 | tee -a $LOGS
