@@ -143,7 +143,7 @@ $failures111 = "OpenSSL_1_1_1: "
 
 if ($test_openssl_1_1_1) {
     #download and build openssl 1.1.1
-    if ($download_and_build_openssl_1_0_2 -eq 1) {
+    if ($download_and_build_openssl_1_1_1 -eq 1) {
         Write-Host "Downloading OpenSSL 1.1.1"
         $wc.DownloadFile($openssl111_url, $openssl111_zip)
         if ($LASTEXITCODE -eq 1) {
