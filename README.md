@@ -40,6 +40,10 @@ On Ubuntu 14.04, you need to also:
 
 	brew install autoconf automake libtool openssl wget
 
+**Windows**
+
+[Visual Studio](https://visualstudio.microsoft.com/vs/) and [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-6) must be installed.
+
 License
 -------
 
@@ -55,6 +59,7 @@ The Open Quantum Safe project is led by [Douglas Stebila](https://www.douglas.st
 Contributors to this testing repository include:
 
 - Shravan Mishra (University of Waterloo)
+- Christian Paquin (Microsoft Research)
 - Douglas Stebila (University of Waterloo)
 
 ### Support
