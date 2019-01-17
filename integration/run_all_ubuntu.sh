@@ -1,4 +1,18 @@
 # Configuration to bootstrap Ubuntu Xenial VM for liboqs integration testing
+#
+# Usage:
+# $ cd <your-working-dir>
+# $ git clone git@github.com:open-quantum-safe/testing.git
+# $ cd testing/integration
+# $ bash run_all_ubuntu.sh
+#
+# To disable the OpenSSH or OpenSSL tests from being executed, create an empty
+# flag file to instruct the script to ignore specific tests:
+#
+# $ cd <your-working-dir>/testing/integration
+# $ touch DISABLE_OPENSSH_TESTS
+# # or
+# $ touch DISABLE_OPENSSL_TESTS
 
 set -e
 
