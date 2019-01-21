@@ -11,27 +11,23 @@ OQS developers should record their test results on the OQS [test coverage wiki p
 
 Integration testing has been added for [Travis CI/build system](https://travis-ci.org/open-quantum-safe/testing).
 
-Quick Start
------------
+Quick Start on Ubuntu
+---------------------
 
 A "quick start" script is provided for Ubuntu VMs. This is intended for use in testing VMs as the script makes changes the PS1 command line prompt and other OS settings. The script automates the installation of dependencies and user/group changes, then runs the OpenSSH and OpenSSL integration test suites.
 
 To use:
-```
-cd <your-working-dir>
-git clone git@github.com:open-quantum-safe/testing.git
-cd testing/integration
-bash run_all_ubuntu.sh
-```
+
+	git clone git@github.com:open-quantum-safe/testing.git
+	cd testing/integration
+	bash run_all_ubuntu.sh
 
 To disable either the OpenSSH or OpenSSL tests from being executed, simply create an empty flag file to instruct the script to ignore specific tests:
-```
-cd <your-working-dir>/testing/integration
-touch DISABLE_OPENSSH_TESTS
-# or
-touch DISABLE_OPENSSL_TESTS
-```
 
+	cd testing/integration
+	touch DISABLE_OPENSSH_TESTS
+	# or
+	touch DISABLE_OPENSSL_TESTS
 
 Dependencies
 ------------
