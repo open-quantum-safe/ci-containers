@@ -80,6 +80,19 @@ build_openssh-portable() {
 	make install >> $1 2>&1
 }
 
+build_openssh-portable_without_openssl() {
+	echo "==============================" 2>&1 | tee -a $1
+	echo "Building openssh-portable without OpenSSL" 2>&1 | tee -a $1
+	cd ${BASEDIR}/openssh-portable
+	git clean -d -f -x >> $1 2>&1
+	git checkout -- . >> $1 2>&1
+	autoreconf -i >> $1 2>&1
+	./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex --with-ldflags="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-libs=-lm --without-openssl --with-liboqs-dir="${BASEDIR}/install" --with-cflags=-I${BASEDIR}/install/include --sysconfdir="${BASEDIR}/install"  >> $1 2>&1
+	make clean >> $1 2>&1
+	make -j  >> $1 2>&1
+	make install >> $1 2>&1
+}
+
 backup_keys() {
   if [ -d $HOME/.ssh/ ];then
     if [ ! -d $HOME/.ssh_oqs_bkup/ ];then
@@ -176,6 +189,19 @@ generate_keys $LOGS
 echo 2>&1 | tee -a $LOGS
 echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable" 2>&1 | tee -a $LOGS
 echo "===============================================================================" 2>&1 | tee -a $LOGS
+run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
+run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+restore_keys
+
+rm -rf ${BASEDIR}/install
+build_openssl $LOGS
+build_liboqs_master $LOGS
+build_openssh-portable_without_openssl $LOGS
+generate_keys $LOGS
+
+echo 2>&1 | tee -a $LOGS
+echo "Combination being tested: liboqs-master using OpenSSL_1_0_2-stable, openssh-portable without OpenSSL" 2>&1 | tee -a $LOGS
+echo "====================================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
 restore_keys
