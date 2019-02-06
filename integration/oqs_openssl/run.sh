@@ -121,12 +121,12 @@ case "$OSTYPE" in
 esac
 make clean >> $LOGS 2>&1
 make >> $LOGS 2>&1
-apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.cer -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
+apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.crt -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
 for CIPHER in ${OPENSSL102_KEMS_MASTER} ; do
     echo "=============================="
     pwd | sed -e 's/.*\///'
     echo "${CIPHER}"
-    apps/openssl s_server -cert rsa.cer -key rsa.key -tls1_2 -www -accept ${PORT} >> $LOGS 2>&1 &
+    apps/openssl s_server -cert rsa.crt -key rsa.key -tls1_2 -www -accept ${PORT} >> $LOGS 2>&1 &
     sleep 1
     SERVER_PID=$!
     echo "GET /" | apps/openssl s_client -cipher "${CIPHER}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
@@ -146,12 +146,12 @@ case "$OSTYPE" in
 esac
 make clean >> $LOGS 2>&1
 make >> $LOGS 2>&1
-apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.cer -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
+apps/openssl req -x509 -new -newkey rsa:2048 -keyout rsa.key -nodes -out rsa.crt -sha256 -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
 for CIPHER in ${OPENSSL102_KEMS_NIST} ; do
     echo "=============================="
     pwd | sed -e 's/.*\///'
     echo "${CIPHER}"
-    apps/openssl s_server -cert rsa.cer -key rsa.key -tls1_2 -www -accept ${PORT} >> $LOGS 2>&1 &
+    apps/openssl s_server -cert rsa.crt -key rsa.key -tls1_2 -www -accept ${PORT} >> $LOGS 2>&1 &
     sleep 1
     SERVER_PID=$!
     echo "GET /" | apps/openssl s_client -cipher "${CIPHER}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
@@ -173,18 +173,22 @@ make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 for SIGALG in ${OPENSSL111_SIGS_MASTER} ; do
     if [ "${SIGALG}" == "ecdsa" ] ; then
-        apps/openssl req -x509 -new -newkey ec:<(apps/openssl ecparam -name secp384r1) -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
+		apps/openssl req -x509 -new -newkey ec:<(apps/openssl ecparam -name secp384r1) -keyout ${SIGALG}_CA.key -out ${SIGALG}_CA.crt -nodes -subj "/CN=oqstest CA" -days 365 -config apps/openssl.cnf >> $LOGS 2>$1
+		apps/openssl genpkey -algorithm ec -pkeyopt ec_paramgen_curve:secp384r1 -out ${SIGALG}_srv.key >> $LOGS 2>$1
     else
-        apps/openssl req -x509 -new -newkey ${SIGALG} -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
+		apps/openssl req -x509 -new -newkey ${SIGALG} -keyout ${SIGALG}_CA.key -out ${SIGALG}_CA.crt -nodes -subj '/CN=oqstest CA' -days 365 -config apps/openssl.cnf >> $LOGS 2>&1
+		apps/openssl genpkey -algorithm ${SIGALG} -out ${SIGALG}_srv.key >> $LOGS 2>$1
     fi
+	apps/openssl req -new -newkey ${SIGALG} -keyout ${SIGALG}_srv.key -out ${SIGALG}_srv.csr -nodes -subj "/CN=oqstest server" -config apps/openssl.cnf >> $LOGS 2>$1
+	apps/openssl x509 -req -in ${SIGALG}_srv.csr -out ${SIGALG}_srv.crt -CA ${SIGALG}_CA.crt -CAkey ${SIGALG}_CA.key -CAcreateserial -days 365 >> $LOGS 2>$1
     for KEXALG in ${OPENSSL111_KEMS_MASTER} ; do
         echo "=============================="
         pwd | sed -e 's/.*\///'
         echo "sig=${SIGALG},kex=${KEXALG}"
-        apps/openssl s_server -cert ${SIGALG}.cer -key ${SIGALG}.key -tls1_3 -www -accept ${PORT} >> $LOGS 2>&1 &
+        apps/openssl s_server -cert ${SIGALG}_srv.crt -key ${SIGALG}_srv.key -CAfile ${SIGALG}_CA.crt -tls1_3 -www -accept ${PORT} >> $LOGS 2>&1 &
         sleep 1
         SERVER_PID=$!
-        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
+        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" -CAfile ${SIGALG}_CA.crt -connect "localhost:${PORT}" > s_client.out 2>/dev/null
         cat s_client.out | grep "Server Temp Key" | grep "${KEXALG}" > /dev/null
         kill ${SERVER_PID}
         echo "Success"
@@ -203,19 +207,23 @@ esac
 make clean >> $LOGS 2>&1
 make -j >> $LOGS 2>&1
 for SIGALG in ${OPENSSL111_SIGS_NIST} ; do
-    if [ "${SIGALG}" == "ecdsa" ] ; then
-        apps/openssl req -x509 -new -newkey ec:<(apps/openssl ecparam -name secp384r1) -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
+	if [ "${SIGALG}" == "ecdsa" ] ; then
+		apps/openssl req -x509 -new -newkey ec:<(apps/openssl ecparam -name secp384r1) -keyout ${SIGALG}_CA.key -out ${SIGALG}_CA.crt -nodes -subj "/CN=oqstest CA" -days 365 -config apps/openssl.cnf >> $LOGS 2>$1
+		apps/openssl genpkey -algorithm ec -pkeyopt ec_paramgen_curve:secp384r1 -out ${SIGALG}_srv.key >> $LOGS 2>$1
     else
-        apps/openssl req -x509 -new -newkey ${SIGALG} -keyout ${SIGALG}.key -nodes -out ${SIGALG}.cer -days 365 -subj '/CN=oqstest' -config apps/openssl.cnf >> $LOGS 2>&1
+		apps/openssl req -x509 -new -newkey ${SIGALG} -keyout ${SIGALG}_CA.key -out ${SIGALG}_CA.crt -nodes -subj '/CN=oqstest CA' -days 365 -config apps/openssl.cnf >> $LOGS 2>&1
+		apps/openssl genpkey -algorithm ${SIGALG} -out ${SIGALG}_srv.key >> $LOGS 2>$1
     fi
+	apps/openssl req -new -newkey ${SIGALG} -keyout ${SIGALG}_srv.key -out ${SIGALG}_srv.csr -nodes -subj "/CN=oqstest server" -config apps/openssl.cnf >> $LOGS 2>$1
+	apps/openssl x509 -req -in ${SIGALG}_srv.csr -out ${SIGALG}_srv.crt -CA ${SIGALG}_CA.crt -CAkey ${SIGALG}_CA.key -CAcreateserial -days 365 >> $LOGS 2>$1
     for KEXALG in ${OPENSSL111_KEMS_NIST} ; do
         echo "=============================="
         pwd | sed -e 's/.*\///'
         echo "sig=${SIGALG},kex=${KEXALG}"
-        apps/openssl s_server -cert ${SIGALG}.cer -key ${SIGALG}.key -tls1_3 -www -accept ${PORT} >> $LOGS 2>&1 &
+        apps/openssl s_server -cert ${SIGALG}_srv.crt -key ${SIGALG}_srv.key -CAfile ${SIGALG}_CA.crt -tls1_3 -www -accept ${PORT} >> $LOGS 2>&1 &
         sleep 1
         SERVER_PID=$!
-        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" -connect "localhost:${PORT}" > s_client.out 2>/dev/null
+        echo "GET /" | apps/openssl s_client -curves "${KEXALG}" -CAfile ${SIGALG}_CA.crt -connect "localhost:${PORT}" > s_client.out 2>/dev/null
         cat s_client.out | grep "Server Temp Key" | grep "${KEXALG}" > /dev/null
         kill ${SERVER_PID}
         echo "Success"
