@@ -9,22 +9,45 @@ OPENSSH_BRANCH="OQS-master"
 
 OKAY=1
 
+HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-sha384@openquantumsafe.org ecdh-nistp384-bike1-L5-sha384@openquantumsafe.org ecdh-nistp384-frodo-640-aes-sha384@openquantumsafe.org ecdh-nistp384-frodo-976-aes-sha384@openquantumsafe.org ecdh-nistp384-sike-503-sha384@openquantumsafe.org ecdh-nistp384-sike-751-sha384@openquantumsafe.org ecdh-nistp384-oqsdefault-sha384@openquantumsafe.org'
+
+PQKEX='bike1-L1-sha384@openquantumsafe.org bike1-L3-sha384@openquantumsafe.org bike1-L5-sha384@openquantumsafe.org frodo-640-aes-sha384@openquantumsafe.org frodo-976-aes-sha384@openquantumsafe.org sike-503-sha384@openquantumsafe.org sike-751-sha384@openquantumsafe.org oqsdefault-sha384@openquantumsafe.org'
+
+AUTH='qteslai qteslaiiispeed qteslaiiisize picnicl1fs oqsdefault'
+
 run_ssh_sshd() {
   echo
-  echo  "$1"  2>&1 | tee -a $4
-  echo  "$2"  2>&1 | tee -a $4
+  echo  "$1"  2>&1 | tee -a $5
+  echo  "$2"  2>&1 | tee -a $5
   for a in $3; do
-  echo "    - KEX: $a"  2>&1 | tee -a $4
-  $BASEDIR/install/sbin/sshd -q -p 2222  -d -o "KexAlgorithms=$a" -f $BASEDIR/install/sshd_config -h $BASEDIR/install/ssh_host_ed25519_key >> $4 2>&1 &
-  $BASEDIR/install/bin/ssh   -l ${USER} -p 2222 -o "KexAlgorithms="$a"" ${HOST} -F $BASEDIR/install/ssh_config -o StrictHostKeyChecking=no "exit" >> $4 2>&1
-  A=`cat $LOGS| grep SSH_CONNECTION`
-  if [ $? -eq 0 ];then
-    echo "    - Result: SUCCESS" 2>&1 | tee -a $4
-  else
-    echo "    - Result: FAILURE" 2>&1 | tee -a $4
-    OKAY=0
-  fi
-  echo 2>&1 | tee -a $4
+    for b in $4; do
+      echo "    - KEX: $a"  2>&1 | tee -a $5
+      echo "    - AUTH: $b"  2>&1 | tee -a $5
+      $BASEDIR/install/sbin/sshd -q -p 2222 -d \
+        -f "$BASEDIR/install/sshd_config" \
+        -o "KexAlgorithms=$a" \
+        -o "AuthorizedKeysFile=${BASEDIR}/install/ssh_server/authorized_keys" \
+        -o "HostKeyAlgorithms=ssh-${b}@openquantumsafe.org" \
+        -o "PubkeyAcceptedKeyTypes=ssh-${b}@openquantumsafe.org" \
+        -h "$BASEDIR/install/ssh_server/id_${b}" >> $5 2>&1 &
+      $BASEDIR/install/bin/ssh -l ${USER} \
+        -p 2222 ${HOST} \
+        -F $BASEDIR/install/ssh_config \
+        -o "KexAlgorithms=${a}" \
+        -o "HostKeyAlgorithms=ssh-${B}@openquantumsafe.org" \
+        -o "PubkeyAcceptedKeyTypes=ssh-${B}@openquantumsafe.org" \
+        -o StrictHostKeyChecking=no \
+        -i "${BASEDIR}/install/ssh_client/id_${b}" \
+        "exit" >> $5 2>&1
+      A=`cat $LOGS| grep SSH_CONNECTION`
+      if [ $? -eq 0 ];then
+        echo "    - Result: SUCCESS" 2>&1 | tee -a $5
+      else
+        echo "    - Result: FAILURE" 2>&1 | tee -a $5
+        OKAY=0
+      fi
+      echo 2>&1 | tee -a $5
+    done
   done
 }
 
@@ -93,35 +116,20 @@ build_openssh-portable_without_openssl() {
 	make install >> $1 2>&1
 }
 
-backup_keys() {
-  if [ -d $HOME/.ssh/ ];then
-    if [ ! -d $HOME/.ssh_oqs_bkup/ ];then
-      mv $HOME/.ssh/ $HOME/.ssh_oqs_bkup
-    fi
-  fi
-}
-
-restore_keys() {
-  if [ -d $HOME/.ssh_oqs_bkup/ ];then
-    if [ -d $HOME/.ssh/ ];then
-      rm -rf $HOME/.ssh/;
-    fi
-    mv $HOME/.ssh_oqs_bkup $HOME/.ssh/
-  fi
-}
-
 generate_keys() {
-  backup_keys
-  mkdir $HOME/.ssh
-  chmod 700  $HOME/.ssh
-  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f $HOME/.ssh/id_ed25519 >> $1 2>&1
-  cat $HOME/.ssh/id_ed25519.pub >> $HOME/.ssh/authorized_keys
-  chmod 640 $HOME/.ssh/authorized_keys
+  mkdir ${BASEDIR}/install/ssh_client
+  mkdir ${BASEDIR}/install/ssh_server
+  chmod 700 ${BASEDIR}/install/ssh_server
+  touch ${BASEDIR}/install/ssh_server/authorized_keys
+  chmod 600 ${BASEDIR}/install/ssh_server/authorized_keys
+  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f ${BASEDIR}/install/ssh_client/id_ed25519 >> $1 2>&1
+  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f ${BASEDIR}/install/ssh_server/id_ed25519 >> $1 2>&1
+  for a in ${AUTH}; do
+    ${BASEDIR}/install/bin/ssh-keygen -t ${a} -N "" -f ${BASEDIR}/install/ssh_client/id_${a} >> $1 2>&1
+    ${BASEDIR}/install/bin/ssh-keygen -t ${a} -N "" -f ${BASEDIR}/install/ssh_server/id_${a} >> $1 2>&1
+  done
+  cat ${BASEDIR}/install/ssh_client/*.pub >> ${BASEDIR}/install/ssh_server/authorized_keys
 }
-
-HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-sha384@openquantumsafe.org ecdh-nistp384-bike1-L5-sha384@openquantumsafe.org ecdh-nistp384-frodo-640-aes-sha384@openquantumsafe.org ecdh-nistp384-frodo-976-aes-sha384@openquantumsafe.org ecdh-nistp384-sike-503-sha384@openquantumsafe.org ecdh-nistp384-sike-751-sha384@openquantumsafe.org ecdh-nistp384-oqsdefault-sha384@openquantumsafe.org'
-
-PQKEX='bike1-L1-sha384@openquantumsafe.org bike1-L3-sha384@openquantumsafe.org bike1-L5-sha384@openquantumsafe.org frodo-640-aes-sha384@openquantumsafe.org frodo-976-aes-sha384@openquantumsafe.org sike-503-sha384@openquantumsafe.org sike-751-sha384@openquantumsafe.org oqsdefault-sha384@openquantumsafe.org'
 
 mkdir -p tmp
 cd tmp
@@ -191,7 +199,6 @@ echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-por
 echo "===============================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
-restore_keys
 
 rm -rf ${BASEDIR}/install
 build_openssl $LOGS
@@ -204,7 +211,6 @@ echo "Combination being tested: liboqs-master using OpenSSL_1_0_2-stable, openss
 echo "====================================================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
-restore_keys
 
 rm -rf ${BASEDIR}/install
 build_openssl $LOGS
@@ -216,7 +222,6 @@ echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-porta
 echo "=============================================================================" 2>&1 | tee -a $LOGS
 run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
 run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
-restore_keys
 
 echo ""
 echo "=============================="
