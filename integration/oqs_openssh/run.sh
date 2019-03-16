@@ -13,7 +13,7 @@ HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-s
 
 PQKEX='bike1-L1-sha384@openquantumsafe.org bike1-L3-sha384@openquantumsafe.org bike1-L5-sha384@openquantumsafe.org frodo-640-aes-sha384@openquantumsafe.org frodo-976-aes-sha384@openquantumsafe.org sike-503-sha384@openquantumsafe.org sike-751-sha384@openquantumsafe.org oqsdefault-sha384@openquantumsafe.org'
 
-AUTH='qteslai qteslaiiispeed qteslaiiisize picnicl1fs oqsdefault'
+AUTH='ed25519 qteslai qteslaiiispeed qteslaiiisize picnicl1fs oqsdefault'
 
 run_ssh_sshd() {
   echo
@@ -97,6 +97,19 @@ build_openssh-portable() {
 	git clean -d -f -x >> $1 2>&1
 	git checkout -- . >> $1 2>&1
 	autoreconf -i >> $1 2>&1
+	./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex --enable-pq-auth --with-ldflags="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-libs=-lm --with-ssl-dir=${BASEDIR}/install/  --with-liboqs-dir="${BASEDIR}/install" --with-cflags=-I${BASEDIR}/install/include --sysconfdir="${BASEDIR}/install"  >> $1 2>&1
+	make clean >> $1 2>&1
+	make -j  >> $1 2>&1
+	make install >> $1 2>&1
+}
+
+build_openssh-portable_nopqauth() {
+	echo "==============================" 2>&1 | tee -a $1
+	echo "Building openssh-portable without PQ authentication" 2>&1 | tee -a $1
+	cd ${BASEDIR}/openssh-portable
+	git clean -d -f -x >> $1 2>&1
+	git checkout -- . >> $1 2>&1
+	autoreconf -i >> $1 2>&1
 	./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex --with-ldflags="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-libs=-lm --with-ssl-dir=${BASEDIR}/install/  --with-liboqs-dir="${BASEDIR}/install" --with-cflags=-I${BASEDIR}/install/include --sysconfdir="${BASEDIR}/install"  >> $1 2>&1
 	make clean >> $1 2>&1
 	make -j  >> $1 2>&1
@@ -110,7 +123,7 @@ build_openssh-portable_without_openssl() {
 	git clean -d -f -x >> $1 2>&1
 	git checkout -- . >> $1 2>&1
 	autoreconf -i >> $1 2>&1
-	./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex --with-ldflags="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-libs=-lm --without-openssl --with-liboqs-dir="${BASEDIR}/install" --with-cflags=-I${BASEDIR}/install/include --sysconfdir="${BASEDIR}/install"  >> $1 2>&1
+	./configure --prefix="${BASEDIR}/install" --enable-pq-kex --enable-hybrid-kex --enable-pq-auth --with-ldflags="-Wl,-rpath -Wl,${BASEDIR}/install/lib" --with-libs=-lm --without-openssl --with-liboqs-dir="${BASEDIR}/install" --with-cflags=-I${BASEDIR}/install/include --sysconfdir="${BASEDIR}/install"  >> $1 2>&1
 	make clean >> $1 2>&1
 	make -j  >> $1 2>&1
 	make install >> $1 2>&1
@@ -122,8 +135,6 @@ generate_keys() {
   chmod 700 ${BASEDIR}/install/ssh_server
   touch ${BASEDIR}/install/ssh_server/authorized_keys
   chmod 600 ${BASEDIR}/install/ssh_server/authorized_keys
-  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f ${BASEDIR}/install/ssh_client/id_ed25519 >> $1 2>&1
-  ${BASEDIR}/install/bin/ssh-keygen -t ed25519 -N "" -f ${BASEDIR}/install/ssh_server/id_ed25519 >> $1 2>&1
   for a in ${AUTH}; do
     ${BASEDIR}/install/bin/ssh-keygen -t ${a} -N "" -f ${BASEDIR}/install/ssh_client/id_${a} >> $1 2>&1
     ${BASEDIR}/install/bin/ssh-keygen -t ${a} -N "" -f ${BASEDIR}/install/ssh_server/id_${a} >> $1 2>&1
@@ -197,8 +208,8 @@ generate_keys $LOGS
 echo 2>&1 | tee -a $LOGS
 echo "Combination being tested: liboqs-master, OpenSSL_1_0_2-stable, openssh-portable" 2>&1 | tee -a $LOGS
 echo "===============================================================================" 2>&1 | tee -a $LOGS
-run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
-run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" "$AUTH" $LOGS
+run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" "$AUTH" $LOGS
 
 rm -rf ${BASEDIR}/install
 build_openssl $LOGS
@@ -209,19 +220,19 @@ generate_keys $LOGS
 echo 2>&1 | tee -a $LOGS
 echo "Combination being tested: liboqs-master using OpenSSL_1_0_2-stable, openssh-portable without OpenSSL" 2>&1 | tee -a $LOGS
 echo "====================================================================================================" 2>&1 | tee -a $LOGS
-run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
-run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" "$AUTH" $LOGS
+run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" "$AUTH" $LOGS
 
 rm -rf ${BASEDIR}/install
 build_openssl $LOGS
 build_liboqs_nist $LOGS
-build_openssh-portable $LOGS
+build_openssh-portable_nopqauth $LOGS
 generate_keys $LOGS
 
 echo "Combination being tested: liboqs-nist, OpenSSL_1_0_2-stable, openssh-portable" 2>&1 | tee -a $LOGS
 echo "=============================================================================" 2>&1 | tee -a $LOGS
-run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" $LOGS
-run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" $LOGS
+run_ssh_sshd "  SSH client and sever using hybrid key exchange methods" "  ======================================================" "$HKEX" "ed25519" $LOGS
+run_ssh_sshd "  SSH client and sever using PQ only key exchange methods" "  =======================================================" "$PQKEX" "ed25519" $LOGS
 
 echo ""
 echo "=============================="
@@ -249,3 +260,4 @@ cd "${BASEDIR}/openssh-portable"
 git log | head -n 1
 echo "    PQKEX=${PQKEX}"
 echo "    HKEX=${HKEX}"
+echo "    AUTH=${AUTH}"
