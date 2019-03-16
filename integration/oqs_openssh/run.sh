@@ -4,8 +4,10 @@ LIBOQS_MASTER_REPO="https://github.com/open-quantum-safe/liboqs.git"
 LIBOQS_MASTER_BRANCH="master"
 LIBOQS_NIST_BRANCH_REPO="https://github.com/open-quantum-safe/liboqs.git"
 LIBOQS_NIST_BRANCH_BRANCH="nist-branch"
-OPENSSH_REPO="https://github.com/open-quantum-safe/openssh-portable.git"
-OPENSSH_BRANCH="OQS-master"
+# OPENSSH_REPO="https://github.com/open-quantum-safe/openssh-portable.git"
+# OPENSSH_BRANCH="OQS-master"
+OPENSSH_REPO="https://github.com/christianpaquin/openssh-portable.git"
+OPENSSH_BRANCH="cp-add-pqc-auth"
 
 OKAY=1
 
@@ -13,7 +15,7 @@ HKEX='ecdh-nistp384-bike1-L1-sha384@openquantumsafe.org ecdh-nistp384-bike1-L3-s
 
 PQKEX='bike1-L1-sha384@openquantumsafe.org bike1-L3-sha384@openquantumsafe.org bike1-L5-sha384@openquantumsafe.org frodo-640-aes-sha384@openquantumsafe.org frodo-976-aes-sha384@openquantumsafe.org sike-503-sha384@openquantumsafe.org sike-751-sha384@openquantumsafe.org oqsdefault-sha384@openquantumsafe.org'
 
-AUTH='ed25519 qteslai qteslaiiispeed qteslaiiisize picnicl1fs oqsdefault'
+AUTH='ed25519 ssh-qteslai@openquantumsafe.org ssh-qteslaiiispeed@openquantumsafe.org ssh-qteslaiiisize@openquantumsafe.org ssh-picnicl1fs@openquantumsafe.org ssh-oqsdefault@openquantumsafe.org'
 
 run_ssh_sshd() {
   echo
@@ -21,31 +23,37 @@ run_ssh_sshd() {
   echo  "$2"  2>&1 | tee -a $5
   for a in $3; do
     for b in $4; do
+      rm -f server_log.txt
+      rm -f client_log.txt
       echo "    - KEX: $a"  2>&1 | tee -a $5
       echo "    - AUTH: $b"  2>&1 | tee -a $5
       $BASEDIR/install/sbin/sshd -q -p 2222 -d \
         -f "$BASEDIR/install/sshd_config" \
         -o "KexAlgorithms=$a" \
         -o "AuthorizedKeysFile=${BASEDIR}/install/ssh_server/authorized_keys" \
-        -o "HostKeyAlgorithms=ssh-${b}@openquantumsafe.org" \
-        -o "PubkeyAcceptedKeyTypes=ssh-${b}@openquantumsafe.org" \
-        -h "$BASEDIR/install/ssh_server/id_${b}" >> $5 2>&1 &
+        -o "HostKeyAlgorithms=${b}" \
+        -o "PubkeyAcceptedKeyTypes=${b}" \
+        -h "$BASEDIR/install/ssh_server/id_${b}" >> server_log.txt 2>&1 &
       $BASEDIR/install/bin/ssh -l ${USER} \
         -p 2222 ${HOST} \
         -F $BASEDIR/install/ssh_config \
         -o "KexAlgorithms=${a}" \
-        -o "HostKeyAlgorithms=ssh-${B}@openquantumsafe.org" \
-        -o "PubkeyAcceptedKeyTypes=ssh-${B}@openquantumsafe.org" \
+        -o "HostKeyAlgorithms=${b}" \
+        -o "PubkeyAcceptedKeyTypes=${b}" \
         -o StrictHostKeyChecking=no \
         -i "${BASEDIR}/install/ssh_client/id_${b}" \
-        "exit" >> $5 2>&1
-      A=`cat $LOGS| grep SSH_CONNECTION`
+        "exit" >> client_log.txt 2>&1
+      A=`cat client_log.txt | grep SSH_CONNECTION`
       if [ $? -eq 0 ];then
         echo "    - Result: SUCCESS" 2>&1 | tee -a $5
       else
         echo "    - Result: FAILURE" 2>&1 | tee -a $5
         OKAY=0
       fi
+      echo "--- SERVER LOG ---" >> $5
+      cat server_log.txt >> $5
+      echo "--- CLIENT LOG ---" >> $5
+      cat client_log.txt >> $5
       echo 2>&1 | tee -a $5
     done
   done
@@ -63,7 +71,7 @@ build_openssl() {
 	make clean >> $1 2>&1
 	make -j8 >> $1 2>&1
 	make depend >> $1 2>&1
-	make install>> $1 2>&1
+	make install_sw >> $1 2>&1
 }
 
 build_liboqs_master() {
