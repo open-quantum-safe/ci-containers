@@ -16,6 +16,9 @@ addons:
     - make
     - unzip
     - xsltproc
+    - python3
+    - python3-nose
+    - python3-rednose
 
 matrix:
   include:
@@ -37,6 +40,7 @@ matrix:
     compiler: clang
     install:
     - export PATH="/usr/local/opt/ccache/libexec:$PATH"
+    - pip3 install nose rednose
     addons:
       homebrew:
         packages:
@@ -46,8 +50,10 @@ matrix:
     env:
       - ARCH=x64
       - CC_OVERRIDE=clang
+      - OPENSSL_DIR=/usr/local/opt/openssl
 
 script:
+  - set -eo pipefail
   - pwd
   - echo "Using GGC  version:"
   - gcc --version
