@@ -3,7 +3,11 @@ import os
 import sys
 import time
 
-sig_algs = ['ssh-ed25519', 'ssh-qteslai@openquantumsafe.org', 'ssh-qteslaiiispeed@openquantumsafe.org', 'ssh-qteslaiiisize@openquantumsafe.org', 'ssh-picnicl1fs@openquantumsafe.org', 'ssh-oqsdefault@openquantumsafe.org']
+if 'WITH_PQAUTH' in os.environ and os.environ['WITH_PQAUTH'] == 'true':
+    sig_algs = ['ssh-ed25519', 'ssh-qteslai@openquantumsafe.org', 'ssh-qteslaiiispeed@openquantumsafe.org', 'ssh-qteslaiiisize@openquantumsafe.org', 'ssh-picnicl1fs@openquantumsafe.org', 'ssh-oqsdefault@openquantumsafe.org']
+else:
+    sig_algs = ['ssh-ed25519']
+
 # post-quantum only KEX
 kex_algs = ['bike1-L1-sha384@openquantumsafe.org', 'bike1-L3-sha384@openquantumsafe.org', 'bike1-L5-sha384@openquantumsafe.org', 'frodo-640-aes-sha384@openquantumsafe.org', 'frodo-976-aes-sha384@openquantumsafe.org', 'sike-503-sha384@openquantumsafe.org', 'sike-751-sha384@openquantumsafe.org', 'oqsdefault-sha384@openquantumsafe.org']
 # hybrid KEX
@@ -42,6 +46,9 @@ def test_connection():
     port = 22345
     for sig_alg in sig_algs:
         for kex_alg in kex_algs:
+            if 'CIRCLECI' in os.environ:
+                if 'bike' in kex_alg:
+                    continue # FIXME: BIKE doesn't work on CircleCI due to symbol _CMP_LT_OS not being defined
             yield(run_connection, sig_alg, kex_alg, port)
             port = port + 1
 
