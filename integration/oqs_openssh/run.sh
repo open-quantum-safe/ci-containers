@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eo pipefail
+
 LIBOQS_MASTER_REPO="https://github.com/open-quantum-safe/liboqs.git"
 LIBOQS_MASTER_BRANCH="master"
 LIBOQS_NIST_BRANCH_REPO="https://github.com/open-quantum-safe/liboqs.git"

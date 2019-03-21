@@ -11,6 +11,7 @@ addons:
     packages:
     - autoconf
     - automake
+    - gcc
     - libtool
     - libssl-dev
     - make
@@ -25,17 +26,9 @@ matrix:
   - os: linux
     dist: xenial
     sudo: required
-    addons:
-      apt:
-        packages:
-        - gcc
   - os: linux
     dist: trusty
     sudo: required
-    addons:
-      apt:
-        sources:
-        - gcc
   - os: osx
     compiler: clang
     install:
@@ -57,17 +50,17 @@ script:
   - pwd
   - echo "Using GGC  version:"
   - gcc --version
-  - echo Running openssh-portable integration tests...
-  - cd integration/oqs_openssh
-  - OPENSSH_LOG_PATH=`date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
-  - time ./run.sh | tee $OPENSSH_LOG_PATH
-  - echo
-  - echo ls *log.txt
-  - echo
-  - echo "Last 100 lines of the SSH build logs:"
-  - tail -n 100 $OPENSSH_LOG_PATH
-  - cd ..
-  - echo
+  # - echo Running openssh-portable integration tests...
+  # - cd integration/oqs_openssh
+  # - OPENSSH_LOG_PATH=`date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
+  # - time ./run.sh | tee $OPENSSH_LOG_PATH
+  # - echo
+  # - echo ls *log.txt
+  # - echo
+  # - echo "Last 100 lines of the SSH build logs:"
+  # - tail -n 100 $OPENSSH_LOG_PATH
+  # - cd ..
+  # - echo
   - echo Running openssl integration tests...
   - cd oqs_openssl
   - OPENSSL_LOG_PATH=`date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`

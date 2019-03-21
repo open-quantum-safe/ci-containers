@@ -14,7 +14,7 @@
 # # or
 # $ touch DISABLE_OPENSSL_TESTS
 
-set -e
+set -eo pipefail
 
 # updates
 if lsb_release -a 2>/dev/null | grep -q "Ubuntu 14."

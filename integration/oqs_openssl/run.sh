@@ -20,7 +20,7 @@
 #  - LIBOQS_NIST_BRANCH: which branch to check out, default nist-branch
 ###########
 
-set -e
+set -eo pipefail
 
 ARCH=${ARCH:-"x64"}
 
