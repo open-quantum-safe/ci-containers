@@ -15,7 +15,7 @@ PREFIX=${PREFIX:-"`pwd`/tmp/install"}
 if [ "x${LIBOQS}" == "xnist" ]; then
     cd tmp/liboqs
     make -j OPENSSL_INCLUDE_DIR="${PREFIX}/include" OPENSSL_LIB_DIR="${PREFIX}/lib"
-    make install-noshared PREFIX="${PREFIX}"
+    make install-noshared PREFIX=${PREFIX}
 else
     cd tmp/liboqs
     autoreconf -i

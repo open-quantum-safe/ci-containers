@@ -40,5 +40,6 @@ for LIBOQS in "master" "nist" ; do
             export WITH_PQAUTH
             rm -rf tmp
             ./run.sh
+        done
     done
 done
