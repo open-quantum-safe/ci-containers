@@ -115,15 +115,15 @@ def gen_keys(sig_alg):
         os.path.join('tmp','openssl')
     )
 
-def test_kex():
+def test_connection():
     global sig_algs, kex_algs
     port = 23567
     for sig_alg in sig_algs:
         for kex_alg in kex_algs:
-            yield(run_kex, sig_alg, kex_alg, port)
+            yield(run_connection, sig_alg, kex_alg, port)
             port = port + 1
 
-def run_kex(sig_alg, kex_alg, port):
+def run_connection(sig_alg, kex_alg, port):
     if 'OPENSSL' in os.environ and os.environ['OPENSSL'] == '102':
         cmd = os.path.join('..', '..', 'scripts', 'do_openssl-102.sh');
     else:

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+###########
+# Run one client/server interaction in OpenSSL 1.0.2
+#
+# Environment variables:
+#  - KEXALG: key exchange algorithm to use
+#  - SIGALG: signature algorithm to use
+#  - PORT: port to run server on
+###########
+
 set -eo pipefail
 
 CIPHER=${KEXALG}
