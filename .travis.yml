@@ -23,10 +23,14 @@ matrix:
       - OPENSSL_DIR=/usr/local/opt/openssl
 
 script:
-  - set -eo pipefail
+  # - set -eo pipefail
   - echo "Using GGC version:"
   - gcc --version
   - echo Running OpenSSH integration tests...
-  - cd ${TRAVIS_BUILD_DIR}/integration/oqs_openssh && ./run_all.sh
+  - cd ${TRAVIS_BUILD_DIR}/integration/oqs_openssh
+  - pwd
+  - bash run_all.sh
   - echo Running OpenSSL integration tests...
-  - cd ${TRAVIS_BUILD_DIR}/integration/oqs_openssl && ./run_all.sh
+  - cd ${TRAVIS_BUILD_DIR}/integration/oqs_openssl
+  - pwd
+  - bash run_all.sh
