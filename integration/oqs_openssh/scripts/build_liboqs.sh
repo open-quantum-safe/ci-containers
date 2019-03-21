@@ -19,7 +19,7 @@ if [ "x${LIBOQS}" == "xnist" ]; then
 else
     cd tmp/liboqs
     autoreconf -i
-    ./configure --prefix=${PREFIX} --with-pic=yes --enable-openssl --with-openssl-dir=${PREFIX}
+    ./configure --prefix=${PREFIX} --with-pic=yes --enable-openssl --with-openssl-dir=${PREFIX} --disable-kem-bike # FIXME: BIKE doesn't work on CircleCI due to symbol _CMP_LT_OS not being defined
     make -j
     make install
 fi
