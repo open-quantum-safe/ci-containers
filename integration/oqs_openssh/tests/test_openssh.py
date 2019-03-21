@@ -49,6 +49,9 @@ def test_connection():
             if 'CIRCLECI' in os.environ:
                 if 'bike' in kex_alg:
                     continue # FIXME: BIKE doesn't work on CircleCI due to symbol _CMP_LT_OS not being defined
+            if 'WITH_OPENSSL' in os.environ and os.environ['WITH_OPENSSL'] != 'true':
+                if 'ecdh' in kex_alg:
+                    continue
             yield(run_connection, sig_alg, kex_alg, port)
             port = port + 1
 
