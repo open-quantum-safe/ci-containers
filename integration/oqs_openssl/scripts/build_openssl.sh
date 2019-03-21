@@ -16,8 +16,4 @@ case "$OSTYPE" in
   *)        echo "Unknown operating system: $OSTYPE" ; exit 1 ;;
 esac
 
-if [ "x${OPENSSL}" == "x102" ]; then
-    make
-else
-    make -j
-fi
+make
