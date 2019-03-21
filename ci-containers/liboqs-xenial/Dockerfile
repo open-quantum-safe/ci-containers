@@ -13,6 +13,7 @@ RUN apt-get update -qq \
 	libtool \
 	make \
 	unzip \
+	wget \
 	xsltproc \
 	doxygen \
 	graphviz \

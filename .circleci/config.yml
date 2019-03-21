@@ -1,0 +1,93 @@
+version: 2
+
+.openssl_job: &openssljob
+  docker:
+    - image: ${IMAGE}
+  steps:
+    - checkout
+    - run:
+        name: Clone liboqs
+        command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
+    - run:
+        name: Clone OpenSSL
+        command: cd integration/oqs_openssl && scripts/clone_openssl.sh
+    - run:
+        name: Build liboqs
+        command: cd integration/oqs_openssl && scripts/build_liboqs.sh
+    - run:
+        name: Build OpenSSL
+        command: cd integration/oqs_openssl && scripts/build_openssl.sh
+    - run:
+        name: Run unit tests
+        command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
+
+jobs:
+  ssl-amd64-buster-liboqs-master-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
+      ARCH: x64
+      LIBOQS: master
+      OPENSSL: 111
+  ssl-amd64-buster-liboqs-master-openssl-102:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
+      ARCH: x64
+      LIBOQS: master
+      OPENSSL: 102
+  ssl-amd64-buster-liboqs-nist-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
+      ARCH: x64
+      LIBOQS: nist
+      OPENSSL: 111
+  ssl-amd64-buster-liboqs-nist-openssl-102:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
+      ARCH: x64
+      LIBOQS: nist
+      OPENSSL: 102
+  ssl-x86_64-xenial-liboqs-master-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: master
+      OPENSSL: 111
+  ssl-x86_64-xenial-liboqs-master-openssl-102:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: master
+      OPENSSL: 102
+  ssl-x86_64-xenial-liboqs-nist-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: nist
+      OPENSSL: 111
+  ssl-x86_64-xenial-liboqs-nist-openssl-102:
+    <<: *openssljob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: nist
+      OPENSSL: 102
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - ssl-amd64-buster-liboqs-master-openssl-111
+      - ssl-amd64-buster-liboqs-master-openssl-102
+      - ssl-amd64-buster-liboqs-nist-openssl-111
+      - ssl-amd64-buster-liboqs-nist-openssl-102
+      - ssl-x86_64-xenial-liboqs-master-openssl-111
+      - ssl-x86_64-xenial-liboqs-master-openssl-102
+      - ssl-x86_64-xenial-liboqs-nist-openssl-111
+      - ssl-x86_64-xenial-liboqs-nist-openssl-102

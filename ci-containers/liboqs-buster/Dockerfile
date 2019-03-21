@@ -12,6 +12,7 @@ RUN apt-get update -qq \
 	libssl-dev \
 	make \
 	unzip \
+	wget \
 	xsltproc \
 	doxygen \
 	graphviz \
