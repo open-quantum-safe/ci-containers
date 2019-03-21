@@ -9,7 +9,7 @@
 #  - PORT: port to run server on
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 apps/openssl s_server -cert ${SIGALG}_srv.crt -key ${SIGALG}_srv.key -CAfile ${SIGALG}_CA.crt -tls1_3 -www -accept ${PORT} &
 sleep 1

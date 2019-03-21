@@ -7,7 +7,7 @@
 # Must be run after OQS has been installed inside the OpenSSL source code directory
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 cd tmp/openssl
 case "$OSTYPE" in

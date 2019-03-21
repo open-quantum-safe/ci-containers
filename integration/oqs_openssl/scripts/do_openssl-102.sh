@@ -9,7 +9,7 @@
 #  - PORT: port to run server on
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 CIPHER=${KEXALG}
 

@@ -18,7 +18,7 @@
 #  - WITH_PQAUTH: build OpenSSH with (true, default) or without (false) post-quantum authentication
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 ARCH=${ARCH:-"x64"}
 

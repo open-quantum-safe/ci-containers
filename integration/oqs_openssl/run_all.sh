@@ -16,7 +16,7 @@
 #  - LIBOQS_NIST_BRANCH: which branch to check out, default nist-branch
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 PRINT_GREEN="tput setaf 2"
 PRINT_RESET="tput sgr 0"

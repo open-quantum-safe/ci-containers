@@ -4,7 +4,7 @@
 # Clone OpenSSL source code
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 REPO="https://github.com/openssl/openssl.git"
 BRANCH="OpenSSL_1_0_2-stable"

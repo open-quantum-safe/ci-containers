@@ -10,6 +10,8 @@
 #  - PORT: port to run server on
 ###########
 
+set -x
+
 OKAY=1
 
 rm -f ${PREFIX}/server_log.txt

@@ -9,7 +9,7 @@
 #  - PREFIX: path to install liboqs, default `pwd`/tmp/openssl/oqs
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 OPENSSL_DIR=${OPENSSL_DIR:-"/usr"}
 PREFIX=${OPENSSL_SRC_DIR:-"`pwd`/tmp/openssl/oqs"}

@@ -8,7 +8,7 @@
 #  - OPENSSH_BRANCH: which branch to check out, default OQS-master
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 REPO=${OPENSSH_REPO:-"https://github.com/open-quantum-safe/openssh-portable.git"}
 BRANCH=${OPENSSH_BRANCH:-"OQS-master"}

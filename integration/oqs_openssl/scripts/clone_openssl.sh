@@ -11,7 +11,7 @@
 #  - OPENSSL_111_BRANCH: which branch to check out, default OQS-OpenSSL_1_1_1-stable
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 if [ "x${OPENSSL}" == "x102" ]; then
     REPO=${OPENSSL_102_REPO:-"https://github.com/open-quantum-safe/openssl.git"}

@@ -14,7 +14,7 @@
 #  - OPENSSH_BRANCH: which branch to check out, default OQS-master
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 PRINT_GREEN="tput setaf 2"
 PRINT_RESET="tput sgr 0"

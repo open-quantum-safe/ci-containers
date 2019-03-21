@@ -7,7 +7,7 @@
 #  - PREFIX: path to install OpenSSL, default `pwd`/tmp/install
 ###########
 
-set -eo pipefail
+set -exo pipefail
 
 PREFIX=${PREFIX:-"`pwd`/tmp/install"}
 
