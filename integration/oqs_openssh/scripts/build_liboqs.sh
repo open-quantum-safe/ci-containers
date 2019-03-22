@@ -19,8 +19,8 @@ if [ "x${LIBOQS}" == "xnist" ]; then
 else
     cd tmp/liboqs
     autoreconf -i
-    if [ "x${CIRCLECI}" == "xtrue"]; then
-        BIKEARG="--distable-kem-bike"
+    if [ "x${CIRCLECI}" == "xtrue" ]; then
+        BIKEARG="--disable-kem-bike"
         # FIXME: BIKE doesn't work on CircleCI due to symbol _CMP_LT_OS not being defined
     else
         BIKEARG=
