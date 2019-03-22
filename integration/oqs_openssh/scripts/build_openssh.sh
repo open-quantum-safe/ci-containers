@@ -16,7 +16,7 @@ WITH_OPENSSL=${WITH_OPENSSL:-"true"}
 WITH_PQAUTH=${WITH_PQAUTH:-"true"}
 
 if [ "x${WITH_PQAUTH}" == "xtrue" ]; then
-    PQAUTH_ARG="--enable-pq-auth"
+    PQAUTH_ARG="--enable-pq-auth --enable-hybrid-auth"
 else
     PQAUTH_ARG=""
 fi
