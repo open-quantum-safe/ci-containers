@@ -21,6 +21,43 @@ install:
 matrix:
   include:
   ################
+  # OPENSSL JOBS #
+  ################
+  # liboqs master branch
+  - os: osx
+    env:
+      - LIBOQS=master
+      - OPENSSL=111
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=master
+      - OPENSSL=102
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  # liboqs nist branch
+  - os: osx
+    env:
+      - LIBOQS=nist
+      - OPENSSL=111
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=nist
+      - OPENSSL=102
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  ################
   # OPENSSH JOBS #
   ################
   # liboqs master branch, with OpenSSL
@@ -78,40 +115,3 @@ matrix:
       - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
-  ################
-  # OPENSSL JOBS #
-  ################
-  # liboqs master branch
-  - os: osx
-    env:
-      - LIBOQS=master
-      - OPENSSL=111
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
-    script:
-      - cd integration/oqs_openss1 && bash run.sh
-  - os: osx
-    env:
-      - LIBOQS=master
-      - OPENSSL=102
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
-    script:
-      - cd integration/oqs_openss1 && bash run.sh
-  # liboqs nist branch
-  - os: osx
-    env:
-      - LIBOQS=nist
-      - OPENSSL=111
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
-    script:
-      - cd integration/oqs_openss1 && bash run.sh
-  - os: osx
-    env:
-      - LIBOQS=nist
-      - OPENSSL=102
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
-    script:
-      - cd integration/oqs_openss1 && bash run.sh
