@@ -26,56 +26,56 @@ matrix:
   # liboqs master branch, with OpenSSL
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=master
       - WITH_OPENSSL=true
       - WITH_PQAUTH=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=master
       - WITH_OPENSSL=true
       - WITH_PQAUTH=false
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
   # liboqs master branch, without OpenSSL
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=master
       - WITH_OPENSSL=false
       - WITH_PQAUTH=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=master
       - WITH_OPENSSL=false
       - WITH_PQAUTH=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
   # liboqs nist branch
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=nist
       - WITH_OPENSSL=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=nist
       - WITH_OPENSSL=false
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openssh && bash run.sh
   ################
@@ -84,34 +84,34 @@ matrix:
   # liboqs master branch
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=master
       - OPENSSL=111
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openss1 && bash run.sh
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=master
       - OPENSSL=102
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openss1 && bash run.sh
   # liboqs nist branch
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=nist
       - OPENSSL=111
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openss1 && bash run.sh
   - os: osx
     env:
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
       - LIBOQS=nist
       - OPENSSL=102
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
     script:
       - cd integration/oqs_openss1 && bash run.sh
