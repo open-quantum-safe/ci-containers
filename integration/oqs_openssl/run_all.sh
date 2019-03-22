@@ -1,14 +1,10 @@
 #!/bin/bash
 
 ###########
-# Do a full run through of a single liboqs/OpenSSL integration test combination
-#
-# Environment variables:
-#  - ARCH: either x64 (default) or x86
-#  - LIBOQS: either master (default) or nist
-#  - OPENSSL: either 102 or 111 (default)
+# Run all liboqs/OpenSSL integration test combinations
 #
 # The following environment variables affect subsequent scripts:
+#  - ARCH: either x64 (default) or x86
 #  - OPENSSL_DIR: path to system OpenSSL installation; default /usr
 #  - OPENSSL_102_REPO: which repo to check out from, default https://github.com/open-quantum-safe/openssl.git
 #  - OPENSSL_102_BRANCH: which branch to check out, default OQS-OpenSSL_1_0_2-stable
@@ -22,10 +18,23 @@
 
 set -exo pipefail
 
-ARCH=${ARCH:-"x64"}
+PRINT_GREEN="tput setaf 2"
+PRINT_RESET="tput sgr 0"
 
-scripts/clone_liboqs.sh
-scripts/clone_openssl.sh
-scripts/build_liboqs.sh
-scripts/build_openssl.sh
-python3 -m nose --rednose --verbose
+for LIBOQS in "master" "nist" ; do
+    for OPENSSL in "111" "102" ; do
+        ${PRINT_GREEN}
+        echo "================================================================="
+        echo "================================================================="
+        echo "liboqs / OpenSSL integration test"
+        echo " - LIBOQS=${LIBOQS}"
+        echo " - OPENSSL=${OPENSSL}"
+        echo "================================================================="
+        echo "================================================================="
+        ${PRINT_RESET}
+        export LIBOQS
+        export OPENSSL
+        rm -rf tmp
+        ./run.sh
+    done
+done

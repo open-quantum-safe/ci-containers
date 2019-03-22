@@ -14,7 +14,7 @@
 # # or
 # $ touch DISABLE_OPENSSL_TESTS
 
-set -e
+set -eo pipefail
 
 # updates
 if lsb_release -a 2>/dev/null | grep -q "Ubuntu 14."
@@ -59,7 +59,7 @@ DISABLE_OPENSSH_TESTS=$PWD/DISABLE_OPENSSH_TESTS
 if [ ! -e $DISABLE_OPENSSH_TESTS ]
   then
     cd oqs_openssh
-    time ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
+    time ./run_all.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
     cd ..
   else
     echo "Skipping OpenSSH test script"
@@ -71,7 +71,7 @@ DISABLE_OPENSSL_TESTS=$PWD/DISABLE_OPENSSL_TESTS
 if [ ! -e $DISABLE_OPENSSL_TESTS ]
   then
     cd oqs_openssl
-    time ./run.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`
+    time ./run_all.sh | tee `date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`
   else
     echo "Skipping OpenSSL test script"
 fi

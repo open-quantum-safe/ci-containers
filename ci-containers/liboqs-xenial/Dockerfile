@@ -1,15 +1,16 @@
 ARG ARCH
-FROM multiarch/debian-debootstrap:${ARCH}-buster
+FROM multiarch/ubuntu-core:${ARCH}-xenial
 
 RUN apt-get update -qq \
  && apt-get upgrade -y \
  && apt-get dist-upgrade -y \
- && apt-get install -y autoconf \
+ && apt-get install -y \
+	autoconf \
 	automake \
-	libtool \
 	gcc \
 	git \
 	libssl-dev \
+	libtool \
 	make \
 	unzip \
 	wget \

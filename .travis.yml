@@ -6,68 +6,112 @@ before_install:
   - sudo mkdir -p -m 0755 /var/empty
 
 addons:
-  apt:
-    update: true
+  homebrew:
     packages:
-    - autoconf
-    - automake
-    - libtool
-    - libssl-dev
-    - make
-    - unzip
-    - xsltproc
+    - doxygen
+    - ccache
+    update: false
+
+compiler: clang
+
+install:
+- export PATH="/usr/local/opt/ccache/libexec:$PATH"
+- pip3 install nose rednose
 
 matrix:
   include:
-  - os: linux
-    dist: xenial
-    sudo: required
-    addons:
-      apt:
-        packages:
-        - gcc
-  - os: linux
-    dist: trusty
-    sudo: required
-    addons:
-      apt:
-        sources:
-        - gcc
+  ################
+  # OPENSSL JOBS #
+  ################
+  # liboqs master branch
   - os: osx
-    compiler: clang
-    install:
-    - export PATH="/usr/local/opt/ccache/libexec:$PATH"
-    addons:
-      homebrew:
-        packages:
-        - doxygen
-        - ccache
-        update: false
     env:
+      - LIBOQS=master
+      - OPENSSL=111
       - ARCH=x64
-      - CC_OVERRIDE=clang
-
-script:
-  - pwd
-  - echo "Using GGC  version:"
-  - gcc --version
-  - echo Running openssh-portable integration tests...
-  - cd integration/oqs_openssh
-  - OPENSSH_LOG_PATH=`date "+%Y%m%d-%Hh%Mm%Ss-openssh.log.txt"`
-  - time ./run.sh | tee $OPENSSH_LOG_PATH
-  - echo
-  - echo ls *log.txt
-  - echo
-  - echo "Last 100 lines of the SSH build logs:"
-  - tail -n 100 $OPENSSH_LOG_PATH
-  - cd ..
-  - echo
-  - echo Running openssl integration tests...
-  - cd oqs_openssl
-  - OPENSSL_LOG_PATH=`date "+%Y%m%d-%Hh%Mm%Ss-openssl.log.txt"`
-  - time ./run.sh | tee $OPENSSL_LOG_PATH
-  - echo
-  - echo ls *log.txt
-  - echo
-  - echo "Last 100 lines of the SSL build logs:"
-  - tail -n 100 $OPENSSL_LOG_PATH
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=master
+      - OPENSSL=102
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  # liboqs nist branch
+  - os: osx
+    env:
+      - LIBOQS=nist
+      - OPENSSL=111
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=nist
+      - OPENSSL=102
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssl && bash run.sh
+  ################
+  # OPENSSH JOBS #
+  ################
+  # liboqs master branch, with OpenSSL
+  - os: osx
+    env:
+      - LIBOQS=master
+      - WITH_OPENSSL=true
+      - WITH_PQAUTH=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssh && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=master
+      - WITH_OPENSSL=true
+      - WITH_PQAUTH=false
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssh && bash run.sh
+  # liboqs master branch, without OpenSSL
+  - os: osx
+    env:
+      - LIBOQS=master
+      - WITH_OPENSSL=false
+      - WITH_PQAUTH=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssh && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=master
+      - WITH_OPENSSL=false
+      - WITH_PQAUTH=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssh && bash run.sh
+  # liboqs nist branch
+  - os: osx
+    env:
+      - LIBOQS=nist
+      - WITH_OPENSSL=true
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssh && bash run.sh
+  - os: osx
+    env:
+      - LIBOQS=nist
+      - WITH_OPENSSL=false
+      - ARCH=x64
+      - OPENSSL_DIR=/usr/local/opt/openssl
+    script:
+      - cd integration/oqs_openssh && bash run.sh

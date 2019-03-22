@@ -5,11 +5,19 @@ The **Open Quantum Safe (OQS) project** has the goal of developing and prototypi
 
 This repository contains scripts for testing the integration of liboqs into OpenSSH and OpenSSL.
 
-Please check the README.md files under the integration/oqs-openssh and integration/oqs-openssl directories for details on how to run the respective tests.
+Please check the README.md files under the **integration/oqs-openssh** and **integration/oqs-openssl** directories for details on how to run the respective tests.
 
-OQS developers should record their test results on the OQS [test coverage wiki page](https://github.com/open-quantum-safe/testing/wiki/Configurations-test-coverage).
+Continuous integration testing of this repository operates on for [Travis CI](https://travis-ci.org/open-quantum-safe/testing) for macOS builds and [CircleCI](https://circleci.com/gh/open-quantum-safe/testing) for Linux builds.
 
-Integration testing has been added for [Travis CI/build system](https://travis-ci.org/open-quantum-safe/testing).
+Quick Start using Docker and CircleCI
+-------------------------------------
+
+You can quickly get pre-built Debian 10 (Buster) or Ubuntu 16.04 (Xenial) Docker containers with dependencies installed for building liboqs and our integration tests:
+
+	docker pull dstebila/liboqs:amd64-buster-0.0.1
+	docker pull dstebila/liboqs:x86_64-xenial-0.0.2
+
+Our Linux integration tests are run on CircleCI.  You can also run those same tests locally using CircleCI's local command-line interface.  First [install CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/).  Then use `circleci local execute --job <jobname>` to launch a job.  See the README.md files under integration/oqs-openssh and integration/oqs-openssl for details.
 
 Quick Start on Ubuntu
 ---------------------
@@ -32,7 +40,7 @@ To disable either the OpenSSH or OpenSSL tests from being executed, simply creat
 Dependencies
 ------------
 
-If the run all script is not being used, you must install the relevant dependencies before proceeding with running any tests.
+If you are not using one of the quick start methods above, you must install the relevant dependencies before proceeding with running any tests.
 
 **Debian/Ubuntu (apt)**
 
