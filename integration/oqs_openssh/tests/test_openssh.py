@@ -8,9 +8,9 @@ if 'WITH_PQAUTH' in os.environ and os.environ['WITH_PQAUTH'] == 'true':
         # classical
         'ssh-ed25519',
         # post-quantum
-        'ssh-qteslai', 'ssh-qteslaiiispeed', 'ssh-qteslaiiisize', 'ssh-picnicl1fs', 'ssh-oqsdefault'
+        'ssh-qteslai@openquantumsafe.org', 'ssh-qteslaiiispeed@openquantumsafe.org', 'ssh-qteslaiiisize@openquantumsafe.org', 'ssh-picnicl1fs@openquantumsafe.org', 'ssh-oqsdefault@openquantumsafe.org'
         #hybrid
-        'ssh-p256-qteslai', 'ssh-rsa3072-qteslai', 'ssh-p384-qteslaiiispeed', 'ssh-p384-qteslaiiisize', 'ssh-p256-picnicl1fs', 'ssh-rsa3072-picnicl1fs', 'ssh-p256-oqsdefault', 'ssh-rsa3072-oqsdefault'
+        'ssh-p256-qteslai@openquantumsafe.org', 'ssh-rsa3072-qteslai@openquantumsafe.org', 'ssh-p384-qteslaiiispeed@openquantumsafe.org', 'ssh-p384-qteslaiiisize@openquantumsafe.org', 'ssh-p256-picnicl1fs@openquantumsafe.org', 'ssh-rsa3072-picnicl1fs@openquantumsafe.org', 'ssh-p256-oqsdefault@openquantumsafe.org', 'ssh-rsa3072-oqsdefault@openquantumsafe.org'
     ]
 else:
     sig_algs = ['ssh-ed25519']
