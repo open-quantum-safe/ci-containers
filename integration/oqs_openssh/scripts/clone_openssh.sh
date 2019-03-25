@@ -10,8 +10,10 @@
 
 set -exo pipefail
 
-REPO=${OPENSSH_REPO:-"https://github.com/open-quantum-safe/openssh-portable.git"}
-BRANCH=${OPENSSH_BRANCH:-"OQS-master"}
+# REPO=${OPENSSH_REPO:-"https://github.com/open-quantum-safe/openssh-portable.git"}
+# BRANCH=${OPENSSH_BRANCH:-"OQS-master"}
+REPO="https://github.com/christianpaquin/openssh-portable.git"
+BRANCH="cp-add-pqc-hybrid-auth"
 
 rm -rf tmp/openssh
 git clone --branch ${BRANCH} --single-branch ${REPO} tmp/openssh
