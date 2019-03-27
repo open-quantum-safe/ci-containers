@@ -25,6 +25,9 @@ for LIBOQS in "master" "nist" ; do
             if [ "x${LIBOQS}" == "xnist" ] && [ "x${WITH_PQAUTH}" == "xtrue" ]; then
                 continue
             fi
+            if [ "x${WITH_OPENSSL}" == "xfalse" ] && [ "x${WITH_PQAUTH}" == "xtrue" ]; then
+                continue
+            fi
             ${PRINT_GREEN}
             echo "================================================================="
             echo "================================================================="
