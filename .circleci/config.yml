@@ -146,14 +146,6 @@ jobs:
       WITH_PQAUTH: false
   # x86_64-xenial (Ubuntu 16.04)
   # liboqs master branch, without OpenSSL enabled for OpenSSH
-  ssh-x86_64-xenial-liboqs-master-no-openssl-with-pqauth:
-    <<: *opensshjob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: master
-      WITH_OPENSSL: false
-      WITH_PQAUTH: true
   ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth:
     <<: *opensshjob
     environment:
@@ -196,7 +188,6 @@ workflows:
       - ssl-x86_64-xenial-liboqs-nist-openssl-102
       - ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth
       - ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth
-      - ssh-x86_64-xenial-liboqs-master-no-openssl-with-pqauth
       - ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth
       - ssh-x86_64-xenial-liboqs-nist-with-openssl
       - ssh-x86_64-xenial-liboqs-nist-no-openssl
