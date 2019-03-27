@@ -28,7 +28,7 @@ if [ "x${WITH_OPENSSL}" == "xtrue" ]; then
 else
     ./configure --prefix="${PREFIX}" --enable-pq-kex --enable-hybrid-kex ${PQAUTH_ARG} --with-ldflags="-Wl,-rpath -Wl,${PREFIX}/lib" --with-libs=-lm --without-openssl --with-liboqs-dir="${PREFIX}" --with-cflags="-I${PREFIX}/include" --sysconfdir="${PREFIX}"
 fi
-if [ "x${CIRCLECI}" == "xtrue" ]; then
+if [ "x${CIRCLECI}" == "xtrue" ] || [ "x${TRAVIS}" == "xtrue" ]; then
     make -j2
 else
     make -j

@@ -84,16 +84,7 @@ matrix:
     env:
       - LIBOQS=master
       - WITH_OPENSSL=false
-      - WITH_PQAUTH=true
-      - ARCH=x64
-      - OPENSSL_DIR=/usr/local/opt/openssl
-    script:
-      - cd integration/oqs_openssh && bash run.sh
-  - os: osx
-    env:
-      - LIBOQS=master
-      - WITH_OPENSSL=false
-      - WITH_PQAUTH=true
+      - WITH_PQAUTH=false
       - ARCH=x64
       - OPENSSL_DIR=/usr/local/opt/openssl
     script:
@@ -103,6 +94,7 @@ matrix:
     env:
       - LIBOQS=nist
       - WITH_OPENSSL=true
+      - WITH_PQAUTH=false
       - ARCH=x64
       - OPENSSL_DIR=/usr/local/opt/openssl
     script:
@@ -111,6 +103,7 @@ matrix:
     env:
       - LIBOQS=nist
       - WITH_OPENSSL=false
+      - WITH_PQAUTH=false
       - ARCH=x64
       - OPENSSL_DIR=/usr/local/opt/openssl
     script:

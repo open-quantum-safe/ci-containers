@@ -19,7 +19,7 @@ esac
 if [ "x${OPENSSL}" == "x102" ]; then
     make
 else
-    if [ "x${CIRCLECI}" == "xtrue" ]; then
+    if [ "x${CIRCLECI}" == "xtrue" ] || [ "x${TRAVIS}" == "xtrue" ]; then
         make -j2
     else
         make -j
