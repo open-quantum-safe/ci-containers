@@ -172,6 +172,7 @@ jobs:
       ARCH: x64
       LIBOQS: nist
       WITH_OPENSSL: true
+      WITH_PQAUTH: false
   ssh-x86_64-xenial-liboqs-nist-no-openssl:
     <<: *opensshjob
     environment:
@@ -179,6 +180,7 @@ jobs:
       ARCH: x64
       LIBOQS: nist
       WITH_OPENSSL: false
+      WITH_PQAUTH: false
 
 workflows:
   version: 2
