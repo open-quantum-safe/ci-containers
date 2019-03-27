@@ -22,7 +22,7 @@ PRINT_RESET="tput sgr 0"
 for LIBOQS in "master" "nist" ; do
     for WITH_OPENSSL in "true" "false" ; do
         for WITH_PQAUTH in "true" "false" ; do
-            if [ "x${LIBOQS}" == "xnist" ]; then
+            if [ "x${LIBOQS}" == "xnist" ] && [ "x${WITH_PQAUTH}" == "xtrue" ]; then
                 continue
             fi
             ${PRINT_GREEN}
