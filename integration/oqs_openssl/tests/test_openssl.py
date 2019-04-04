@@ -12,7 +12,7 @@ sig_algs_master_111 = ['rsa', 'ecdsa', 'picnicl1fs', 'qteslaI', 'qteslaIIIsize',
 kex_algs_nist_102 = ['OQSKEM-DEFAULT', 'OQSKEM-DEFAULT-ECDHE']
 sig_algs_nist_102 = ['rsa', 'ecdsa']
 
-kex_algs_nist_111 = ['oqs_kem_default', 'bike1l1', 'bike1l3', 'bike1l5', 'bike2l1', 'bike2l3', 'bike2l5', 'bike3l1', 'bike3l3', 'bike3l5', 'frodo640aes', 'frodo640cshake', 'frodo976aes', 'frodo976cshake', 'newhope512cca', 'newhope1024cca', 'sike503', 'sike751', 'p256-oqs_kem_default', 'p256-bike1l1', 'p256-bike2l1', 'p256-bike3l1', 'p256-frodo640aes', 'p256-frodo640cshake', 'p256-newhope512cca', 'p256-sike503', 'kyber512', 'kyber768', 'kyber1024', 'ledakem_C1_N02', 'ledakem_C1_N03', 'ledakem_C1_N04', 'ledakem_C3_N02', 'ledakem_C3_N03', 'ledakem_C3_N04', 'ledakem_C5_N02', 'lima_2p_1024_cca', 'lima_sp_1018_cca', 'lima_sp_1306_cca', 'lima_sp_1822_cca', 'saber_light_saber', 'saber_saber', 'saber_fire_saber']
+kex_algs_nist_111 = ['oqs_kem_default', 'bike1l1', 'bike1l3', 'bike1l5', 'bike2l1', 'bike2l3', 'bike2l5', 'bike3l1', 'bike3l3', 'bike3l5', 'frodo640aes', 'frodo640cshake', 'frodo976aes', 'frodo976cshake', 'newhope512cca', 'newhope1024cca', 'sike503', 'sike751', 'p256-oqs_kem_default', 'p256-bike1l1', 'p256-bike2l1', 'p256-bike3l1', 'p256-frodo640aes', 'p256-frodo640cshake', 'p256-newhope512cca', 'p256-sike503', 'kyber512', 'kyber768', 'kyber1024', 'ledakem_C1_N02', 'ledakem_C1_N03', 'ledakem_C1_N04', 'ledakem_C3_N02', 'ledakem_C3_N03', 'ledakem_C3_N04', 'ledakem_C5_N02', 'saber_light_saber', 'saber_saber', 'saber_fire_saber']
 sig_algs_nist_111 = ['rsa', 'ecdsa']
 
 if 'LIBOQS' in os.environ and os.environ['LIBOQS'] == 'nist':
