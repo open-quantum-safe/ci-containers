@@ -19,4 +19,6 @@ RUN apt-get update -qq \
 	graphviz \
 	python3 \
 	python3-nose \
-	python3-rednose
+	python3-rednose \
+	python3-pytest \
+	python3-pytest-xdist

@@ -12,10 +12,13 @@ RUN apt-get update -qq \
 	libssl-dev \
 	make \
 	unzip \
+	zlib1g-dev \
 	wget \
 	xsltproc \
 	doxygen \
 	graphviz \
 	python3 \
 	python3-nose \
-	python3-rednose
+	python3-rednose \
+	python3-pytest \
+	python3-pytest-xdist
