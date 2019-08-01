@@ -16,3 +16,5 @@ RUN add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.
 RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | apt-key add -
 RUN apt-get update -qq
 RUN apt-get install -qq -y clang-format-3.9
+RUN apt-get install -y python3-pip
+RUN pip3 install pytest-xdist
