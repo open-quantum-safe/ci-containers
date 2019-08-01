@@ -10,3 +10,4 @@ RUN apt-get install -y doxygen graphviz xsltproc
 RUN apt-get install -y python3 python3-nose python3-pytest
 RUN apt-get install -y python3-pip
 RUN pip3 install pytest-xdist
+RUN apt-get install -y python3.5
