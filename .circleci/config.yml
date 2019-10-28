@@ -180,8 +180,3 @@ workflows:
     jobs:
       - ssl-amd64-buster-liboqs-master-openssl-111
       - ssl-x86_64-xenial-liboqs-master-openssl-111
-      - ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth
-      - ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth
-      - ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth
-      - ssh-x86_64-xenial-liboqs-nist-with-openssl
-      - ssh-x86_64-xenial-liboqs-nist-no-openssl
