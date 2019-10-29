@@ -41,6 +41,9 @@ version: 2
     - checkout
     - setup_remote_docker
     - run:
+        name: Check env vars
+        command: echo $DOCKER_LOGIN
+    - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
     - run:
