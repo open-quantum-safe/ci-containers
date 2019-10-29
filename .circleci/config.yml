@@ -52,7 +52,10 @@ version: 2
         command: cd integration/oqs_openssl && scripts/build_openssl.sh
     - run:
          name: Show environment
-         command: ls -laR /tmp/openssl; pwd
+         command: ls -laR /root/project/integration/oqs_openssl/tmp/openssl; pwd
+    - run:
+         name: Build docker image
+         command: cd integration/oqs_openssl && scripts/build_docker.sh
 
     #- run:
     #    name: Run unit tests
