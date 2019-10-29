@@ -9,7 +9,7 @@
 set -exo pipefail
 
 case "$OSTYPE" in
-    linux*)   echo "Copying over required files from tmp/openssl...  ;;
+    linux*)   echo "Copying over required files from tmp/openssl..."  ;;
     *)        echo "Operating system: $OSTYPE not configured for dockerization" ; exit 1 ;;
 esac
 
