@@ -57,9 +57,9 @@ version: 2
     - run:
          name: Show environment
          command: ls -laR /root/project/integration/oqs_openssl/tmp/openssl; pwd
-    #- run:
-    #    name: Run unit tests
-    #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
+    - run:
+        name: Run unit tests
+        command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
     - run:
          name: Build docker image
          command: cd integration/oqs_openssl && scripts/build_docker.sh
