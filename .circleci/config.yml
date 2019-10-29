@@ -38,6 +38,7 @@ version: 2
     - image: ${IMAGE}
   steps:
     - checkout
+    - setup_remote_docker
     - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
@@ -186,5 +187,4 @@ workflows:
   version: 2
   build:
     jobs:
-      - ssl-amd64-buster-liboqs-master-openssl-111
       - ssl-x86_64-bionic-liboqs-master-openssl-111
