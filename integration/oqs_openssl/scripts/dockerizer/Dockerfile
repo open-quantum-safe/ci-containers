@@ -9,6 +9,8 @@ RUN apt-get update -y && apt-get upgrade -y
 
 # Add Openssl binaries, libraries and includes:
 ADD openssl /usr/local/openssl/bin/openssl
+ADD include /usr/local/openssl/include
+ADD lib /usr/local/openssl/lib
 
 # Prepare non-root environment:
 RUN useradd -ms /bin/bash oqssl
