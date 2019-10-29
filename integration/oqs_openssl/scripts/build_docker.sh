@@ -12,7 +12,7 @@ case "$OSTYPE" in
     linux*)   echo "Copying over required files from tmp/openssl..."  ;;
     *)        echo "Operating system: $OSTYPE not configured for dockerization" ; exit 1 ;;
 esac
-
+cd scripts
 # copy required files over:
 pwd
 ls -l
