@@ -11,3 +11,7 @@ RUN apt-get install -y python3 python3-nose python3-rednose python3-pytest
 RUN apt-get install -y python3-pip
 RUN apt-get install -y docker.io
 RUN pip3 install pytest-xdist
+
+LABEL com.circleci.preserve-entrypoint=true
+
+ENTRYPOINT openssl
