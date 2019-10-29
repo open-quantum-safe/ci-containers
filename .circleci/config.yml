@@ -97,13 +97,13 @@ jobs:
   #    ARCH: x64
   #    LIBOQS: nist
   #    OPENSSL: 102
-  # x86_64-xenial (Ubuntu 16.04)
+  # x86_64-bionic (Ubuntu 18.04)
   # liboqs master branch
-  ssl-x86_64-xenial-liboqs-master-openssl-111:
+  ssl-x86_64-bionic-liboqs-master-openssl-111:
     <<: *openssljob
     environment:
-      #IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      IMAGE: dstebila/liboqs:ubuntu-bionic-x86_64-0.1.0
+      #IMAGE: dstebila/liboqs:ubuntu-bionic-x86_64-0.1.0
+      IMAGE: zrlmib/liboqs-ubuntu-bionic
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
@@ -116,13 +116,13 @@ jobs:
   #    OPENSSL: 102
   # x86_64-xenial (Ubuntu 16.04)
   # liboqs nist branch
-  ssl-x86_64-xenial-liboqs-nist-openssl-111:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: nist
-      OPENSSL: 111
+  #ssl-x86_64-xenial-liboqs-nist-openssl-111:
+  #  <<: *openssljob
+  #  environment:
+  #    IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+  #    ARCH: x64
+  #    LIBOQS: nist
+  #    OPENSSL: 111
   #ssl-x86_64-xenial-liboqs-nist-openssl-102:
   #  <<: *openssljob
   #  environment:
@@ -187,4 +187,4 @@ workflows:
   build:
     jobs:
       - ssl-amd64-buster-liboqs-master-openssl-111
-      - ssl-x86_64-xenial-liboqs-master-openssl-111
+      - ssl-x86_64-bionic-liboqs-master-openssl-111
