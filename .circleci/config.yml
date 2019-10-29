@@ -36,6 +36,7 @@ version: 2
 .openssl_job: &openssljob
   docker:
     - image: ${IMAGE}
+  context: zrlmib
   steps:
     - checkout
     - setup_remote_docker
@@ -54,13 +55,12 @@ version: 2
     - run:
          name: Show environment
          command: ls -laR /root/project/integration/oqs_openssl/tmp/openssl; pwd
-    - run:
-         name: Build docker image
-         command: cd integration/oqs_openssl && scripts/build_docker.sh
-
     #- run:
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
+    - run:
+         name: Build docker image
+         command: cd integration/oqs_openssl && scripts/build_docker.sh
 
 jobs:
   ################
@@ -84,13 +84,13 @@ jobs:
   #    OPENSSL: 102
   # amd64-buster (Debian 10)
   # liboqs nist branch
-  ssl-amd64-buster-liboqs-nist-openssl-111:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
-      ARCH: x64
-      LIBOQS: nist
-      OPENSSL: 111
+  #ssl-amd64-buster-liboqs-nist-openssl-111:
+  #  <<: *openssljob
+  #  environment:
+  #    IMAGE: dstebila/liboqs:amd64-buster-0.0.1
+  #    ARCH: x64
+  #    LIBOQS: nist
+  #    OPENSSL: 111
   #ssl-amd64-buster-liboqs-nist-openssl-102:
   #  <<: *openssljob
   #  environment:
@@ -187,5 +187,4 @@ workflows:
   version: 2
   build:
     jobs:
-      - ssl-x86_64-bionic-liboqs-master-openssl-111:
-        context: zrlmib
+      - ssl-x86_64-bionic-liboqs-master-openssl-111
