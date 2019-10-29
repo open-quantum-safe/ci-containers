@@ -36,7 +36,7 @@ version: 2
 .openssl_job: &openssljob
   docker:
     - image: ${IMAGE}
-      context: zrlmib
+    - context: zrlmib
   steps:
     - checkout
     - setup_remote_docker
