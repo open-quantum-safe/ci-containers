@@ -63,6 +63,9 @@ version: 2
     - run:
          name: Build docker image
          command: cd integration/oqs_openssl && scripts/build_docker.sh
+    - run:
+         name: Push docker image
+         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker tag ubuntu-oqssl zrlmib/ubuntu-oqssl && docker push zrlmib/ubuntu-oqssl
 
 jobs:
   ################
