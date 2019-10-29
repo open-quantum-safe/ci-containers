@@ -36,7 +36,6 @@ version: 2
 .openssl_job: &openssljob
   docker:
     - image: ${IMAGE}
-      context: zrlmib
   steps:
     - checkout
     - setup_remote_docker
@@ -190,4 +189,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - ssl-x86_64-bionic-liboqs-master-openssl-111
+      - ssl-x86_64-bionic-liboqs-master-openssl-111:
+      context: zrlmib
+
