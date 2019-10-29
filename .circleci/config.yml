@@ -187,4 +187,5 @@ workflows:
   version: 2
   build:
     jobs:
-      - ssl-x86_64-bionic-liboqs-master-openssl-111
+      - ssl-x86_64-bionic-liboqs-master-openssl-111:
+        context: zrlmib

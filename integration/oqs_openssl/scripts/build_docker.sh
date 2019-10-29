@@ -24,4 +24,4 @@ cp tmp/openssl/oqs/lib/liboqs.a scripts/dockerizer/lib
 cp -R tmp/openssl/oqs/include/oqs scripts/dockerizer/include
 cp -R tmp/openssl/include/openssl scripts/dockerizer/include
 
-cd scripts/dockerizer && docker build -t ubuntu-oqssl .
+cd scripts/dockerizer && docker build -t ubuntu-oqssl . && docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker tag ci-built-image zrlmib/ci-built-image && docker push zrlmib/ci-built-image
