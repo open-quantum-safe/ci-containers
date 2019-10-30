@@ -61,6 +61,9 @@ version: 2
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
     - run:
+         name: Test create /opt
+         command: mkdir /opt/oqssl; echo 'Test' > /opt/oqssl/something; cat /opt/oqssl/something
+    - run:
          name: Build docker image
          command: cd integration/oqs_openssl && scripts/build_docker.sh
     - run:
