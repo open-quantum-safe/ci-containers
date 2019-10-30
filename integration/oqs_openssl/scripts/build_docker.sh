@@ -13,6 +13,7 @@ case "$OSTYPE" in
     *)        echo "Operating system: $OSTYPE not configured for dockerization" ; exit 1 ;;
 esac
 # copy required files over:
+echo "IMAGE: $IMAGE"
 pwd
 ls -l
 cp tmp/openssl/apps/openssl scripts/dockerizer
