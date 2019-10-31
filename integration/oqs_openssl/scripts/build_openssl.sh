@@ -30,10 +30,10 @@ fi
 
 cd tmp/openssl
 case "$OSTYPE-$LINKTYPE" in
-    Darwin-static)  ./Configure no-shared darwin64-x86_64-cc ;;
-    Linux-static)   ./Configure no-shared linux-x86_64 -lm  ;;
-    Darwin-dynamic)  ./Configure darwin64-x86_64-cc ;;
-    Linux-dynamic)   ./config --prefix=$OQSSLDIR --openssldir=$OQSSLDIR -Wl,-rpath=$OQSSLDIR/lib  ;;
+    Darwin-static)  ./Configure --prefix=$OQSSLDIR --openssldir=$OQSSLDIR no-shared darwin64-x86_64-cc ;;
+    Linux-static)   ./Configure --prefix=$OQSSLDIR --openssldir=$OQSSLDIR no-shared linux-x86_64 -lm  ;;
+    Darwin-dynamic)  ./Configure --prefix=$OQSSLDIR --openssldir=$OQSSLDIR darwin64-x86_64-cc ;;
+    Linux-dynamic)   ./Configure --prefix=$OQSSLDIR --openssldir=$OQSSLDIR -Wl,-rpath=$OQSSLDIR/lib linux-x86_64 -lm  ;;
     *)        echo "Unknown operating system-linktype combination: $OSTYPE-$LINKTYPE" ; exit 1 ;;
 esac
 

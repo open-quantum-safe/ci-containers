@@ -54,15 +54,9 @@ version: 2
     - run:
         name: Build OpenSSL
         command: cd integration/oqs_openssl && scripts/build_openssl.sh
-    - run:
-         name: Show environment
-         command: ls -laR /root/project/integration/oqs_openssl/tmp/openssl; pwd
     #- run:
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
-    - run:
-         name: Test create /opt
-         command: mkdir /opt/oqssl; echo 'Test' > /opt/oqssl/something; cat /opt/oqssl/something
     - run:
          name: Build docker image
          command: cd integration/oqs_openssl && scripts/build_docker.sh
@@ -164,6 +158,6 @@ workflows:
           context: openqsafe
       - ssl-amd64-buster-liboqs-master-openssl-111:
           context: openqsafe
-      - ssl-amd64-centos-liboqs-master-openssl-111:
+      - ssl-amd64-centos7-liboqs-master-openssl-111:
           context: openqsafe
 
