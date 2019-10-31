@@ -105,60 +105,42 @@ jobs:
   ################
   # x86_64-xenial (Ubuntu 16.04)
   # liboqs master branch, with OpenSSL enabled for OpenSSH
-  #ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth:
-  #  <<: *opensshjob
-  #  environment:
-  #    IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-  #    ARCH: x64
-  #    LIBOQS: master
-  #    WITH_OPENSSL: true
-  #    WITH_PQAUTH: true
-  #ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth:
-  #  <<: *opensshjob
-  #  environment:
-  #    IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-  #    ARCH: x64
-  #    LIBOQS: master
-  #    WITH_OPENSSL: true
-  #    WITH_PQAUTH: false
+  ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth:
+    <<: *opensshjob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: master
+      WITH_OPENSSL: true
+      WITH_PQAUTH: true
+  ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth:
+    <<: *opensshjob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: master
+      WITH_OPENSSL: true
+      WITH_PQAUTH: false
   # x86_64-xenial (Ubuntu 16.04)
   # liboqs master branch, without OpenSSL enabled for OpenSSH
-  #ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth:
-  #  <<: *opensshjob
-  #  environment:
-  #    IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-  #    ARCH: x64
-  #    LIBOQS: master
-  #    WITH_OPENSSL: false
-  #    WITH_PQAUTH: false
+  ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth:
+    <<: *opensshjob
+    environment:
+      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
+      ARCH: x64
+      LIBOQS: master
+      WITH_OPENSSL: false
+      WITH_PQAUTH: false
   # x86_64-xenial (Ubuntu 16.04)
-  # liboqs nist branch
-  # (nist-branch doesn't support PQ auth)
-  #ssh-x86_64-xenial-liboqs-nist-with-openssl:
-  #  <<: *opensshjob
-  #  environment:
-  #    IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-  #    ARCH: x64
-  #    LIBOQS: nist
-  #    WITH_OPENSSL: true
-  #    WITH_PQAUTH: false
-  #ssh-x86_64-xenial-liboqs-nist-no-openssl:
-  #  <<: *opensshjob
-  #  environment:
-  #    IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-  #    ARCH: x64
-  #    LIBOQS: nist
-  #    WITH_OPENSSL: false
-  #    WITH_PQAUTH: false
 
 workflows:
   version: 2
   build:
     jobs:
-      #- ssl-x86_64-bionic-liboqs-master-openssl-111:
-      #    context: openqsafe
-      #- ssl-amd64-buster-liboqs-master-openssl-111:
-      #    context: openqsafe
+      - ssl-x86_64-bionic-liboqs-master-openssl-111:
+          context: openqsafe
+      - ssl-amd64-buster-liboqs-master-openssl-111:
+          context: openqsafe
       - ssl-x86_64-centos7-liboqs-master-openssl-111:
           context: openqsafe
 
