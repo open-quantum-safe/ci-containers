@@ -158,6 +158,6 @@ workflows:
           context: openqsafe
       - ssl-amd64-buster-liboqs-master-openssl-111:
           context: openqsafe
-      - ssl-amd64-centos7-liboqs-master-openssl-111:
+      - ssl-x86_64-centos7-liboqs-master-openssl-111:
           context: openqsafe
 
