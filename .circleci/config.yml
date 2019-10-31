@@ -44,7 +44,7 @@ version: 2
         command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
     - run:
         name: Check gcc
-        command: gcc --version
+        command: source ~/.bashrc && gcc --version
     - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
