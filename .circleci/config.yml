@@ -22,7 +22,7 @@ version: 2
         command: cd integration/oqs_openssh && scripts/clone_liboqs.sh
     - run:
         name: Build liboqs
-        command: cd integration/oqs_openssh && scripts/build_liboqs.sh
+        command: source ~/.bashrc && cd integration/oqs_openssh && scripts/build_liboqs.sh
     - run:
         name: Clone OpenSSH
         command: cd integration/oqs_openssh && scripts/clone_openssh.sh
@@ -43,9 +43,6 @@ version: 2
         name: Check env vars
         command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
     - run:
-        name: Check gcc
-        command: source ~/.bashrc && gcc --version
-    - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
     - run:
@@ -53,7 +50,7 @@ version: 2
         command: cd integration/oqs_openssl && scripts/clone_openssl.sh
     - run:
         name: Build liboqs
-        command: cd integration/oqs_openssl && scripts/build_liboqs.sh
+        command: source ~/.bashrc && cd integration/oqs_openssl && scripts/build_liboqs.sh
     - run:
         name: Build OpenSSL
         command: cd integration/oqs_openssl && scripts/build_openssl.sh
