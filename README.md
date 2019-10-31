@@ -1,8 +1,7 @@
 OQS Integration Testing
 =======================
 
-[![Build Status](https://travis-ci.com/open-quantum-safe/testing.svg?branch=master)](https://travis-ci.com/open-quantum-safe/testing)
-[![CircleCI](https://circleci.com/gh/open-quantum-safe/testing/tree/master.svg?style=svg)](https://circleci.com/gh/open-quantum-safe/testing/tree/master)
+[![CircleCI](https://circleci.com/gh/zrlmib/testing/tree/master.svg?style=svg)](https://circleci.com/gh/zrlmib/testing/tree/master)
 
 The **Open Quantum Safe (OQS) project** has the goal of developing and prototyping quantum-resistant cryptography.  [liboqs](https://github.com/open-quantum-safe/liboqs) is an open source C library for post-quantum cryptographic algorithms.  The OQS project has developed forks of [OpenSSH](https://github.com/open-quantum-safe/openssh-portable) and [OpenSSL](https://github.com/open-quantum-safe/openssl) that integrate quantum-resistant algorithms into the SSH and TLS protocols.
 
