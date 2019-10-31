@@ -4,25 +4,22 @@
 # Build OpenSSL docker image
 #
 # Must be run after OQSLL has been built (and tested OK) 
+# Environment variables:
+# IMAGE: Defines the docker image we're running (and which is consequently being created)
 ###########
 
 set -exo pipefail
 
-case "$OSTYPE" in
-    linux*)   echo "Copying over required files from tmp/openssl..."  ;;
-    *)        echo "Operating system: $OSTYPE not configured for dockerization" ; exit 1 ;;
-esac
-# copy required files over:
-echo "IMAGE: $IMAGE"
-pwd
-ls -l
-cp tmp/openssl/apps/openssl scripts/dockerizer
-mkdir scripts/dockerizer/include
-mkdir scripts/dockerizer/lib
-cp tmp/openssl/libcrypto.a scripts/dockerizer/lib
-cp tmp/openssl/libssl.a scripts/dockerizer/lib
-cp tmp/openssl/oqs/lib/liboqs.a scripts/dockerizer/lib
-cp -R tmp/openssl/oqs/include/oqs scripts/dockerizer/include
-cp -R tmp/openssl/include/openssl scripts/dockerizer/include
+# IMAGE defines the Dockerfile-folder to be populated so needs to be present
+if [[ -z $IMAGE ]]; then
+   echo "IMAGE must be set in environment to proceed. Exiting."
+   exit -1
+fi
 
-cd scripts/dockerizer && docker build -t ubuntu-oqssl . 
+BASE=`echo $IMAGE | sed -e 's/openqsafe\///g'`
+
+# copy required files over:
+echo "BASE: $BASE"
+cp -R /opt/oqssl scripts/dockerizer/$BASE
+
+cd scripts/dockerizer/$BASE && docker build -t $IMAGE-run .  

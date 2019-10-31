@@ -42,21 +42,21 @@ version: 2
     - run:
         name: Check env vars
         command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
-    #- run:
-    #    name: Clone liboqs
-    #    command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
-    #- run:
-    #    name: Clone OpenSSL
-    #    command: cd integration/oqs_openssl && scripts/clone_openssl.sh
-    #- run:
-    #    name: Build liboqs
-    #    command: cd integration/oqs_openssl && scripts/build_liboqs.sh
-    #- run:
-    #    name: Build OpenSSL
-    #    command: cd integration/oqs_openssl && scripts/build_openssl.sh
-    #- run:
-    #     name: Show environment
-    #     command: ls -laR /root/project/integration/oqs_openssl/tmp/openssl; pwd
+    - run:
+        name: Clone liboqs
+        command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
+    - run:
+        name: Clone OpenSSL
+        command: cd integration/oqs_openssl && scripts/clone_openssl.sh
+    - run:
+        name: Build liboqs
+        command: cd integration/oqs_openssl && scripts/build_liboqs.sh
+    - run:
+        name: Build OpenSSL
+        command: cd integration/oqs_openssl && scripts/build_openssl.sh
+    - run:
+         name: Show environment
+         command: ls -laR /root/project/integration/oqs_openssl/tmp/openssl; pwd
     #- run:
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
@@ -65,7 +65,7 @@ version: 2
          command: cd integration/oqs_openssl && scripts/build_docker.sh
     - run:
          name: Push docker image
-         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker tag ubuntu-oqssl openqsafe/ubuntu-oqssl && docker push openqsafe/ubuntu-oqssl
+         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE-run
 
 jobs:
   ################
@@ -80,6 +80,7 @@ jobs:
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
+      LINKTYPE: dynamic
   # x86_64-bionic (Ubuntu 18.04)
   # liboqs master branch
   ssl-x86_64-bionic-liboqs-master-openssl-111:
@@ -88,6 +89,17 @@ jobs:
       IMAGE: openqsafe/liboqs-ubuntu-bionic
       ARCH: x64
       LIBOQS: master
+      LINKTYPE: static
+      OPENSSL: 111
+  # x86_64-centos7 (Centos 7)
+  # liboqs master branch
+  ssl-x86_64-centos7-liboqs-master-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: openqsafe/liboqs-centos-7
+      ARCH: x64
+      LIBOQS: master
+      LINKTYPE: dynamic
       OPENSSL: 111
       
   ################
@@ -148,5 +160,7 @@ workflows:
       - ssl-x86_64-bionic-liboqs-master-openssl-111:
           context: openqsafe
       - ssl-amd64-buster-liboqs-master-openssl-111:
+          context: openqsafe
+      - ssl-amd64-centos-liboqs-master-openssl-111:
           context: openqsafe
 
