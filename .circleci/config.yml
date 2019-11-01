@@ -155,8 +155,8 @@ workflows:
     jobs:
       - ssl-x86_64-bionic-liboqs-master-openssl-111:
           context: openqsafe
-      #- ssl-amd64-buster-liboqs-master-openssl-111:
-      #    context: openqsafe
-      #- ssl-x86_64-centos7-liboqs-master-openssl-111:
-      #    context: openqsafe
+      - ssl-amd64-buster-liboqs-master-openssl-111:
+          context: openqsafe
+      - ssl-x86_64-centos7-liboqs-master-openssl-111:
+          context: openqsafe
 
