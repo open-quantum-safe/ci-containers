@@ -18,6 +18,7 @@ autoreconf -i
 if [ "x${WITH_OPENSSL}" == "xtrue" ]; then
     ./configure --prefix="${PREFIX}" --without-openssl-header-check --with-ldflags="-Wl,-rpath -Wl,${PREFIX}/lib" --with-libs=-lm --with-ssl-dir="${PREFIX}" --with-liboqs-dir="${PREFIX}" --with-cflags="-I${PREFIX}/include" --sysconfdir="${PREFIX}"
     cat Makefile
+    cat config.log
 else
     ./configure --prefix="${PREFIX}" --with-ldflags="-Wl,-rpath -Wl,${PREFIX}/lib" --with-libs=-lm --without-openssl --with-liboqs-dir="${PREFIX}" --with-cflags="-I${PREFIX}/include" --sysconfdir="${PREFIX}"
 fi
