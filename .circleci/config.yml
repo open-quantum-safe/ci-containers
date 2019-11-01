@@ -54,6 +54,12 @@ version: 2
     - run:
         name: Build OpenSSL
         command: cd integration/oqs_openssl && scripts/build_openssl.sh
+    - run:
+        name: Clone OpenSSH
+        command: cd integration/oqs_openssh && scripts/clone_openssh.sh
+    - run:
+        name: Build OpenSSH
+        command: cd integration/oqs_openssh && scripts/build_openssh.sh
     #- run:
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
@@ -139,8 +145,8 @@ workflows:
     jobs:
       - ssl-x86_64-bionic-liboqs-master-openssl-111:
           context: openqsafe
-      - ssl-amd64-buster-liboqs-master-openssl-111:
-          context: openqsafe
-      - ssl-x86_64-centos7-liboqs-master-openssl-111:
-          context: openqsafe
+      #- ssl-amd64-buster-liboqs-master-openssl-111:
+      #    context: openqsafe
+      #- ssl-x86_64-centos7-liboqs-master-openssl-111:
+      #    context: openqsafe
 
