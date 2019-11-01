@@ -99,7 +99,7 @@ jobs:
       IMAGE: openqsafe/liboqs-ubuntu-bionic
       ARCH: x64
       LIBOQS: master
-      LINKTYPE: static
+      LINKTYPE: dynamic
       PREFIX: /opt/oqssl
       WITH_OPENSSL: true
       OPENSSL: 111
