@@ -43,6 +43,12 @@ version: 2
         name: Check env vars
         command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
     - run:
+        name: Set up SSH environment
+        command: |
+          mkdir -p -m 0755 /var/empty
+          groupadd sshd
+          useradd -g sshd -c 'sshd privsep' -d /var/empty -s /bin/false sshd
+    - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
     - run:
@@ -56,10 +62,10 @@ version: 2
         command: cd integration/oqs_openssl && scripts/build_openssl.sh
     - run:
         name: Clone OpenSSH
-        command: cd integration/oqs_openssh && scripts/clone_openssh.sh
+        command: cd integration/oqs_openssl && ../oqs_openssh/scripts/clone_openssh.sh
     - run:
         name: Build OpenSSH
-        command: cd integration/oqs_openssh && scripts/build_openssh.sh
+        command: cd integration/oqs_openssl && ../oqs_openssh/scripts/build_openssh.sh
     #- run:
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
@@ -83,6 +89,7 @@ jobs:
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
+      PREFIX: /opt/oqssl
       LINKTYPE: dynamic
   # x86_64-bionic (Ubuntu 18.04)
   # liboqs master branch
@@ -93,6 +100,7 @@ jobs:
       ARCH: x64
       LIBOQS: master
       LINKTYPE: static
+      PREFIX: /opt/oqssl
       OPENSSL: 111
   # x86_64-centos7 (Centos 7)
   # liboqs master branch
@@ -104,6 +112,7 @@ jobs:
       LIBOQS: master
       LINKTYPE: dynamic
       OPENSSL: 111
+      PREFIX: /opt/oqssl
       OPENSSL_DIR: /usr/local/ssl
       
   ################
