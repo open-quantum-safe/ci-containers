@@ -16,7 +16,7 @@ WITH_OPENSSL=${WITH_OPENSSL:-"true"}
 cd tmp/openssh
 autoreconf -i
 if [ "x${WITH_OPENSSL}" == "xtrue" ]; then
-    ./configure --prefix="${PREFIX}" --without-openssl-header-check --with-ldflags="-Wl,-rpath -Wl,${PREFIX}/lib" --with-libs="-lm -lpthreads" --with-ssl-dir="${PREFIX}" --with-liboqs-dir="${PREFIX}" --with-cflags="-I${PREFIX}/include" --sysconfdir="${PREFIX}" || cat config.log
+    ./configure --prefix="${PREFIX}" --without-openssl-header-check --with-ldflags="-Wl,-rpath -Wl,${PREFIX}/lib" --with-libs="-lm -lpthread" --with-ssl-dir="${PREFIX}" --with-liboqs-dir="${PREFIX}" --with-cflags="-I${PREFIX}/include" --sysconfdir="${PREFIX}" || cat config.log
     cat Makefile
     cat config.log
 else
