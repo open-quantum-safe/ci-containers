@@ -53,6 +53,6 @@ else
     if [ "$?" -eq 0 ]; then
        make install
        cp -R oqs/include/oqs $OQSSLDIR/include
-       cp oqs/lib/* $OQSSLDIR/lib
+       cd oqs/lib; tar -cvf - * | (cd $OQSSLDIR/lib; tar -xvf - ); cd -
     fi
 fi
