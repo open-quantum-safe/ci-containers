@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [[ "$#" -lt 2 ]]; then
+   echo "Usage: $0 <Signature algorithm> <KEM algorithm>."
+   echo "  Signature algorithms at https://github.com/open-quantum-safe/openssl#authentication"
+   echo "  KEM algorithms at https://github.com/open-quantum-safe/openssl#key-exchange"
+   echo
+   exit -1
+fi
+
+bash --norc -i -c "oqs-sslserver $1 speed > /dev/null 2>&1 &"
+sleep 2
+oqs-sslclient $1 $2 speed

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+export PATH=/usr/local/openssl/bin:$PATH
+openssl version
+cd /tmp
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <Signature algorithm name, e.g., dilithium4> [<KEXALG>, e.g., newhope1024cca (default)] [speed]"
+    exit -1
+fi
+
+if [ "$#" -gt 1 ]; then
+    KEXALG=$2
+else
+    KEXALG="newhope1024cca"
+fi
+
+# Require presence of cert: 
+if [ ! -f "oqsdata/$1_CA.crt" ]; then
+   echo "Presence of $1 root certificate required. Please run sslserver.sh first. Exiting."
+   exit -1
+fi 
+if [ "$#" -gt 2 ]; then
+   openssl s_time -verify 9 -connect localhost:4433 -cafile oqsdata/$1_CA.crt
+else
+   echo "Q" | openssl s_client -verify 9 -curves $KEXALG -connect localhost:4433 -CAfile oqsdata/$1_CA.crt
+fi

@@ -3,7 +3,7 @@
 ###########
 # Build OpenSSL docker image
 #
-# Must be run after OQSLL has been built (and tested OK) 
+# Must be run after OQSS* has been built (and tested OK) 
 # Environment variables:
 # IMAGE: Defines the docker image we're running (and which is consequently being created)
 ###########
@@ -20,6 +20,10 @@ BASE=`echo $IMAGE | sed -e 's/openqsafe\///g'`
 
 # copy required files over:
 echo "BASE: $BASE"
-cp -R /opt/oqssl scripts/dockerizer/$BASE
+cp scripts/dockerizer/oqs-* /opt/oqssl/bin
+cp scripts/dockerizer/$BASE/* /opt
+cd /opt && docker build -f Dockerfile -t $IMAGE-run .
+cd /opt && docker build -f Dockerfile-dev -t $IMAGE-dev .
+#cp -R /opt/oqssl scripts/dockerizer/$BASE
 
-cd scripts/dockerizer/$BASE && docker build -t $IMAGE-run .  
+#cd scripts/dockerizer/$BASE && docker build -t $IMAGE-run .  

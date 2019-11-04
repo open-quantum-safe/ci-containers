@@ -74,6 +74,23 @@ On Ubuntu 14.04, you need to also:
 
 [Visual Studio](https://visualstudio.microsoft.com/vs/) and [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-6) must be installed.
 
+Integration Docker Images
+-------------------------
+
+Upon successful completion of all internal tests, the current CircleCI integration creates several ready-to-use Docker images:
+
+**Demonstration images**
+
+The images available on [Docker Hub](https://hub.docker.com) in the project `openqssafe` with the extension `-run` are suitable for executing all supported `openssl` and `openssh` commands as known from the upstream projects. In other words, completely built-and-tested images for the presently supported operating systems are available for running out of the box. No need to install or build any software.
+
+At minimum, all images can be started identically with `docker run openqsafe/liboqs-<platform>-run` providing a user shell with pre-set environments for running openssl and openssh. These are non-root images to facilitate use in restricted Kubernetes environments.
+
+All images also provide a convenience script meant to demonstrate (and measure) the performance of quantum safe crypto algorithms 
+
+**Integration images**
+
+At the same location, a set of images with the extension `-dev` is available that contains all typically required tooling for building and integrating software that uses/consumes openssl and openssh, e.g., curl or nginx. These images are providing a root shell for maximum flexibility in building and extending them for any kind of integration task.
+
 License
 -------
 
