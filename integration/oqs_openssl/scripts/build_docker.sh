@@ -20,6 +20,7 @@ BASE=`echo $IMAGE | sed -e 's/openqsafe\///g'`
 
 # Move build images in place:
 cp scripts/dockerizer/$BASE/* /opt
+cp scripts/dockerizer/*entrypoint* /opt/oqssa/bin
 cd /opt && docker build -f Dockerfile-dev -t $IMAGE-dev . && cd -
 
 # Add demo scripts to run image:

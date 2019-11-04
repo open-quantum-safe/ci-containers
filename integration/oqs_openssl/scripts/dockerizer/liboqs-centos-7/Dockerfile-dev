@@ -11,7 +11,7 @@ ADD oqssa /opt/oqssa
 RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /root/.bashrc
 
 # Default command to run
-WORKDIR /opt/oqssa/bin
+WORKDIR /opt/oqssa
 ENTRYPOINT source /opt/rh/devtoolset-8/enable && exec "$@"
 CMD ["/bin/bash"]
 

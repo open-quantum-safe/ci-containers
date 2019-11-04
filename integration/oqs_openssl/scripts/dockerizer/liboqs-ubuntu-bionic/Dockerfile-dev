@@ -11,5 +11,5 @@ ADD oqssa /opt/oqssa
 RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /root/.bashrc
 
 # Default command to run
-WORKDIR /home/oqssa/bin
+WORKDIR /opt/oqssa
 CMD ["/bin/bash"]
