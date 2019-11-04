@@ -66,6 +66,7 @@ version: 2
     - run:
         name: Build OpenSSH
         command: cd integration/oqs_openssl && ../oqs_openssh/scripts/build_openssh.sh
+    # XXX Presently disabled due to test error:
     #- run:
     #    name: Run unit tests
     #    command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
@@ -159,6 +160,8 @@ workflows:
           context: openqsafe
       - ssl-x86_64-centos7-liboqs-master-openssl-111:
           context: openqsafe
-      - ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth
-      - ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth
+      # Presently not building due to explicit references to OpenSSL 1.0.2 in clone script: Why?? Suggest to delete as openssh now included in openssl build
+      #- ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth
+      #- ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth
+      #- ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth
 

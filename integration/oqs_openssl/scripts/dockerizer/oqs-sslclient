@@ -16,7 +16,7 @@ fi
 
 # Require presence of cert: 
 if [ ! -f "oqsdata/$1_CA.crt" ]; then
-   echo "Presence of $1 root certificate required. Please run sslserver.sh first. Exiting."
+   echo "Presence of $1 root certificate required. Please run oqs-sslserver first. If done, check all certificates were generated correctly (check algorithm names). Exiting."
    exit -1
 fi 
 if [ "$#" -gt 2 ]; then
