@@ -85,11 +85,37 @@ The images available on [Docker Hub](https://hub.docker.com) in the project `ope
 
 At minimum, all images can be started identically with `docker run -it openqsafe/liboqs-<platform>-run` providing a user shell with pre-set environments for running openssl and openssh. These are non-root images to facilitate use in restricted, e.g., Kubernetes, environments.
 
-All images also provide convenience scripts meant to demonstrate (and measure) the performance of quantum safe crypto algorithms: These have the prefix `oqs-`. So for example, by running `docker run -t openqsafe/liboqs-<platform>-run oqs-speedtest dilithium4 kyber1024` the TLS/SSL performance of this OQS Signature/KEM combination can be easily tested. 
+All images also provide convenience scripts meant to demonstrate (and measure) the performance of quantum safe crypto algorithms: These have the prefix `oqs-` (located in `/opt/oqssa`). So for example, by running `docker run -t openqsafe/liboqs-<platform>-run oqs-speedtest dilithium4 kyber1024` the TLS/SSL performance of this OQS Signature/KEM combination can be easily tested. 
 
 **Integration images**
 
-At the same location, a set of images with the extension `-dev` is available that contains all typically required tooling for building and integrating software that uses/consumes openssl and openssh, e.g., curl or nginx. These images are providing a root shell for maximum flexibility in building and extending them for any kind of integration task.
+At the same location, a set of images with the extension `-dev` is available that contains all typically required tooling for building and integrating software that uses/consumes openssl and openssh, e.g., curl or nginx. These images are providing a root shell for maximum flexibility in building and extending them for any kind of integration task. Again, all OQS-applications, libaries and includes are located in the folder `/opt/oqssa`.
+
+*** Example use case***
+
+To build `curl` with OQS support, simply start the development image in docker, e.g., by running
+```
+docker run -it openqsafe/liboqs-ubuntu-bionic-dev
+```
+Within the image (on the command prompt), obtain the curl source code, build and install it, e.g., as follows:
+```
+cd ~ && wget -4 https://curl.haxx.se/download/curl-7.65.3.tar.gz && tar xzvf curl-7.65.3.tar.gz
+cd curl-7.65.3 && CPPFLAGS="-I/opt/oqssa/include" LDFLAGS=-Wl,-R/opt/oqssa/lib ./configure --disable-libcurl-option --with-ssl=/opt/oqssa --prefix=/opt/oqssa 
+make && make install
+```
+
+If you encounter an error message pointing to an EVP API mismatch between OpenSSL and OQS-enabled OpenSSL, simply run this script prior to retrying the `make` run:
+```
+cat lib/vtls/openssl.c | sed -e 's/\#define BACKEND connssl->backend/\#define BACKEND connssl->backend\n\# define EVP_MD_CTX_create()     EVP_MD_CTX_new()\n\# define EVP_MD_CTX_destroy(ctx) EVP_MD_CTX_free((ctx))/g' > lib/vtls/openssl.c-new && mv lib/vtls/openssl.c-new lib/vtls/openssl.c
+```
+
+**Supported platforms**
+
+At this time the following platforms are supported (all x86_64):
+* ubuntu-bionic (18.04)
+* debian-buster (10)
+* centos-7
+
 
 License
 -------
