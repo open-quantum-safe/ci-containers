@@ -89,7 +89,7 @@ jobs:
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
-      PREFIX: /opt/oqssl
+      PREFIX: /opt/oqssa
       LINKTYPE: dynamic
   # x86_64-bionic (Ubuntu 18.04)
   # liboqs master branch
@@ -100,7 +100,7 @@ jobs:
       ARCH: x64
       LIBOQS: master
       LINKTYPE: dynamic
-      PREFIX: /opt/oqssl
+      PREFIX: /opt/oqssa
       WITH_OPENSSL: true
       OPENSSL: 111
   # x86_64-centos7 (Centos 7)
@@ -113,7 +113,7 @@ jobs:
       LIBOQS: master
       LINKTYPE: dynamic
       OPENSSL: 111
-      PREFIX: /opt/oqssl
+      PREFIX: /opt/oqssa
       OPENSSL_DIR: /usr/local/ssl
       
   ################

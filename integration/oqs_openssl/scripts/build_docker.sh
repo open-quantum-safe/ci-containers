@@ -20,10 +20,7 @@ BASE=`echo $IMAGE | sed -e 's/openqsafe\///g'`
 
 # copy required files over:
 echo "BASE: $BASE"
-cp scripts/dockerizer/oqs-* /opt/oqssl/bin
+cp scripts/dockerizer/oqs-* /opt/oqssa/bin
 cp scripts/dockerizer/$BASE/* /opt
 cd /opt && docker build -f Dockerfile -t $IMAGE-run .
 cd /opt && docker build -f Dockerfile-dev -t $IMAGE-dev .
-#cp -R /opt/oqssl scripts/dockerizer/$BASE
-
-#cd scripts/dockerizer/$BASE && docker build -t $IMAGE-run .  

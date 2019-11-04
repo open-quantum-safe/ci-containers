@@ -23,7 +23,7 @@ OSTYPE=`uname`
 
 # Default install directory:
 if [[ -z "$INSTALLDIR" ]]; then
-   OQSSLDIR=/opt/oqssl
+   OQSSLDIR=/opt/oqssa
 else
    OQSSLDIR=$INSTALLDIR
 fi

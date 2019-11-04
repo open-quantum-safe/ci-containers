@@ -83,9 +83,9 @@ Upon successful completion of all internal tests, the current CircleCI integrati
 
 The images available on [Docker Hub](https://hub.docker.com) in the project `openqssafe` with the extension `-run` are suitable for executing all supported `openssl` and `openssh` commands as known from the upstream projects. In other words, completely built-and-tested images for the presently supported operating systems are available for running out of the box. No need to install or build any software.
 
-At minimum, all images can be started identically with `docker run openqsafe/liboqs-<platform>-run` providing a user shell with pre-set environments for running openssl and openssh. These are non-root images to facilitate use in restricted Kubernetes environments.
+At minimum, all images can be started identically with `docker run -it openqsafe/liboqs-<platform>-run` providing a user shell with pre-set environments for running openssl and openssh. These are non-root images to facilitate use in restricted, e.g., Kubernetes, environments.
 
-All images also provide a convenience script meant to demonstrate (and measure) the performance of quantum safe crypto algorithms 
+All images also provide convenience scripts meant to demonstrate (and measure) the performance of quantum safe crypto algorithms: These have the prefix `oqs-`. So for example, by running `docker run -t openqsafe/liboqs-<platform>-run oqs-speedtest dilithium4 kyber1024` the TLS/SSL performance of this OQS Signature/KEM combination can be easily tested. 
 
 **Integration images**
 

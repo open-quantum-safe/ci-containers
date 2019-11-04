@@ -2,13 +2,13 @@ FROM centos:7
 
 RUN yum -y update 
 
-RUN useradd -ms /bin/bash oqssl
+RUN useradd -ms /bin/bash oqssa
  
-ADD oqssl /opt/oqssl
-RUN echo 'export PATH=/opt/oqssl/bin:$PATH' >> /home/oqssl/.bashrc
+ADD oqssa /opt/oqssa
+RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /home/oqssa/.bashrc
 
 # Default command to run
-USER oqssl
-WORKDIR /home/oqssl
+USER oqssa
+WORKDIR /home/oqssa
 CMD ["/bin/bash"]
 
