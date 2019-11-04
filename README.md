@@ -14,10 +14,14 @@ Continuous integration testing of this repository operates on for [Travis CI](ht
 Quick Start using Docker and CircleCI
 -------------------------------------
 
-You can quickly get pre-built Debian 10 (Buster) or Ubuntu 16.04 (Xenial) Docker containers with dependencies installed for building liboqs and our integration tests:
+You can quickly get pre-built Debian 10 (Buster), Ubuntu 16.04 (Xenial) or 18.04 (Bionic) and Centos 7 Docker containers with dependencies installed for building liboqs, openssl, openssh and our integration tests:
 
 	docker pull dstebila/liboqs:amd64-buster-0.0.1
 	docker pull dstebila/liboqs:x86_64-xenial-0.0.2
+	docker pull openqsafe/liboqs-centos-7
+	docker pull openqsafe/liboqs-ubuntu-bionic
+	docker pull openqsafe/liboqs-debian-buster
+
 
 Our Linux integration tests are run on CircleCI.  You can also run those same tests locally using CircleCI's local command-line interface.  First [install CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/).  Then use `circleci local execute --job <jobname>` to launch a job.  See the README.md files under integration/oqs-openssh and integration/oqs-openssl for details.
 
@@ -91,7 +95,7 @@ All images also provide convenience scripts meant to demonstrate (and measure) t
 
 At the same location, a set of images with the extension `-dev` is available that contains all typically required tooling for building and integrating software that uses/consumes openssl and openssh, e.g., curl or nginx. These images are providing a root shell for maximum flexibility in building and extending them for any kind of integration task. Again, all OQS-applications, libaries and includes are located in the folder `/opt/oqssa`.
 
-*** Example use case***
+***Example use case***
 
 To build `curl` with OQS support, simply start the development image in docker, e.g., by running
 ```
