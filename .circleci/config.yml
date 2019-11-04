@@ -74,7 +74,7 @@ version: 2
          command: cd integration/oqs_openssl && scripts/build_docker.sh
     - run:
          name: Push docker image
-         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE-run
+         command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD && docker push $IMAGE-run && docker push $IMAGE-dev 
 
 jobs:
   ################

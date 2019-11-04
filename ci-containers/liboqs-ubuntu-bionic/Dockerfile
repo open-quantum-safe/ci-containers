@@ -12,7 +12,10 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y docker.io
 RUN pip3 install pytest-xdist
 
+ADD entrypoint.sh /root/entrypoint.sh
+ENTRYPOINT ["/root/entrypoint.sh"]
+
 LABEL com.circleci.preserve-entrypoint=true
 
-#ENTRYPOINT openssl
-ENTRYPOINT bash
+#ENTRYPOINT bash
+CMD ["/bin/bash"]

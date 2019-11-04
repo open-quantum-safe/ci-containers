@@ -10,5 +10,6 @@ RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /home/oqssa/.bashrc
 # Default command to run
 USER oqssa
 WORKDIR /home/oqssa
+ENTRYPOINT ["/opt/oqssa/bin/oqs-entrypoint.sh"]
 CMD ["/bin/bash"]
 
