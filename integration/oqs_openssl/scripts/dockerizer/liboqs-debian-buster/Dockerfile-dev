@@ -1,0 +1,13 @@
+FROM debian:buster
+
+RUN apt-get update -qq
+RUN apt-get upgrade -y
+RUN apt-get -y install automake autoconf make gcc wget git build-essential libtool vim
+
+ADD oqssa /opt/oqssa
+RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /root/.bashrc
+
+# Default command to run
+WORKDIR /home/oqssa
+CMD ["/bin/bash"]
+

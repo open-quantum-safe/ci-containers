@@ -1,0 +1,15 @@
+From ubuntu:18.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt update -y
+RUN apt upgrade -y
+
+RUN apt-get -y install automake autoconf make gcc wget git build-essential libtool vim
+
+ADD oqssa /opt/oqssa
+RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /root/.bashrc
+
+# Default command to run
+WORKDIR /opt/oqssa
+CMD ["/bin/bash"]

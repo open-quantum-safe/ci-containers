@@ -1,0 +1,36 @@
+#!/bin/bash
+
+export PATH=/usr/local/openssl/bin:$PATH
+openssl version
+cd /tmp
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <Signature algorithm name, e.g., dilithium4; [speed]"
+    exit -1
+fi
+
+mkdir -p oqsdata
+# If not already existing, generate root key & CA cert:
+if [ ! -f "oqsdata/$1-root-key.pem" ]; then
+   openssl req -x509 -new -newkey $1 -keyout oqsdata/$1_CA.key -out oqsdata/$1_CA.crt -nodes -subj "/CN=oqstest CA" -days 365 
+fi
+
+# If not already existing, generate server key, csr and cert:
+if [ ! -f "oqsdata/$1-srv.crt" ]; then
+   openssl req -new -newkey $1 -keyout oqsdata/$1_srv.key -out oqsdata/$1_srv.csr -nodes -subj "/CN=oqstest server" 
+
+   # Retrieve cert:
+   openssl x509 -req -in oqsdata/$1_srv.csr -out oqsdata/$1_srv.crt -CA oqsdata/$1_CA.crt -CAkey oqsdata/$1_CA.key -CAcreateserial -days 365
+fi
+
+echo "Client could be started as follows: openssl s_client -curves <KEXALG> -CAfile oqsdata/$1_CA.crt -connect localhost:4433"
+echo "KEXALG could be one listed at https://github.com/open-quantum-safe/openssl#key-exchange"
+echo "Starting Server now..."
+
+# Start server:
+if [ "$#" -gt 1 ]; then
+   openssl s_server -cert oqsdata/$1_srv.crt -key oqsdata/$1_srv.key > /dev/null 2>&1
+else
+   openssl s_server -cert oqsdata/$1_srv.crt -key oqsdata/$1_srv.key 
+fi
+
+

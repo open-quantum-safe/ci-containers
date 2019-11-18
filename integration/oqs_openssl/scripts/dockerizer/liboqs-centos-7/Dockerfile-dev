@@ -1,0 +1,18 @@
+FROM centos:7
+
+RUN yum -y update 
+
+RUN yum -y install git autoconf automake perl-core zlib-devel make yum-utils wget unzip vim
+RUN yum -y install centos-release-scl 
+RUN yum -y install devtoolset-8-gcc* 
+RUN yum -y install libtool
+
+ADD oqssa /opt/oqssa
+RUN echo 'export PATH=/opt/oqssa/bin:$PATH' >> /root/.bashrc
+
+# Default command to run
+WORKDIR /opt/oqssa
+ADD entrypoint.sh /root/entrypoint.sh
+ENTRYPOINT ["/root/entrypoint.sh"]
+CMD ["/bin/bash"]
+

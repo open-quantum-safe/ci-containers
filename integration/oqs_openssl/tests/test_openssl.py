@@ -3,32 +3,29 @@ import os
 import sys
 import time
 
-kex_algs_master_102 = ['OQSKEM-DEFAULT', 'OQSKEM-DEFAULT-ECDHE']
-sig_algs_master_102 = ['rsa', 'ecdsa']
+kex_algs_master_111 = [
+    'oqs_kem_default',
+    'p256-oqs_kem_default',
+##### OQS_TEMPLATE_FRAGMENT_KEX_ALGS_MASTER_START
+    # post-quantum key exchanges
+    'frodo640aes','frodo640shake','frodo976aes','frodo976shake','frodo1344aes','frodo1344shake','bike1l1cpa','bike1l3cpa','bike1l1fo','bike1l3fo','kyber512','kyber768','kyber1024','newhope512cca','newhope1024cca','ntru_hps2048509','ntru_hps2048677','ntru_hps4096821','ntru_hrss701','lightsaber','saber','firesaber','sidhp434','sidhp503','sidhp610','sidhp751','sikep434','sikep503','sikep610','sikep751',
+    # post-quantum + classical key exchanges
+    'p256-frodo640aes','p256-frodo640shake','p256-frodo976aes','p256-frodo976shake','p256-frodo1344aes','p256-frodo1344shake','p256-bike1l1cpa','p256-bike1l3cpa','p256-bike1l1fo','p256-bike1l3fo','p256-kyber512','p256-kyber768','p256-kyber1024','p256-newhope512cca','p256-newhope1024cca','p256-ntru_hps2048509','p256-ntru_hps2048677','p256-ntru_hps4096821','p256-ntru_hrss701','p256-lightsaber','p256-saber','p256-firesaber','p256-sidhp434','p256-sidhp503','p256-sidhp610','p256-sidhp751','p256-sikep434','p256-sikep503','p256-sikep610','p256-sikep751',
+##### OQS_TEMPLATE_FRAGMENT_KEX_ALGS_MASTER_END
+    ]
+sig_algs_master_111 = [
+    'rsa:3072',
+    'ecdsa',
+##### OQS_TEMPLATE_FRAGMENT_SIG_ALGS_MASTER_START
+    # post-quantum signatures
+    'oqsdefault','dilithium2','dilithium3','dilithium4','picnicl1fs','qteslapi','qteslapiii',
+    # post-quantum + classical signatures
+    'p256_oqsdefault','rsa3072_oqsdefault','p256_dilithium2','rsa3072_dilithium2','p384_dilithium4','p256_picnicl1fs','rsa3072_picnicl1fs','p256_qteslapi','rsa3072_qteslapi','p384_qteslapiii',
+##### OQS_TEMPLATE_FRAGMENT_SIG_ALGS_MASTER_END
+    ]
 
-kex_algs_master_111 = ['oqs_kem_default', 'bike1l1', 'bike1l3', 'bike1l5', 'bike2l1', 'bike2l3', 'bike2l5', 'bike3l1', 'bike3l3', 'bike3l5', 'frodo640aes', 'frodo640cshake', 'frodo976aes', 'frodo976cshake', 'newhope512cca', 'newhope1024cca', 'sidh503', 'sidh751', 'sike503', 'sike751', 'p256-oqs_kem_default', 'p256-bike1l1', 'p256-bike2l1', 'p256-bike3l1', 'p256-frodo640aes', 'p256-frodo640cshake', 'p256-newhope512cca', 'p256-sidh503', 'p256-sike503']
-sig_algs_master_111 = ['rsa', 'ecdsa', 'picnicl1fs', 'qteslaI', 'qteslaIIIsize', 'qteslaIIIspeed', 'rsa3072_picnicl1fs', 'rsa3072_qteslaI', 'p256_picnicl1fs', 'p256_qteslaI', 'p384_qteslaIIIsize', 'p384_qteslaIIIspeed']
-
-kex_algs_nist_102 = ['OQSKEM-DEFAULT', 'OQSKEM-DEFAULT-ECDHE']
-sig_algs_nist_102 = ['rsa', 'ecdsa']
-
-kex_algs_nist_111 = ['oqs_kem_default', 'bike1l1', 'bike1l3', 'bike1l5', 'bike2l1', 'bike2l3', 'bike2l5', 'bike3l1', 'bike3l3', 'bike3l5', 'frodo640aes', 'frodo640cshake', 'frodo976aes', 'frodo976cshake', 'newhope512cca', 'newhope1024cca', 'sike503', 'sike751', 'p256-oqs_kem_default', 'p256-bike1l1', 'p256-bike2l1', 'p256-bike3l1', 'p256-frodo640aes', 'p256-frodo640cshake', 'p256-newhope512cca', 'p256-sike503', 'kyber512', 'kyber768', 'kyber1024', 'ledakem_C1_N02', 'ledakem_C1_N03', 'ledakem_C1_N04', 'ledakem_C3_N02', 'ledakem_C3_N03', 'ledakem_C3_N04', 'ledakem_C5_N02', 'saber_light_saber', 'saber_saber', 'saber_fire_saber']
-sig_algs_nist_111 = ['rsa', 'ecdsa']
-
-if 'LIBOQS' in os.environ and os.environ['LIBOQS'] == 'nist':
-    if 'OPENSSL' in os.environ and os.environ['OPENSSL'] == '102':
-        kex_algs = kex_algs_nist_102
-        sig_algs = sig_algs_nist_102
-    else:
-        kex_algs = kex_algs_nist_111
-        sig_algs = sig_algs_nist_111
-else:
-    if 'OPENSSL' in os.environ and os.environ['OPENSSL'] == '102':
-        kex_algs = kex_algs_master_102
-        sig_algs = sig_algs_master_102
-    else:
-        kex_algs = kex_algs_master_111
-        sig_algs = sig_algs_master_111
+kex_algs = kex_algs_master_111
+sig_algs = sig_algs_master_111
 
 def test_gen_keys():
     global sig_algs
@@ -54,7 +51,7 @@ def gen_keys(sig_alg):
                 '-keyout', '{}_CA.key'.format(sig_alg),
                 '-out', '{}_CA.crt'.format(sig_alg),
                 '-nodes',
-                '-subj', '/CN=oqstest CA',
+                '-subj', '/CN=oqstest_CA',
                 '-days', '365',
                 '-config', 'apps/openssl.cnf'
             ],
@@ -68,7 +65,7 @@ def gen_keys(sig_alg):
                 '-keyout', '{}_srv.key'.format(sig_alg),
                 '-out', '{}_srv.csr'.format(sig_alg),
                 '-nodes',
-                '-subj', '/CN=oqstest server',
+                '-subj', '/CN=oqstest_server',
                 '-config', 'apps/openssl.cnf'
             ],
             os.path.join('tmp','openssl')
@@ -82,7 +79,7 @@ def gen_keys(sig_alg):
                 '-keyout', '{}_CA.key'.format(sig_alg),
                 '-out', '{}_CA.crt'.format(sig_alg),
                 '-nodes',
-                '-subj', '/CN=oqstest CA',
+                '-subj', '/CN=oqstest_CA',
                 '-days', '365',
                 '-config', 'apps/openssl.cnf'
             ],
@@ -96,7 +93,7 @@ def gen_keys(sig_alg):
                 '-keyout', '{}_srv.key'.format(sig_alg),
                 '-out', '{}_srv.csr'.format(sig_alg),
                 '-nodes',
-                '-subj', '/CN=oqstest server',
+                '-subj', '/CN=oqstest_server',
                 '-config', 'apps/openssl.cnf'
             ],
             os.path.join('tmp','openssl')
@@ -124,10 +121,7 @@ def test_connection():
             port = port + 1
 
 def run_connection(sig_alg, kex_alg, port):
-    if 'OPENSSL' in os.environ and os.environ['OPENSSL'] == '102':
-        cmd = os.path.join('..', '..', 'scripts', 'do_openssl-102.sh');
-    else:
-        cmd = os.path.join('..', '..', 'scripts', 'do_openssl-111.sh');
+    cmd = os.path.join('oqs_test', 'scripts', 'do_openssl-111.sh');
     helpers.run_subprocess(
         [cmd],
         os.path.join('tmp','openssl'),

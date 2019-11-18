@@ -1,8 +1,7 @@
 OQS Integration Testing
 =======================
 
-[![Build Status](https://travis-ci.com/open-quantum-safe/testing.svg?branch=master)](https://travis-ci.com/open-quantum-safe/testing)
-[![CircleCI](https://circleci.com/gh/open-quantum-safe/testing/tree/master.svg?style=svg)](https://circleci.com/gh/open-quantum-safe/testing/tree/master)
+[![CircleCI](https://circleci.com/gh/baentsch/testing/tree/master.svg?style=svg)](https://circleci.com/gh/baentsch/testing/tree/master)
 
 The **Open Quantum Safe (OQS) project** has the goal of developing and prototyping quantum-resistant cryptography.  [liboqs](https://github.com/open-quantum-safe/liboqs) is an open source C library for post-quantum cryptographic algorithms.  The OQS project has developed forks of [OpenSSH](https://github.com/open-quantum-safe/openssh-portable) and [OpenSSL](https://github.com/open-quantum-safe/openssl) that integrate quantum-resistant algorithms into the SSH and TLS protocols.
 
@@ -15,10 +14,14 @@ Continuous integration testing of this repository operates on for [Travis CI](ht
 Quick Start using Docker and CircleCI
 -------------------------------------
 
-You can quickly get pre-built Debian 10 (Buster) or Ubuntu 16.04 (Xenial) Docker containers with dependencies installed for building liboqs and our integration tests:
+You can quickly get pre-built Debian 10 (Buster), Ubuntu 16.04 (Xenial) or 18.04 (Bionic) and Centos 7 Docker containers with dependencies installed for building liboqs, openssl, openssh and our integration tests:
 
 	docker pull dstebila/liboqs:amd64-buster-0.0.1
 	docker pull dstebila/liboqs:x86_64-xenial-0.0.2
+	docker pull openqsafe/liboqs-centos-7
+	docker pull openqsafe/liboqs-ubuntu-bionic
+	docker pull openqsafe/liboqs-debian-buster
+
 
 Our Linux integration tests are run on CircleCI.  You can also run those same tests locally using CircleCI's local command-line interface.  First [install CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/).  Then use `circleci local execute --job <jobname>` to launch a job.  See the README.md files under integration/oqs-openssh and integration/oqs-openssl for details.
 
@@ -74,6 +77,49 @@ On Ubuntu 14.04, you need to also:
 **Windows**
 
 [Visual Studio](https://visualstudio.microsoft.com/vs/) and [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-6) must be installed.
+
+Integration Docker Images
+-------------------------
+
+Upon successful completion of all internal tests, the current CircleCI integration creates several ready-to-use Docker images:
+
+**Demonstration images**
+
+The images available on [Docker Hub](https://hub.docker.com) in the project `openqssafe` with the extension `-run` are suitable for executing all supported `openssl` and `openssh` commands as known from the upstream projects. In other words, completely built-and-tested images for the presently supported operating systems are available for running out of the box. No need to install or build any software.
+
+At minimum, all images can be started identically with `docker run -it openqsafe/liboqs-<platform>-run` providing a user shell with pre-set environments for running openssl and openssh. These are non-root images to facilitate use in restricted, e.g., Kubernetes, environments.
+
+All images also provide convenience scripts meant to demonstrate (and measure) the performance of quantum safe crypto algorithms: These have the prefix `oqs-` (located in `/opt/oqssa`). So for example, by running `docker run -t openqsafe/liboqs-<platform>-run oqs-speedtest dilithium4 kyber1024` the TLS/SSL performance of this OQS Signature/KEM combination can be easily tested. 
+
+**Integration images**
+
+At the same location, a set of images with the extension `-dev` is available that contains all typically required tooling for building and integrating software that uses/consumes openssl and openssh, e.g., curl or nginx. These images are providing a root shell for maximum flexibility in building and extending them for any kind of integration task. Again, all OQS-applications, libaries and includes are located in the folder `/opt/oqssa`.
+
+***Example use case***
+
+To build `curl` with OQS support, simply start the development image in docker, e.g., by running
+```
+docker run -it openqsafe/liboqs-ubuntu-bionic-dev
+```
+Within the image (on the command prompt), obtain the curl source code, build and install it, e.g., as follows:
+```
+cd ~ && wget -4 https://curl.haxx.se/download/curl-7.65.3.tar.gz && tar xzvf curl-7.65.3.tar.gz
+cd curl-7.65.3 && CPPFLAGS="-I/opt/oqssa/include" LDFLAGS=-Wl,-R/opt/oqssa/lib ./configure --disable-libcurl-option --with-ssl=/opt/oqssa --prefix=/opt/oqssa 
+make && make install
+```
+
+If you encounter an error message pointing to an EVP API mismatch between OpenSSL and OQS-enabled OpenSSL, simply run this script prior to retrying the `make` run:
+```
+cat lib/vtls/openssl.c | sed -e 's/\#define BACKEND connssl->backend/\#define BACKEND connssl->backend\n\# define EVP_MD_CTX_create()     EVP_MD_CTX_new()\n\# define EVP_MD_CTX_destroy(ctx) EVP_MD_CTX_free((ctx))/g' > lib/vtls/openssl.c-new && mv lib/vtls/openssl.c-new lib/vtls/openssl.c
+```
+
+**Supported platforms**
+
+At this time the following platforms are supported (all x86_64):
+* ubuntu-bionic (18.04)
+* debian-buster (10)
+* centos-7
+
 
 License
 -------
