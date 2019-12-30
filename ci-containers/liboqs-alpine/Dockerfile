@@ -16,9 +16,8 @@ RUN apk add --no-cache python3 && \
     if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
       rm -r /root/.cache
 
-RUN apk add make build-base linux-headers openssl-dev 
-RUN apk add autoconf automake git libtool unzip wget 
+RUN apk add openssl make build-base linux-headers openssl-dev autoconf automake git libtool unzip wget docker
 
-RUN pip3 install -U pytest-xdist
+RUN pip3 install -U pytest-xdist nose rednose
 
-CMD ["/usr/bin/sh"]
+CMD ["/bin/sh"]
