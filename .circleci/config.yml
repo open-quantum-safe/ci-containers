@@ -1,43 +1,14 @@
 version: 2
 
-.openssh_job: &opensshjob
-  docker:
-    - image: ${IMAGE}
-  steps:
-    - checkout
-    - run:
-        name: Set up SSH environment
-        command: |
-          mkdir -p -m 0755 /var/empty
-          groupadd sshd
-          useradd -g sshd -c 'sshd privsep' -d /var/empty -s /bin/false sshd
-    - run:
-        name: Clone OpenSSL
-        command: cd integration/oqs_openssh && scripts/clone_openssl.sh
-    - run:
-        name: Build OpenSSL
-        command: cd integration/oqs_openssh && scripts/build_openssl.sh
-    - run:
-        name: Clone liboqs
-        command: cd integration/oqs_openssh && scripts/clone_liboqs.sh
-    - run:
-        name: Build liboqs
-        command: cd integration/oqs_openssh && scripts/build_liboqs.sh
-    - run:
-        name: Clone OpenSSH
-        command: cd integration/oqs_openssh && scripts/clone_openssh.sh
-    - run:
-        name: Build OpenSSH
-        command: cd integration/oqs_openssh && scripts/build_openssh.sh
-    - run:
-        name: Run unit tests
-        command: cd integration/oqs_openssh && python3 -m nose --rednose --verbose
-
 .openssl_job: &openssljob
   docker:
     - image: ${IMAGE}
   steps:
     - checkout
+    - setup_remote_docker
+    - run:
+        name: Check env vars
+        command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
     - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
@@ -46,7 +17,7 @@ version: 2
         command: cd integration/oqs_openssl && scripts/clone_openssl.sh
     - run:
         name: Build liboqs
-        command: cd integration/oqs_openssl && scripts/build_liboqs.sh
+        command: source ~/.bashrc && cd integration/oqs_openssl && scripts/build_liboqs.sh
     - run:
         name: Build OpenSSL
         command: cd integration/oqs_openssl && scripts/build_openssl.sh
@@ -58,136 +29,19 @@ jobs:
   ################
   # OPENSSL JOBS #
   ################
-  # amd64-buster (Debian 10)
-  # liboqs master branch
-  ssl-amd64-buster-liboqs-master-openssl-111:
+  ssl-x86_64-centos7-liboqs-master-openssl-111:
     <<: *openssljob
     environment:
-      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
+      IMAGE: openqsafe/ci-centos7
       ARCH: x64
       LIBOQS: master
+      LINKTYPE: dynamic
       OPENSSL: 111
-  ssl-amd64-buster-liboqs-master-openssl-102:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 102
-  # amd64-buster (Debian 10)
-  # liboqs nist branch
-  ssl-amd64-buster-liboqs-nist-openssl-111:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
-      ARCH: x64
-      LIBOQS: nist
-      OPENSSL: 111
-  ssl-amd64-buster-liboqs-nist-openssl-102:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:amd64-buster-0.0.1
-      ARCH: x64
-      LIBOQS: nist
-      OPENSSL: 102
-  # x86_64-xenial (Ubuntu 16.04)
-  # liboqs master branch
-  ssl-x86_64-xenial-liboqs-master-openssl-111:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 111
-  ssl-x86_64-xenial-liboqs-master-openssl-102:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 102
-  # x86_64-xenial (Ubuntu 16.04)
-  # liboqs nist branch
-  ssl-x86_64-xenial-liboqs-nist-openssl-111:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: nist
-      OPENSSL: 111
-  ssl-x86_64-xenial-liboqs-nist-openssl-102:
-    <<: *openssljob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: nist
-      OPENSSL: 102
-      
-  ################
-  # OPENSSH JOBS #
-  ################
-  # x86_64-xenial (Ubuntu 16.04)
-  # liboqs master branch, with OpenSSL enabled for OpenSSH
-  ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth:
-    <<: *opensshjob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: master
-      WITH_OPENSSL: true
-      WITH_PQAUTH: true
-  ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth:
-    <<: *opensshjob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: master
-      WITH_OPENSSL: true
-      WITH_PQAUTH: false
-  # x86_64-xenial (Ubuntu 16.04)
-  # liboqs master branch, without OpenSSL enabled for OpenSSH
-  ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth:
-    <<: *opensshjob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: master
-      WITH_OPENSSL: false
-      WITH_PQAUTH: false
-  # x86_64-xenial (Ubuntu 16.04)
-  # liboqs nist branch
-  # (nist-branch doesn't support PQ auth)
-  ssh-x86_64-xenial-liboqs-nist-with-openssl:
-    <<: *opensshjob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: nist
-      WITH_OPENSSL: true
-      WITH_PQAUTH: false
-  ssh-x86_64-xenial-liboqs-nist-no-openssl:
-    <<: *opensshjob
-    environment:
-      IMAGE: dstebila/liboqs:x86_64-xenial-0.0.2
-      ARCH: x64
-      LIBOQS: nist
-      WITH_OPENSSL: false
-      WITH_PQAUTH: false
+      PREFIX: /opt/oqssa
+      OPENSSL_DIR: /usr/local/ssl
 
 workflows:
   version: 2
   build:
     jobs:
-      - ssl-amd64-buster-liboqs-master-openssl-111
-      - ssl-amd64-buster-liboqs-master-openssl-102
-      - ssl-amd64-buster-liboqs-nist-openssl-111
-      - ssl-amd64-buster-liboqs-nist-openssl-102
-      - ssl-x86_64-xenial-liboqs-master-openssl-111
-      - ssl-x86_64-xenial-liboqs-master-openssl-102
-      - ssl-x86_64-xenial-liboqs-nist-openssl-111
-      - ssl-x86_64-xenial-liboqs-nist-openssl-102
-      - ssh-x86_64-xenial-liboqs-master-with-openssl-with-pqauth
-      - ssh-x86_64-xenial-liboqs-master-with-openssl-no-pqauth
-      - ssh-x86_64-xenial-liboqs-master-no-openssl-no-pqauth
-      - ssh-x86_64-xenial-liboqs-nist-with-openssl
-      - ssh-x86_64-xenial-liboqs-nist-no-openssl
+      - ssl-x86_64-centos7-liboqs-master-openssl-111
