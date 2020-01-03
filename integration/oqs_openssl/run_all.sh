@@ -21,8 +21,8 @@ set -exo pipefail
 PRINT_GREEN="tput setaf 2"
 PRINT_RESET="tput sgr 0"
 
-for LIBOQS in "master" "nist" ; do
-    for OPENSSL in "111" "102" ; do
+for LIBOQS in "master" ; do
+    for OPENSSL in "111" ; do
         ${PRINT_GREEN}
         echo "================================================================="
         echo "================================================================="

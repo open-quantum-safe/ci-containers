@@ -8,15 +8,14 @@
 
 # Environment variables:
 #  - OPENSSL: version to be built (102 or 111)
-#  - LINKTYPE: either static or dynamic (must be present)
+#  - LINKTYPE: either static or dynamic (dynamic default)
 #  - INSTALLDIR (optional): If given, determines install location; target folder must be writable
 ###########
 
 set -exo pipefail
 
 if [[ -z "$LINKTYPE" ]]; then
-   echo "$LINKTYPE not set (static, dynamic). Exiting."
-   exit -1
+   export LINKTYPE="dynamic"
 fi
 
 OSTYPE=`uname`

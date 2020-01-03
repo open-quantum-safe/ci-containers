@@ -7,7 +7,7 @@
 #  - LIBOQS: either master (default) or nist
 #  - OPENSSL_DIR: path to system OpenSSL installation; default /usr
 #  - PREFIX: path to install liboqs, default `pwd`/tmp/openssl/oqs
-#  - LINKTYPE: either static or dynamic (must be present)
+#  - LINKTYPE: either static or dynamic (dynamic default)
 ###########
 
 set -exo pipefail
@@ -16,8 +16,7 @@ OPENSSL_DIR=${OPENSSL_DIR:-"/usr"}
 PREFIX=${OPENSSL_SRC_DIR:-"`pwd`/tmp/openssl/oqs"}
 
 if [[ -z ${LINKTYPE} ]]; then
-   echo "LINKTYPE not set (static, dynamic). Exiting."
-   exit -1
+   export LINKTYPE="dynamic"
 fi
 
 cd tmp/liboqs
