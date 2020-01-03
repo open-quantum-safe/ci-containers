@@ -39,9 +39,20 @@ jobs:
       OPENSSL: 111
       PREFIX: /opt/oqssa
       OPENSSL_DIR: /usr/local/ssl
+  ssl-x86_64-alpine-liboqs-master-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: openqsafe/ci-alpine
+      ARCH: x64
+      LIBOQS: master
+      LINKTYPE: dynamic
+      OPENSSL: 111
+      PREFIX: /opt/oqssa
+      OPENSSL_DIR: /usr/local/ssl
 
 workflows:
   version: 2
   build:
     jobs:
       - ssl-x86_64-centos7-liboqs-master-openssl-111
+      - ssl-x86_64-alpine-liboqs-master-openssl-111
