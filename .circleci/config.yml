@@ -48,7 +48,6 @@ jobs:
       LINKTYPE: dynamic
       OPENSSL: 111
       PREFIX: /opt/oqssa
-      OPENSSL_DIR: /usr/local/ssl
 
 workflows:
   version: 2

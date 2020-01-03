@@ -16,8 +16,13 @@ RUN apk add --no-cache python3 && \
     if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
       rm -r /root/.cache
 
+# All SW-build and docker-image build prereqs
 RUN apk add openssl make build-base linux-headers openssl-dev autoconf automake git libtool unzip wget docker
 
+# Unit testing prereqs
 RUN pip3 install -U pytest-xdist nose rednose
+
+# Setup identical environment for CircleCI
+RUN touch /root/.bashrc 
 
 CMD ["/bin/sh"]
