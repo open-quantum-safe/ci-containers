@@ -2,7 +2,7 @@
 
 BASENAME=ubuntu-bionic
 LOCALIMAGENAME=liboqs-$BASENAME
-ARCH=`uname -p`
+ARCH=x86_64
 
 # This script is to simplify building and publishing this image and follow a standard naming convention
 
