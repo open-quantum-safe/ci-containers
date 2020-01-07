@@ -6,9 +6,9 @@ version: 2
   steps:
     - checkout
     - setup_remote_docker
-#    - run:
-#        name: Check env vars
-#        command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
+    - run:
+        name: Check env vars
+        command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
     - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
