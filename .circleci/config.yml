@@ -41,6 +41,7 @@ jobs:
       OPENSSL_DIR: /usr/local/ssl
   ssl-x86_64-alpine-liboqs-master-openssl-111:
     <<: *openssljob
+    context: openqsafe
     environment:
       IMAGE: openqsafe/ci-alpine
       ARCH: x64
@@ -54,7 +55,5 @@ workflows:
   build:
     jobs:
       - ssl-x86_64-centos7-liboqs-master-openssl-111
-        context: openqsafe
       - ssl-x86_64-alpine-liboqs-master-openssl-111
-        context: openqsafe
 
