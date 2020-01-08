@@ -54,4 +54,7 @@ workflows:
   build:
     jobs:
       - ssl-x86_64-centos7-liboqs-master-openssl-111
+        context: openqsafe
       - ssl-x86_64-alpine-liboqs-master-openssl-111
+        context: openqsafe
+
