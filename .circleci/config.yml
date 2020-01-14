@@ -7,9 +7,6 @@ version: 2
     - checkout
     - setup_remote_docker
     - run:
-        name: Check env vars
-        command: if [[ -z "${DOCKER_LOGIN}" ]]; then echo "$DOCKER_LOGIN not set. Exiting."; exit -1; else echo "Env check OK."; fi
-    - run:
         name: Clone liboqs
         command: cd integration/oqs_openssl && scripts/clone_liboqs.sh
     - run:
@@ -32,7 +29,16 @@ jobs:
   ssl-x86_64-centos7-liboqs-master-openssl-111:
     <<: *openssljob
     environment:
-      IMAGE: openqsafe/ci-centos7
+      IMAGE: openqsafe/ci-centos-7
+      ARCH: x64
+      LIBOQS: master
+      LINKTYPE: dynamic
+      OPENSSL: 111
+      PREFIX: /opt/oqssa
+  ssl-x86_64-centos8-liboqs-master-openssl-111:
+    <<: *openssljob
+    environment:
+      IMAGE: openqsafe/ci-centos-8
       ARCH: x64
       LIBOQS: master
       LINKTYPE: dynamic
@@ -54,6 +60,7 @@ workflows:
   version: 2
   build:
     jobs:
+      - ssl-x86_64-centos8-liboqs-master-openssl-111
       - ssl-x86_64-centos7-liboqs-master-openssl-111
       - ssl-x86_64-alpine-liboqs-master-openssl-111
 
