@@ -17,7 +17,7 @@ version: 2
         command: source ~/.bashrc && cd integration/oqs_openssl && scripts/build_liboqs.sh
     - run:
         name: Build OpenSSL
-        command: cd integration/oqs_openssl && scripts/build_openssl.sh
+        command: source ~/.bashrc && cd integration/oqs_openssl && scripts/build_openssl.sh
     - run:
         name: Run unit tests
         command: cd integration/oqs_openssl && python3 -m nose --rednose --verbose
@@ -35,6 +35,7 @@ jobs:
       LINKTYPE: dynamic
       OPENSSL: 111
       PREFIX: /opt/oqssa
+      OPENSSL_DIR: /usr/local/ssl
   ssl-x86_64-centos8-liboqs-master-openssl-111:
     <<: *openssljob
     environment:
@@ -44,7 +45,6 @@ jobs:
       LINKTYPE: dynamic
       OPENSSL: 111
       PREFIX: /opt/oqssa
-      OPENSSL_DIR: /usr/local/ssl
   ssl-x86_64-alpine-liboqs-master-openssl-111:
     <<: *openssljob
     context: openqsafe
