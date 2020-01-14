@@ -25,7 +25,7 @@ if [ "x${LIBOQS}" == "xnist" ]; then
 else
     cd tmp/liboqs
     autoreconf -i
-    ./configure --prefix=${PREFIX} --enable-shared=no --enable-openssl --with-openssl-dir=${OPENSSL_DIR}
+    ./configure --prefix=${PREFIX} --enable-shared=no --with-openssl=${OPENSSL_DIR}
     if [ "x${CIRCLECI}" == "xtrue" ] || [ "x${TRAVIS}" == "xtrue" ]; then
         make -j2
     else
