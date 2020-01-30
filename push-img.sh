@@ -18,6 +18,5 @@ cd "${BASENAME}"
 docker build -t "${IMAGENAME}"
 
 printf "Pushing image to openqsafe."
-#TODO: Confirm tagging strategy
-docker tag "${IMAGENAME}" openquantumsafe/ci-"${IMAGENAME}":v1
-docker push openquantumsafe/ci-"${BASENAME}":v1
+docker tag "${IMAGENAME}" openquantumsafe/ci-"${IMAGENAME}":1
+docker push openquantumsafe/ci-"${BASENAME}":1
