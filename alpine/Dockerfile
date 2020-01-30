@@ -1,4 +1,4 @@
-From alpine
+FROM alpine:3.11.3
 
 MAINTAINER MIB (mib@zurich.ibm.com)
 
@@ -15,8 +15,11 @@ RUN apk add --no-cache python3 && \
     if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
       rm -r /root/.cache
 
-# All SW-build and docker-image build prereqs
-RUN apk add openssl make cmake ninja build-base linux-headers openssl-dev autoconf automake git libtool unzip wget docker
+RUN apk add build-base linux-headers \
+            cmake ninja \
+            autoconf automake libtool make \
+            openssl openssl-dev \
+            git docker
 
 # Unit testing prereqs
 RUN pip3 install -U pytest-xdist nose rednose
