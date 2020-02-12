@@ -2,7 +2,8 @@
 set -e
 
 cd /root
-git clone https://github.com/openssl/openssl.git
+#TODO: See if we can just download the official tarball
+git clone --single-branch https://github.com/openssl/openssl.git
 cd openssl
 git checkout tags/OpenSSL_1_1_1d
 ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl no-comp shared
