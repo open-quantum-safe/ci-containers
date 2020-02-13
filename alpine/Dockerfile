@@ -1,4 +1,6 @@
-FROM alpine:3.11.3
+ARG ARCH
+FROM ${ARCH}/alpine:3.11.3
+LABEL version="1"
 
 MAINTAINER MIB (mib@zurich.ibm.com)
 
