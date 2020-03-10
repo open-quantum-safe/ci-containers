@@ -1,6 +1,6 @@
 ARG ARCH
 FROM ${ARCH}/centos:7
-LABEL version="1"
+LABEL version="2"
 
 RUN yum -y update && \
     yum -y install \
@@ -36,3 +36,6 @@ RUN /root/build-openssl111d.sh
 
 # Install more current gcc for OQS building
 RUN yum -y install centos-release-scl devtoolset-8-gcc* libtool && echo "source /opt/rh/devtoolset-8/enable" >> /root/.bashrc
+
+# Install docker for CCI docker build generation
+RUN cd /root && curl -fsSL https://get.docker.com/ | sh

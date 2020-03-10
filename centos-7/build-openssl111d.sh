@@ -2,10 +2,9 @@
 set -e
 
 cd /root
-#TODO: See if we can just download the official tarball
-git clone --single-branch https://github.com/openssl/openssl.git
-cd openssl
-git checkout tags/OpenSSL_1_1_1d
+curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1d.tar.gz
+tar xzvf OpenSSL_1_1_1d.tar.gz
+cd openssl-OpenSSL_1_1_1d
 ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl no-comp shared
 make
 make install_sw
