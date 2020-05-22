@@ -4,6 +4,10 @@ LABEL version="6"
 
 RUN apt-get update -qq && \
     apt-get dist-upgrade -y && \
+    apt-get install -y wget && \
+    wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.14.3.linux-amd64.tar.gz && \
+    cp /usr/local/go/bin/* /usr/bin && \
     apt-get install -y autoconf \
                        automake \
                        astyle \
@@ -14,12 +18,12 @@ RUN apt-get update -qq && \
                        gcc gcc-7 gcc-8\
                        g++ \
                        git \
-                       golang-go \
                        libtool \
                        libssl-dev \
                        libunwind-dev \
                        make \
                        ninja-build \
+                       pkg-config \
                        python3 \
                        python3-nose \
                        python3-rednose \
