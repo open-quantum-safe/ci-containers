@@ -20,7 +20,7 @@ localCheckout: &localCheckout
         name: docker login
         command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
     - run:
-        name: Ubuntu
+        name: Ubuntu-Bionic
         command: cd ubuntu-bionic && docker build --build-arg ARCH=x86_64 -t ci-ubuntu . && docker tag ci-ubuntu $DOCKER_LOGIN/ci-ubuntu-bionic-x86_64 
     - run:
         name: Debian
