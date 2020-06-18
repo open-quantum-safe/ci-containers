@@ -1,6 +1,6 @@
 ARG ARCH
 FROM ${ARCH}/alpine:3.11.3
-LABEL version="1"
+LABEL version="2"
 
 MAINTAINER MIB (mib@zurich.ibm.com)
 
@@ -20,11 +20,20 @@ RUN apk add --no-cache python3 && \
 RUN apk add build-base linux-headers \
             cmake ninja \
             autoconf automake libtool make \
-            openssl openssl-dev \
-            git docker
+            openssl openssl-dev python3-dev\
+            git docker \
+            make musl-dev # go
 
 # Unit testing prereqs
-RUN pip3 install -U pytest-xdist nose rednose
+RUN pip3 install -U pytest-xdist nose rednose psutil
+
+# No go for the time being:
+## Configure Go
+#ENV GOROOT /usr/lib/go
+#ENV GOPATH /go
+#ENV PATH /go/bin:$PATH
+#
+#RUN mkdir -p ${GOPATH}/src ${GOPATH}/bin
 
 # Setup identical environment for CircleCI
 RUN touch /root/.bashrc

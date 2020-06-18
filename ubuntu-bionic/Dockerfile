@@ -30,4 +30,9 @@ RUN apt-get update -qq && \
                        python3-pytest \
                        python3-pytest-xdist \
                        python3-psutil \
-                       zlib1g-dev
+                       zlib1g-dev \
+                       maven \
+                       openjdk-11-jdk
+
+ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+		
