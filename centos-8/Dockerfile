@@ -1,6 +1,6 @@
 ARG ARCH
 FROM ${ARCH}/centos:8
-LABEL version="3"
+LABEL version="4"
 
 RUN yum -y update && \
     yum -y install \
@@ -8,7 +8,7 @@ RUN yum -y update && \
         gcc \
         cmake \
         autoconf automake git openssl-devel libtool make \
-        python3-pip python3-devel wget && \
+        python3-pip python3-devel wget clang && \
     yum check-update && \
     pip3 install -U nose rednose pytest pytest-xdist psutil
 
