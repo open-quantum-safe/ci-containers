@@ -32,7 +32,8 @@ RUN apt-get update -qq && \
                        python3-psutil \
                        zlib1g-dev \
                        maven \
-                       openjdk-11-jdk
+                       openjdk-11-jdk \
+                       qemu
 
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
 		
