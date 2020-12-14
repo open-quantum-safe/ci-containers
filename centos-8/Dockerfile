@@ -12,7 +12,7 @@ RUN yum -y update && \
     yum check-update && \
     pip3 install -U nose rednose pytest pytest-xdist psutil
 
-RUN dnf config-manager --set-enabled PowerTools && \
+RUN dnf config-manager --set-enabled powertools && \
     dnf -y install \
            doxygen \
            doxygen-latex \
