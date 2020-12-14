@@ -12,7 +12,7 @@ The Open Quantum Safe project is led by [Douglas Stebila](https://www.douglas.st
 
 ### Contributors
 
-- Michael Baentsch (IBM Research)
+- Michael Baentsch 
 - Ben Davies (University of Waterloo)
 - Shravan Mishra (University of Waterloo)
 - Christian Paquin (Microsoft Research)
