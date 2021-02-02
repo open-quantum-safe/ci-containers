@@ -35,5 +35,6 @@ RUN apt-get update -qq && \
                        openjdk-11-jdk \
                        qemu
 
+RUN cd /tmp && wget https://sourceware.org/pub/valgrind/valgrind-3.16.1.tar.bz2 && tar -xf valgrind-3.16.1.tar.bz2 && cd valgrind-3.16.1 && ./autogen.sh && ./configure && make -j 4 && make install && rm -rf /tmp/valgrind*
+
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
-		
