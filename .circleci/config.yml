@@ -28,12 +28,13 @@ localCheckout: &localCheckout
     - run:
         name: Debian
         command: cd debian-buster && docker build --build-arg ARCH=amd64 -t ci-debian . && docker tag ci-debian $TARGETNAME/ci-debian-buster-amd64  
-    - run:
-        name: Centos8
-        command: cd centos-8 && docker build --build-arg ARCH=amd64 -t ci-centos8 . && docker tag ci-centos8 $TARGETNAME/ci-centos-8-amd64
-    - run:
-        name: Centos7
-        command: cd centos-7 && docker build --build-arg ARCH=amd64 -t ci-centos7 . && docker tag ci-centos7 $TARGETNAME/ci-centos-7-amd64
+    # Centos discontinued; disable until real need appears
+    #- run:
+    #    name: Centos8
+    #    command: cd centos-8 && docker build --build-arg ARCH=amd64 -t ci-centos8 . && docker tag ci-centos8 $TARGETNAME/ci-centos-8-amd64
+    #- run:
+    #    name: Centos7
+    #    command: cd centos-7 && docker build --build-arg ARCH=amd64 -t ci-centos7 . && docker tag ci-centos7 $TARGETNAME/ci-centos-7-amd64
     - run:
         name: Alpine
         command: cd alpine && docker build --build-arg ARCH=amd64 -t ci-alpine . && docker tag ci-alpine $TARGETNAME/ci-alpine-amd64
