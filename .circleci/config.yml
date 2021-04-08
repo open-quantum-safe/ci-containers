@@ -26,10 +26,10 @@ localCheckout: &localCheckout
     - run:
         name: Ubuntu-Focal
         command: cd ubuntu-focal && docker build --build-arg ARCH=x86_64 -t ci-ubuntu-focal . && docker tag ci-ubuntu-focal $TARGETNAME/ci-ubuntu-focal-x86_64
-    # Not supporting Debian presently; disable until real need appears
-    #- run:
-    #    name: Debian
-    #    command: cd debian-buster && docker build --build-arg ARCH=amd64 -t ci-debian . && docker tag ci-debian $TARGETNAME/ci-debian-buster-amd64
+    # Debian used for ARM x-building
+    - run:
+        name: Debian
+        command: cd debian-buster && docker build --build-arg ARCH=amd64 -t ci-debian . && docker tag ci-debian $TARGETNAME/ci-debian-buster-amd64
     # Centos discontinued; disable until real need appears
     #- run:
     #    name: Centos8
