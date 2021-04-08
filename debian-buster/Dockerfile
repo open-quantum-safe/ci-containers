@@ -1,8 +1,9 @@
 ARG ARCH
 FROM multiarch/debian-debootstrap:${ARCH}-buster
-LABEL version="3"
+LABEL version="4"
 
-RUN apt-get update -qq && \
+RUN dpkg --add-architecture arm64 && \
+    apt-get update -qq && \
     apt-get upgrade -y && \
     apt-get dist-upgrade -y && \
     apt-get install -y gcc \
@@ -11,7 +12,9 @@ RUN apt-get update -qq && \
        doxygen  \
        python3 python3-nose python3-rednose python3-pytest python3-pytest-xdist docker.io \
        python3-psutil \
-       maven openjdk-11-jdk
+       maven openjdk-11-jdk \
+       gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu qemu-user-static \
+       libssl-dev:arm64
 
 ENV JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
 
