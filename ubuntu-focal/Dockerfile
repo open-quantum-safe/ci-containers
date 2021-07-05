@@ -17,7 +17,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        clang-9 \
                        cmake \
                        docker.io \
-                       doxygen \
                        gcc gcc-7 gcc-8\
                        g++ \
                        git \
@@ -37,6 +36,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        maven \
                        openjdk-11-jdk \
                        qemu \
-                       valgrind
+                       valgrind \
+                       flex bison
 
+RUN cd /root && wget https://doxygen.nl/files/doxygen-1.9.1.src.tar.gz && tar xzvf doxygen-1.9.1.src.tar.gz && cd doxygen-1.9.1 && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make && make install && doxygen --version
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
