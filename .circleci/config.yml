@@ -24,6 +24,9 @@ localCheckout: &localCheckout
     #    name: Ubuntu-Bionic
     #    command: cd ubuntu-bionic && docker build --build-arg ARCH=x86_64 -t ci-ubuntu-bionic . && docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-x86_64
     - run:
+        name: Ubuntu-Bionic-i386
+        command: cd ubuntu-bionic && docker build --build-arg ARCH=i386 -t ci-ubuntu-bionic . && docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-i386
+    - run:
         name: Ubuntu-Focal
         command: cd ubuntu-focal && docker build --build-arg ARCH=x86_64 -t ci-ubuntu-focal . && docker tag ci-ubuntu-focal $TARGETNAME/ci-ubuntu-focal-x86_64
     # Debian used for ARM x-building
@@ -42,7 +45,7 @@ localCheckout: &localCheckout
         command: cd alpine && docker build --build-arg ARCH=amd64 -t ci-alpine . && docker tag ci-alpine $TARGETNAME/ci-alpine-amd64
     - run:
         name: Push images
-        command: docker push $TARGETNAME/ci-alpine-amd64 && docker push $TARGETNAME/ci-ubuntu-focal-x86_64 && docker push $TARGETNAME/ci-debian-buster-amd64
+        command: docker push $TARGETNAME/ci-alpine-amd64 && docker push $TARGETNAME/ci-ubuntu-focal-x86_64 && docker push $TARGETNAME/ci-debian-buster-amd64 && docker push $TARGETNAME/ci-ubuntu-bionic-i386
 
 jobs:
   ubuntu-x86_64:
