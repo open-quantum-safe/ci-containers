@@ -36,6 +36,6 @@ RUN apt-get update -qq && \
                        qemu \
                        libc6-dbg
 
-RUN if [ "${ARCH}" != "i386" ] ; then cd /tmp && wget https://sourceware.org/pub/valgrind/valgrind-3.16.1.tar.bz2 && tar -xf valgrind-3.16.1.tar.bz2 && cd valgrind-3.16.1 && ./autogen.sh && ./configure && make -j 4 && make install && rm -rf /tmp/valgrind*; fi
+RUN if [ "${ARCH}" != "i386" ] ; then cd /tmp && wget https://sourceware.org/pub/valgrind/valgrind-3.16.1.tar.bz2 && tar -xf valgrind-3.16.1.tar.bz2 && cd valgrind-3.16.1 && ./autogen.sh && ./configure && make -j 4 && make install && rm -rf /tmp/valgrind* && apt remove -y cmake && cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz && tar xzvf cmake-3.22.1.tar.gz && cd cmake-3.22.1 && ./bootstrap && make && make install && rm -rf /tmp/cmake* ; fi
 
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
