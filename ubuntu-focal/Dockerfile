@@ -1,6 +1,7 @@
 ARG ARCH
 FROM multiarch/ubuntu-core:${ARCH}-focal
 LABEL version="2"
+ARG ARCH
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
@@ -42,6 +43,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lcov \
                        yamllint
 
-RUN cd /root && wget https://doxygen.nl/files/doxygen-1.9.1.src.tar.gz && tar xzvf doxygen-1.9.1.src.tar.gz && cd doxygen-1.9.1 && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version
+RUN if [ "$ARCH" = "amd64" ] ; then cd / && wget https://doxygen.nl/files/doxygen-1.9.1.src.tar.gz && tar xzvf doxygen-1.9.1.src.tar.gz && cd doxygen-1.9.1 && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
 RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 14 all
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
