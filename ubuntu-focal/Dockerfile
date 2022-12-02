@@ -9,8 +9,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     apt-get update -qq && \
     apt-get dist-upgrade -y && \
     apt-get install -y apt-utils wget && \
-    wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.14.3.linux-amd64.tar.gz && \
+    wget https://go.dev/dl/go1.19.3.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.19.3.linux-amd64.tar.gz && \
     cp /usr/local/go/bin/* /usr/bin && \
     apt-get install -y autoconf \
                        automake \
