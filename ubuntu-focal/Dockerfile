@@ -9,8 +9,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     apt-get update -qq && \
     apt-get dist-upgrade -y && \
     apt-get install -y apt-utils wget && \
-    wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.14.3.linux-amd64.tar.gz && \
+    wget https://go.dev/dl/go1.19.3.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.19.3.linux-amd64.tar.gz && \
     cp /usr/local/go/bin/* /usr/bin && \
     apt-get install -y autoconf \
                        automake \
@@ -43,6 +43,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lcov \
                        yamllint
 
-RUN if [ "$ARCH" = "amd64" ] ; then cd / && wget https://doxygen.nl/files/doxygen-1.9.1.src.tar.gz && tar xzvf doxygen-1.9.1.src.tar.gz && cd doxygen-1.9.1 && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
+RUN if [ "$ARCH" = "amd64" ] ; then cd / && wget https://www.doxygen.nl/files/doxygen-1.9.5.src.tar.gz && tar xzvf doxygen-1.9.5.src.tar.gz && cd doxygen-1.9.5 && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
 RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 14 all
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
