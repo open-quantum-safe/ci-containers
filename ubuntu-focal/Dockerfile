@@ -41,6 +41,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        flex bison \
                        lsb-release software-properties-common \
                        lcov \
+                       graphviz \
                        yamllint
 
 RUN if [ "$ARCH" = "amd64" ] ; then cd / && git clone --depth 1 --branch Release_1_9_2 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
