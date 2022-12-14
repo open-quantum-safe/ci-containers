@@ -43,6 +43,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lcov \
                        yamllint
 
-RUN if [ "$ARCH" = "amd64" ] ; then cd / && wget https://www.doxygen.nl/files/doxygen-1.9.5.src.tar.gz && tar xzvf doxygen-1.9.5.src.tar.gz && cd doxygen-1.9.5 && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
+RUN if [ "$ARCH" = "amd64" ] ; then cd / && git clone --depth 1 --branch Release_1_9_2 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
 RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 14 all
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
