@@ -26,13 +26,16 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        libunwind-dev \
                        make \
                        ninja-build \
+                       npm \
                        pkg-config \
                        python3 \
+                       python3-git \
                        python3-nose \
                        python3-rednose \
                        python3-pytest \
                        python3-pytest-xdist \
                        python3-psutil \
+                       python3-wget \
                        zlib1g-dev \
                        maven \
                        openjdk-11-jdk \
@@ -42,7 +45,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lsb-release software-properties-common \
                        lcov \
                        graphviz \
-                       yamllint
+                       yamllint && \
+    npm -g install ajv ajv-cli
 
 RUN if [ "$ARCH" = "amd64" ] ; then cd / && git clone --depth 1 --branch Release_1_9_2 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
 RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 14 all
