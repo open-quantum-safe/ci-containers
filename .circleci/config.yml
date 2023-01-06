@@ -1,9 +1,10 @@
-version: 2
+version: 2.1
 
 # CircleCI doesn't handle large file sets properly for local builds
 # https://github.com/CircleCI-Public/circleci-cli/issues/281#issuecomment-472808051
 localCheckout: &localCheckout
   run: |-
+    git config --global --add safe.directory /tmp/_circleci_local_build_repo
     PROJECT_PATH=$(cd ${CIRCLE_WORKING_DIRECTORY}; pwd)
     mkdir -p ${PROJECT_PATH}
     cd /tmp/_circleci_local_build_repo
@@ -19,48 +20,85 @@ localCheckout: &localCheckout
     - run:
         name: docker login
         command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
-    # Switch to Ubuntu focal - eventually remove entirely
-    #- run:
-    #    name: Ubuntu-Bionic
-    #    command: cd ubuntu-bionic && docker build --build-arg ARCH=x86_64 -t ci-ubuntu-bionic . && docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-x86_64
-    - run:
-        name: Ubuntu-Bionic-i386
-        command: docker build --build-arg ARCH=i386 -t ci-ubuntu-bionic . && docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-i386
-        working_directory: ubuntu-bionic
     - run:
         name: Ubuntu-Focal
-        command: docker build --build-arg ARCH=x86_64 -t ci-ubuntu-focal . && docker tag ci-ubuntu-focal $TARGETNAME/ci-ubuntu-focal-x86_64
+        command: docker build --build-arg ARCH=x86_64 -t ci-ubuntu-focal .
         working_directory: ubuntu-focal
-    - run:
-        name: Ubuntu-Jammy
-        command: docker build -t ci-ubuntu-jammy . && docker tag ci-ubuntu-jammy $TARGETNAME/ci-ubuntu-jammy
-        working_directory: ubuntu-jammy
     # Debian used for ARM x-building
     - run:
         name: Debian Buster (10)
-        command: cd debian-buster && docker build --build-arg ARCH=amd64 -t ci-debian-buster . && docker tag ci-debian-buster $TARGETNAME/ci-debian-buster-amd64
+        command: cd debian-buster && docker build --build-arg ARCH=amd64 -t ci-debian-buster .
     - run:
         name: Debian Bullseye (11)
-        command: cd debian-bullseye && docker build --build-arg ARCH=amd64 -t ci-debian-bullseye . && docker tag ci-debian-bullseye $TARGETNAME/ci-debian-bullseye-amd64
+        command: cd debian-bullseye && docker build --build-arg ARCH=amd64 -t ci-debian-bullseye .
     # Centos discontinued; disable until real need appears
     #- run:
     #    name: Centos8
-    #    command: cd centos-8 && docker build --build-arg ARCH=amd64 -t ci-centos8 . && docker tag ci-centos8 $TARGETNAME/ci-centos-8-amd64
+    #    command: cd centos-8 && docker build --build-arg ARCH=amd64 -t ci-centos8 .
     #- run:
     #    name: Centos7
-    #    command: cd centos-7 && docker build --build-arg ARCH=amd64 -t ci-centos7 . && docker tag ci-centos7 $TARGETNAME/ci-centos-7-amd64
+    #    command: cd centos-7 && docker build --build-arg ARCH=amd64 -t ci-centos7 .
     - run:
         name: Alpine
-        command: cd alpine && docker build --build-arg ARCH=amd64 -t ci-alpine . && docker tag ci-alpine $TARGETNAME/ci-alpine-amd64
-    - run:
-        name: Push images
-        command: docker push $TARGETNAME/ci-alpine-amd64 && docker push $TARGETNAME/ci-ubuntu-focal-x86_64 && docker push $TARGETNAME/ci-debian-buster-amd64 && docker push $TARGETNAME/ci-debian-bullseye-amd64 && docker push $TARGETNAME/ci-ubuntu-bionic-i386 && docker push $TARGETNAME/ci-ubuntu-jammy
+        command: cd alpine && docker build --build-arg ARCH=amd64 -t ci-alpine .
+    - when:
+        condition:
+          equal: [ main, << pipeline.git.branch >> ]
+        steps:
+          - run:
+              name: Tag and push images
+              command: |
+                  docker tag ci-alpine $TARGETNAME/ci-alpine-amd64 && docker push $TARGETNAME/ci-alpine-amd64 && docker tag ci-ubuntu-focal $TARGETNAME/ci-ubuntu-focal-x86_64 && docker push $TARGETNAME/ci-ubuntu-focal-x86_64 && docker tag ci-debian-buster $TARGETNAME/ci-debian-buster-amd64 && docker push $TARGETNAME/ci-debian-buster-amd64 && docker tag ci-debian-bullseye $TARGETNAME/ci-debian-bullseye-amd64 && docker push $TARGETNAME/ci-debian-bullseye-amd64
 
 jobs:
-  ubuntu-x86_64:
+  ubuntu-focal-x86_64:
     <<: *linuxjob
     environment:
       IMAGE: openquantumsafe/ci-ubuntu-focal-x86_64:latest
+  ubuntu-bionic-i386:
+      docker:
+        - image: openquantumsafe/ci-ubuntu-focal-x86_64:latest
+      steps:
+        - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+        - setup_remote_docker
+        - run:
+            name: docker login
+            command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+        - run:
+            name: Ubuntu-Bionic-i386
+            command: docker build --build-arg ARCH=i386 -t ci-ubuntu-bionic .
+            working_directory: ubuntu-bionic
+        - when:
+            condition:
+              equal: [ main, << pipeline.git.branch >> ]
+            steps:
+              - run:
+                  name: Tag and push image
+                  command: |
+                      docker tag docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-i386 && docker push $TARGETNAME/ci-ubuntu-bionic-i386
+
+  ubuntu-jammy:
+      docker:
+        - image: openquantumsafe/ci-ubuntu-focal-x86_64:latest
+      steps:
+        - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+        - setup_remote_docker
+        - run:
+            name: docker login
+            command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+        - run:
+            name: Ubuntu-Jammy
+            command: docker build -t ci-ubuntu-jammy .
+            working_directory: ubuntu-jammy
+        - when:
+            condition:
+              equal: [ main, << pipeline.git.branch >> ]
+            steps:
+              - run:
+                  name: Tag and push image
+                  command: docker tag ci-ubuntu-jammy $TARGETNAME/ci-ubuntu-jammy && docker push docker push $TARGETNAME/ci-ubuntu-jammy
+
+
   arm64:
     description: Building and pushing ARM64 CI image
     docker:
@@ -78,7 +116,7 @@ jobs:
       - run:
           name: Enable experimental features on docker server
           command: |
-            ssh remote-docker <<EOF
+            ssh remote-docker \<<EOF
               sudo bash -c 'echo "{\"experimental\": true}" > /etc/docker/daemon.json'
               sudo systemctl restart docker
             EOF
@@ -110,7 +148,11 @@ workflows:
   version: 2
   build:
     jobs:
-      - ubuntu-x86_64:
+      - ubuntu-focal-x86_64:
+          context: openquantumsafe
+      - ubuntu-bionic-i386:
+          context: openquantumsafe
+      - ubuntu-jammy:
           context: openquantumsafe
       - arm64:
           context: openquantumsafe
