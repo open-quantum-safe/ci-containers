@@ -75,7 +75,7 @@ jobs:
               - run:
                   name: Tag and push image
                   command: |
-                      docker tag docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-i386 && docker push $TARGETNAME/ci-ubuntu-bionic-i386
+                      docker tag ci-ubuntu-bionic $TARGETNAME/ci-ubuntu-bionic-i386 && docker push $TARGETNAME/ci-ubuntu-bionic-i386
 
   ubuntu-jammy:
       docker:
@@ -96,7 +96,7 @@ jobs:
             steps:
               - run:
                   name: Tag and push image
-                  command: docker tag ci-ubuntu-jammy $TARGETNAME/ci-ubuntu-jammy && docker push docker push $TARGETNAME/ci-ubuntu-jammy
+                  command: docker tag ci-ubuntu-jammy $TARGETNAME/ci-ubuntu-jammy && docker push $TARGETNAME/ci-ubuntu-jammy
 
 
   arm64:
