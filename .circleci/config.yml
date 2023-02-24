@@ -102,7 +102,7 @@ jobs:
   arm64:
     description: Building and pushing ARM64 CI image
     machine:
-      - image: ubuntu-2004:current
+      image: ubuntu-2004:current
     resource_class: arm.medium
     steps:
       - setup_remote_docker:
