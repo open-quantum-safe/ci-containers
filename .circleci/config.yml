@@ -106,7 +106,7 @@ jobs:
     resource_class: large
     steps:
       - setup_remote_docker:
-          version: 20.10.11
+          version: 20.10.18
       - run:
           name: Check versions
           command: |
