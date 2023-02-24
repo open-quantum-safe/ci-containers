@@ -122,11 +122,16 @@ jobs:
             # explicitly tag platform
             docker version
             docker build --build-arg MAKE_DEFINES="-j 18" --build-arg ARCH=arm64 -t ci-ubuntu-focal-arm64 .
-            docker tag ci-ubuntu-focal-arm64 $TARGETNAME/ci-ubuntu-focal-arm64
           working_directory: ubuntu-focal
-      - run:
-          name: Push image
-          command: docker push $TARGETNAME/ci-ubuntu-focal-arm64
+      - when:
+          condition:
+            equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Tag and push image
+                command: |
+                  docker tag ci-ubuntu-focal-arm64 $TARGETNAME/ci-ubuntu-focal-arm64
+                  docker push $TARGETNAME/ci-ubuntu-focal-arm64
 
 workflows:
   version: 2
