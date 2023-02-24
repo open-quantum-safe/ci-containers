@@ -105,8 +105,6 @@ jobs:
       image: ubuntu-2004:current
     resource_class: arm.medium
     steps:
-      - setup_remote_docker:
-          version: 20.10.18
       - run:
           name: Check versions
           command: |
