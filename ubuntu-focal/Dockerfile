@@ -1,6 +1,6 @@
 ARG ARCH
 FROM multiarch/ubuntu-core:${ARCH}-focal
-LABEL version="2"
+LABEL version="3"
 ARG ARCH
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
@@ -47,7 +47,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lcov \
                        graphviz \
                        yamllint && \
-    npm -g install ajv ajv-cli
+    npm -g install ajv ajv-cli && \
+    pip3 install tabulate jinja2
 
 RUN if [ "$ARCH" = "amd64" ] ; then cd / && git clone --depth 1 --branch Release_1_9_2 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
 RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 15 all
