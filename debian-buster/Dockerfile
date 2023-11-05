@@ -6,7 +6,7 @@ RUN dpkg --add-architecture arm64 && \
     apt-get update -qq && \
     apt-get upgrade -y && \
     apt-get dist-upgrade -y && \
-    apt-get install -y gcc \
+    apt-get install -y gcc g++ \
        ninja-build \
        autoconf automake git libssl-dev libtool make unzip wget zlib1g-dev \
        doxygen  \
