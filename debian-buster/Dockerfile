@@ -25,5 +25,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
 #    cp /usr/local/go/bin/* /usr/bin 
 
 # Update cmake
-RUN cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz && tar xzvf cmake-3.22.1.tar.gz && cd cmake-3.22.1 && ./bootstrap && make && make install && rm -rf /tmp/cmake* && cmake --version
+RUN cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz && tar xzvf cmake-3.22.1.tar.gz && cd cmake-3.22.1 && ./bootstrap && make && make install && rm -rf /tmp/cmake*
+
+ENV PATH=$PATH:/usr/local/bin
+RUN cmake --version
 
