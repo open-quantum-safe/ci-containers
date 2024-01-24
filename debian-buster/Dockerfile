@@ -10,8 +10,8 @@ RUN dpkg --add-architecture arm64 && \
        ninja-build \
        autoconf automake git libssl-dev libtool make unzip wget zlib1g-dev \
        doxygen  \
-       python3 python3-nose python3-rednose python3-pytest python3-pytest-xdist docker.io \
-       python3-psutil \
+       python3 python3-nose python3-rednose python3-pip python3-pytest \
+       python3-pytest-xdist docker.io python3-psutil \
        maven openjdk-11-jdk \
        gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu qemu-user-static \
        libssl-dev:arm64
@@ -25,7 +25,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
 #    cp /usr/local/go/bin/* /usr/bin 
 
 # Update cmake
-RUN cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz && tar xzvf cmake-3.22.1.tar.gz && cd cmake-3.22.1 && ./bootstrap && make && make install && rm -rf /tmp/cmake*
+RUN pip3 install cmake==3.22.1
 
 ENV PATH=$PATH:/usr/local/bin
 RUN cmake --version
