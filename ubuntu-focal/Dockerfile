@@ -19,6 +19,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        cmake \
                        docker.io \
                        gcc gcc-7 gcc-8\
+                       gcc-mingw-w64\
                        g++ \
                        git \
                        libtool \
