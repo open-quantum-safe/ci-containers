@@ -47,6 +47,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lsb-release software-properties-common \
                        lcov \
                        graphviz \
+                       sudo \
+                       curl \
                        yamllint && \
     npm -g install ajv ajv-cli && \
     pip3 install tabulate jinja2
