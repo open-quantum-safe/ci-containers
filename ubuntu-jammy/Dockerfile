@@ -43,7 +43,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        yamllint && \
      pip3 install tabulate jinja2
 
-RUN cd / && git clone --depth 1 --branch Release_1_9_2 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version 
+RUN cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version 
 RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 14 all
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
 # Activate if we want to test specific OpenSSL3 versions:
