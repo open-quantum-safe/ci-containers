@@ -9,9 +9,10 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     apt-get update -qq && \
     apt-get dist-upgrade -y && \
     apt-get install -y apt-utils wget && \
-    wget https://go.dev/dl/go1.22.2.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz && \
-    cp /usr/local/go/bin/* /usr/bin && \
+    wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz && \
+    export GOROOT=/usr/local/go && \
+    export PATH=$PATH:$GOROOT/bin && \
     apt-get install -y autoconf \
                        automake \
                        astyle \
