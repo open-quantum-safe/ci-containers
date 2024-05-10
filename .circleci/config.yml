@@ -1,4 +1,4 @@
-version: 2.1
+version: 2.2
 
 # CircleCI doesn't handle large file sets properly for local builds
 # https://github.com/CircleCI-Public/circleci-cli/issues/281#issuecomment-472808051
@@ -98,6 +98,27 @@ jobs:
                   name: Tag and push image
                   command: docker tag ci-ubuntu-jammy $TARGETNAME/ci-ubuntu-jammy && docker push $TARGETNAME/ci-ubuntu-jammy
 
+  ubuntu-latest:
+      docker:
+        - image: ubuntu:latest
+      steps:
+        - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+        - setup_remote_docker
+        - run:
+            name: docker login
+            command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+        - run:
+            name: Ubuntu-Latest
+            command: docker build -t ci-ubuntu-latest .
+            working_directory: ubuntu-latest
+        - when:
+            condition:
+              equal: [ main, << pipeline.git.branch >> ]
+            steps:
+              - run:
+                  name: Tag and push image
+                  command: docker tag ci-ubuntu-latest $TARGETNAME/ci-ubuntu-latest && docker push $TARGETNAME/ci-ubuntu-latest
+
 
   arm64:
     description: Building and pushing ARM64 CI image
@@ -143,6 +164,7 @@ workflows:
           context: openquantumsafe
       - ubuntu-jammy:
           context: openquantumsafe
+      - ubuntu-latest:
+          context: openquantumsafe
       - arm64:
           context: openquantumsafe
-
