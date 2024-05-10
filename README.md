@@ -18,6 +18,7 @@ The Open Quantum Safe project is led by [Douglas Stebila](https://www.douglas.st
 - Christian Paquin (Microsoft Research)
 - Douglas Stebila (University of Waterloo)
 - Goutam Tamvada (University of Waterloo)
+- JT
 
 ### Support
 
