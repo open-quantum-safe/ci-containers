@@ -100,7 +100,7 @@ jobs:
 
   ubuntu-latest:
       docker:
-        - image: cimg/base
+        - image: cimg/base:2024.05
       steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
         - setup_remote_docker
