@@ -1,5 +1,5 @@
-FROM ubuntu:jammy
-LABEL version="3"
+FROM ubuntu:latest
+LABEL version="1"
 ARG ARCH
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
@@ -7,6 +7,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     echo $TZ > /etc/timezone && \
     apt-get update -qq && \
     apt-get dist-upgrade -y && \
+    apt-get install -y tzdata && \
+    dpkg-reconfigure --frontend noninteractive tzdata && \
     apt-get install -y apt-utils wget \
                        autoconf \
                        automake \
@@ -31,20 +33,23 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        python3-pytest-xdist \
                        python3-psutil \
                        python3-pip \
+                       python3-tabulate \
+                       python3-jinja2 \
                        zlib1g-dev \
                        maven \
                        openjdk-11-jdk \
-                       qemu \
                        valgrind \
                        flex bison \
                        lsb-release software-properties-common \
                        lcov \
                        graphviz \
+                       llvm \
                        golang \
-                       yamllint && \
-     pip3 install tabulate jinja2
+                       doxygen \
+                       yamllint
 
-RUN cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version 
-ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
+# Why activate such old Java version? Disabling for now
+#ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
+
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install
