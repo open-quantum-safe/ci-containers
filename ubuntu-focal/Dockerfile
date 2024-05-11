@@ -9,8 +9,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     apt-get update -qq && \
     apt-get dist-upgrade -y && \
     apt-get install -y apt-utils wget && \
-    wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz && \
     apt-get install -y autoconf \
                        automake \
                        astyle \
@@ -52,9 +50,11 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     npm -g install ajv ajv-cli && \
     pip3 install tabulate jinja2
 
+RUN if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "x64" ] || [ "$ARCH" = "x86_64" ]; then cd / && wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz && \ tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz && \ ; fi
+RUN if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "x64" ] || [ "$ARCH" = "x86_64" ]; then cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
+RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 15 all
+
 ENV GOROOT="/usr/local/go"
 ENV PATH="$PATH:/usr/local/go/bin"
 
-RUN if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "x64" ] || [ "$ARCH" = "x86_64" ]; then cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
-RUN cd /root && wget https://apt.llvm.org/llvm.sh && chmod u+x llvm.sh && ./llvm.sh 15 all
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
