@@ -1,0 +1,44 @@
+name: Build and push Docker images
+
+on:
+  push:
+
+jobs:
+  ubuntu-arm64:
+    strategy:
+      matrix:
+        distro:
+          - focal
+          - jammy
+          - latest
+    runs-on: oqs-arm64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build arm64 tag
+        uses: docker/build-push-action@v6
+        with:
+          # push: true
+          build-args: ARCH=arm64
+          tags: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-arm64
+          context: ubuntu-${{ matrix.distro }}
+
+  ubuntu-x86_64:
+    needs: ubuntu-arm64
+    strategy:
+      matrix:
+        distro:
+          - focal
+          - jammy
+          - latest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build and push x86_64 tag
+        uses: docker/build-push-action@v6
+        with:
+          # push: true
+          build-args: ARCH=x86_64
+          tags: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-x86_64
+          context: ubuntu-${{ matrix.distro }}
