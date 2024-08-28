@@ -1,6 +1,5 @@
 FROM ubuntu:latest
-LABEL version="1"
-ARG ARCH
+LABEL version="2"
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
@@ -25,8 +24,11 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        libunwind-dev \
                        make \
                        ninja-build \
+                       npm \
+                       opam \
                        pkg-config \
                        python3 \
+                       python3-git \
                        python3-nose \
                        python3-rednose \
                        python3-pytest \
@@ -48,8 +50,11 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        doxygen \
                        yamllint
 
-# Why activate such old Java version? Disabling for now
-#ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
+# set up jasmin compiler for libjade
+RUN opam init --yes --auto-setup && opam install --confirm-level=unsafe-yes --destdir=/usr/local jasmin.2023.06.3
+
+# install ajv for CBOM validation
+RUN npm -g install ajv ajv-cli
 
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install

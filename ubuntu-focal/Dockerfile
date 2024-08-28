@@ -1,6 +1,6 @@
 ARG ARCH
-FROM multiarch/ubuntu-core:${ARCH}-focal
-LABEL version="4"
+FROM ubuntu:focal
+LABEL version="5"
 ARG ARCH
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
