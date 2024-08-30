@@ -14,9 +14,11 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        astyle \
                        clang \
                        clang-format \
+                       clang-tools \
                        cmake \
                        docker.io \
                        gcc \
+                       gcc-mingw-w64 \
                        g++ \
                        git \
                        libtool \
