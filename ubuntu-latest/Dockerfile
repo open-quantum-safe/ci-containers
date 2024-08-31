@@ -58,5 +58,19 @@ RUN opam init --yes --auto-setup && opam install --confirm-level=unsafe-yes --de
 # install ajv for CBOM validation
 RUN npm -g install ajv ajv-cli
 
+# actionlint - for GitHub workflow file validation
+# (version pinned to commit hash of v1.7.1)
+FROM golang:1.23 AS build
+RUN mkdir /app
+WORKDIR /app
+ENV CGO_ENABLED 0
+RUN git clone https://github.com/rhysd/actionlint.git
+WORKDIR /app/actionlint
+RUN git reset --hard 62dc61a
+RUN go build -o /usr/local/bin/actionlint ./cmd/actionlint
+# copy built binary from build stage to final image
+FROM ubuntu:latest
+COPY --from=build /usr/local/bin/actionlint /usr/local/bin/actionlint
+
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install
