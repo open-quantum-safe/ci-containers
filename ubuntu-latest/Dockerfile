@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:latest as base
 LABEL version="2"
 
 # actionlint - for GitHub workflow file validation
@@ -10,9 +10,10 @@ ENV CGO_ENABLED 0
 RUN git clone https://github.com/rhysd/actionlint.git
 WORKDIR /app/actionlint
 RUN git reset --hard 62dc61a
-RUN go build -o /usr/bin/actionlint ./cmd/actionlint
+RUN go build -o /usr/local/bin/actionlint ./cmd/actionlint
 # copy built binary from build stage to final image
 FROM ubuntu:latest
+WORKDIR /root
 COPY --from=build /usr/local/bin/actionlint /usr/local/bin/actionlint
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
