@@ -83,5 +83,10 @@ RUN apt-key del 7fa2af80 && \
     echo LD_LIBRARY_PATH=/usr/local/cuda-12.6/lib64 \
          ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} >> .bashrc
 
+RUN wget https://developer.download.nvidia.com/compute/cupqc/redist/cupqc/cupqc-pkg-0.2.0.tar.gz && \
+    mkdir /cupqc && \
+    tar -xzvf cupqc-pkg-0.2.0.tar.gz -C /cupqc && \
+    echo cuPQC_DIR="/cupqc/cupqc/cupqc-pkg-0.2.0/cmake/" >> .bashrc
+
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install
