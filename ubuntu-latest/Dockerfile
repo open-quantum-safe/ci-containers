@@ -16,6 +16,9 @@ FROM ubuntu:latest
 WORKDIR /root
 COPY --from=build /usr/local/bin/actionlint /usr/local/bin/actionlint
 
+ARG ARCH
+ENV ARCH=${ARCH}
+
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
@@ -73,20 +76,21 @@ RUN opam init --yes --auto-setup && opam install --confirm-level=unsafe-yes --de
 # install ajv for CBOM validation
 RUN npm -g install ajv ajv-cli
 
-# install nvcc for building with OQS_USE_CUPQC=ON
-RUN apt-key del 7fa2af80 && \
+# install nvcc for building with OQS_USE_CUPQC=ON on x86_64
+RUN if [ "$ARCH" = "x86_64" ]; then \
+    apt-key del 7fa2af80 && \
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && \
     dpkg -i cuda-keyring_1.1-1_all.deb && \
     apt-get update && \
     apt-get install -y cuda-toolkit && \
     echo PATH=/usr/local/cuda-12.6/bin${PATH:+:${PATH}} >> .bashrc && \
     echo LD_LIBRARY_PATH=/usr/local/cuda-12.6/lib64 \
-         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} >> .bashrc
-
-RUN wget https://developer.download.nvidia.com/compute/cupqc/redist/cupqc/cupqc-pkg-0.2.0.tar.gz && \
+         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} >> .bashrc && \
+    wget https://developer.download.nvidia.com/compute/cupqc/redist/cupqc/cupqc-pkg-0.2.0.tar.gz && \
     mkdir /cupqc && \
     tar -xzvf cupqc-pkg-0.2.0.tar.gz -C /cupqc && \
-    echo cuPQC_DIR="/cupqc/cupqc/cupqc-pkg-0.2.0/cmake/" >> .bashrc
+    echo cuPQC_DIR="/cupqc/cupqc/cupqc-pkg-0.2.0/cmake/" >> .bashrc; \
+    fi
 
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install
