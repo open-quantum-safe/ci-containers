@@ -34,6 +34,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        clang-format \
                        clang-tools \
                        cmake \
+                       default-jdk-headless \
                        docker.io \
                        gcc \
                        gcc-mingw-w64 \
@@ -59,7 +60,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        python3-jinja2 \
                        zlib1g-dev \
                        maven \
-                       openjdk-11-jdk \
                        valgrind \
                        flex bison \
                        lsb-release software-properties-common \
@@ -91,6 +91,9 @@ RUN if [ "$ARCH" = "x86_64" ]; then \
     tar -xzvf cupqc-pkg-0.2.0.tar.gz -C /cupqc && \
     echo cuPQC_DIR="/cupqc/cupqc/cupqc-pkg-0.2.0/cmake/" >> .bashrc; \
     fi
+
+# set JAVA_HOME for liboqs-java builds
+ENV JAVA_HOME="/usr/lib/jvm/default-java"
 
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install
