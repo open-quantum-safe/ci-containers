@@ -9,7 +9,7 @@ WORKDIR /app
 ENV CGO_ENABLED 0
 RUN git clone https://github.com/rhysd/actionlint.git
 WORKDIR /app/actionlint
-RUN git reset --hard 62dc61a
+RUN git reset --hard 03d0035 # v1.7.7
 RUN go build -o /usr/local/bin/actionlint ./cmd/actionlint
 # copy built binary from build stage to final image
 FROM ubuntu:latest
