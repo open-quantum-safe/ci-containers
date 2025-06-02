@@ -34,6 +34,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        clang-format \
                        clang-tools \
                        cmake \
+                       curl \
                        default-jdk-headless \
                        docker.io \
                        gcc \
