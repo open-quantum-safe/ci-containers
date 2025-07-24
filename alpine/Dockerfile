@@ -22,6 +22,7 @@ RUN apk add build-base linux-headers \
             autoconf automake libtool make \
             openssl openssl-dev python3-dev\
             git docker \
+            gmp gmp-dev \
             make musl-dev # go
 
 # Unit testing prereqs

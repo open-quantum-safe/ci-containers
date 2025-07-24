@@ -41,6 +41,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        gcc-mingw-w64 \
                        g++ \
                        git \
+                       libgmp-dev \
                        libtool \
                        libssl-dev \
                        libunwind-dev \
