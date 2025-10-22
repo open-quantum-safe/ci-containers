@@ -26,7 +26,7 @@ RUN apk add build-base linux-headers \
             make musl-dev # go
 
 # Unit testing prereqs
-RUN pip3 install -U pytest-xdist nose rednose psutil
+RUN pip3 install -U pytest-xdist nose rednose psutil requests
 
 # No go for the time being:
 ## Configure Go

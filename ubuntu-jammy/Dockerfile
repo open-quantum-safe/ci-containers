@@ -32,6 +32,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        python3-pytest-xdist \
                        python3-psutil \
                        python3-pip \
+                       python3-requests \
                        zlib1g-dev \
                        maven \
                        openjdk-11-jdk \
