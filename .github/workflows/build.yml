@@ -32,3 +32,16 @@ jobs:
           build-args: ARCH=${{ matrix.arch }}
           tags: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-${{ matrix.arch }}
           context: ubuntu-${{ matrix.distro }}
+
+  alpine-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          build-args: ARCH=amd64
+          tags: openquantumsafe/ci-alpine-amd64:latest
+          context: alpine
