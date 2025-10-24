@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Build image
+      - name: Build ci-alpine-amd64:latest, do not push
         uses: docker/build-push-action@v6
         with:
           push: false
