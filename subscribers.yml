@@ -1,0 +1,56 @@
+# subscribers.yml
+#
+# Register a project here (by pull request) to be notified whenever a new
+# version of one of the OQS CI container images is published to Docker Hub.
+#
+# When a subscribed image gets a new version, a GitHub issue is opened on your
+# repository containing:
+#   * the new version,
+#   * the image digest (sha256) that consumers should pin, and
+#   * a link to verify it on Docker Hub.
+#
+# The goal is to help you stop depending on the mutable `:latest` tag — which is
+# a security risk, because the image behind it can change without notice — and
+# instead pin an immutable `@sha256:...` digest that you bump deliberately when
+# you receive one of these notifications.
+#
+# ---------------------------------------------------------------------------
+# open-quantum-safe repositories only
+# ---------------------------------------------------------------------------
+# Subscriptions are limited to public repositories in the open-quantum-safe
+# organization. Notifications are delivered by the `oqs-bot` org member using a
+# fine-grained, org-scoped token, so repositories outside the org cannot be
+# notified. To subscribe, add your project to the `subscribers` list below via
+# pull request.
+#
+# Not part of open-quantum-safe but interested in these notifications? This
+# could be extended to other repositories if there is demand — please open a
+# pull request or issue to register your interest.
+#
+# ---------------------------------------------------------------------------
+# Schema
+# ---------------------------------------------------------------------------
+# subscribers:
+#   - repo: <owner>/<repo>        # (required) repository that receives the issue
+#     images:                     # (required) one or more images to watch,
+#       - <image>                 #            named WITHOUT the "openquantumsafe/"
+#       - <image>                 #            prefix (see the list below)
+#     mention:                    # (optional) GitHub usernames to @-mention
+#       - <github-username>       #            in the issue body
+#
+# Watchable images (these are the images CI publishes; keep in sync with
+# .github/workflows/push.yml):
+#   - ci-ubuntu-focal
+#   - ci-ubuntu-jammy
+#   - ci-ubuntu-latest
+#   - ci-alpine-amd64
+# ---------------------------------------------------------------------------
+
+subscribers:
+  - repo: open-quantum-safe/oqs-provider   # must be an open-quantum-safe repository
+    images:
+      - ci-ubuntu-latest
+      - ci-ubuntu-jammy
+      - ci-alpine-amd64
+    mention:
+      - jplomas

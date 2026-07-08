@@ -1,0 +1,21 @@
+name: Validate subscribers.yml
+
+# Give contributors fast feedback when they add or edit a subscription.
+on:
+  pull_request:
+    paths:
+      - subscribers.yml
+      - .github/scripts/validate-subscribers.sh
+      - .github/workflows/validate-subscribers.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Validate subscribers.yml
+        run: ./.github/scripts/validate-subscribers.sh
