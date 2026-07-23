@@ -1,5 +1,5 @@
 FROM ubuntu:latest as base
-LABEL version="2"
+LABEL version="3"
 
 # actionlint - for GitHub workflow file validation
 # (version pinned to commit hash of v1.7.1)
@@ -11,6 +11,24 @@ RUN git clone https://github.com/rhysd/actionlint.git
 WORKDIR /app/actionlint
 RUN git reset --hard 03d0035 # v1.7.7
 RUN go build -o /usr/local/bin/actionlint ./cmd/actionlint
+
+# jasmin compiler for libjade - built via opam in its own stage so the
+# OCaml toolchain (ocaml, libcompiler-libs-ocaml-dev, opam itself, ~1.1GB
+# combined) never ends up in the final image, only the resulting
+# jasminc binary + whatever it dynamically links against. Mirrors the
+# actionlint pattern above, which already does this for the Go toolchain.
+FROM ubuntu:latest as jasmin-build
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+        opam \
+        gcc \
+        make \
+        pkg-config \
+        libgmp-dev \
+        ca-certificates
+RUN opam init --yes --auto-setup && \
+    opam install --confirm-level=unsafe-yes --destdir=/opt/jasmin-install jasmin.2023.06.3
+
 # copy built binary from build stage to final image
 FROM ubuntu:latest
 WORKDIR /root
@@ -24,21 +42,23 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     echo $TZ > /etc/timezone && \
     apt-get update -qq && \
     apt-get dist-upgrade -y && \
-    apt-get install -y tzdata && \
+    apt-get install -y --no-install-recommends tzdata && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
-    apt-get install -y apt-utils wget \
+    apt-get install -y --no-install-recommends apt-utils wget \
+                       xz-utils \
                        autoconf \
                        automake \
                        astyle \
                        clang \
                        clang-format \
                        clang-tools \
+                       libclang-rt-dev \
                        cmake \
                        curl \
                        default-jdk-headless \
                        docker.io \
                        gcc \
-                       gcc-mingw-w64 \
+                       gcc-mingw-w64-x86-64 \
                        g++ \
                        git \
                        libgmp-dev \
@@ -48,7 +68,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        make \
                        ninja-build \
                        npm \
-                       opam \
                        pkg-config \
                        python3 \
                        python3-git \
@@ -66,16 +85,25 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        lsb-release software-properties-common \
                        lcov \
                        graphviz \
-                       llvm \
                        golang \
                        doxygen \
-                       yamllint
-
-# set up jasmin compiler for libjade
-RUN opam init --yes --auto-setup && opam install --confirm-level=unsafe-yes --destdir=/usr/local jasmin.2023.06.3
+                       yamllint \
+                       libmpfr6 \
+                       libppl14 && \
+    rm -rf /var/lib/apt/lists/*
 
 # install ajv for CBOM validation
 RUN npm -g install ajv ajv-cli
+
+# jasmin compiler for libjade, built in the jasmin-build stage above.
+# jasminc dynamically links against apron's native-stub libraries
+# (libapron.so, libboxMPQ.so, liboctMPQ.so, libap_ppl.so), which opam
+# installs directly under the switch's share/ directory rather than
+# somewhere --destdir exports -- verified via `ldd`, see PR discussion.
+# libmpfr6/libppl14 above cover apron's own further system-level deps.
+COPY --from=jasmin-build /opt/jasmin-install /usr/local
+COPY --from=jasmin-build /root/.opam/default/share/apron/lib /usr/local/share/apron/lib
+ENV LD_LIBRARY_PATH="/usr/local/share/apron/lib:${LD_LIBRARY_PATH}"
 
 # set up Kyberslash patch for Valgrind-based constant-time testing
 COPY valgrind-try-patch-20250805.txt /tmp/
@@ -100,5 +128,3 @@ ENV PATH="/opt/valgrind_varlat/bin:${PATH}"
 # set JAVA_HOME for liboqs-java builds
 ENV JAVA_HOME="/usr/lib/jvm/default-java"
 
-# Activate if we want to test specific OpenSSL3 versions:
-# RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install
