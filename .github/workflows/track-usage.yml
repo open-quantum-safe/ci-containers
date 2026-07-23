@@ -1,0 +1,49 @@
+name: Track container usage
+
+# Monthly snapshot of how the OQS CI container images are used across the
+# open-quantum-safe organization. Regenerates USAGE-TRACKER.md (with up/down/same usage
+# trends versus the previous snapshot) and commits any change directly to main.
+
+on:
+  schedule:
+    - cron: '0 6 1 * *' # 06:00 UTC on the 1st of every month
+  workflow_dispatch: # allow manual runs
+
+# Deny by default; the one job that needs to push grants itself write access.
+permissions: {}
+
+concurrency:
+  group: track-usage
+  cancel-in-progress: false
+
+jobs:
+  track:
+    name: Refresh usage snapshot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the regenerated USAGE-TRACKER.md back to main
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Regenerate USAGE-TRACKER.md
+        env:
+          # gh authenticates from this; the script reads public data only.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash tools/usage-tracker.sh
+
+      - name: Commit snapshot to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add USAGE-TRACKER.md
+          if git diff --cached --quiet -- USAGE-TRACKER.md; then
+            echo "USAGE-TRACKER.md unchanged; nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh USAGE-TRACKER.md container usage snapshot"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
