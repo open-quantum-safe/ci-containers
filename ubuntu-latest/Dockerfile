@@ -102,8 +102,8 @@ RUN npm -g install ajv ajv-cli
 # somewhere --destdir exports -- verified via `ldd`, see PR discussion.
 # libmpfr6/libppl14 above cover apron's own further system-level deps.
 COPY --from=jasmin-build /opt/jasmin-install /usr/local
-COPY --from=jasmin-build /root/.opam/default/share/apron/lib /usr/local/share/apron/lib
-ENV LD_LIBRARY_PATH="/usr/local/share/apron/lib:${LD_LIBRARY_PATH}"
+COPY --from=jasmin-build /root/.opam/default/share/apron/lib/ /usr/local/lib/
+RUN ldconfig && jasminc -version
 
 # set up Kyberslash patch for Valgrind-based constant-time testing
 COPY valgrind-try-patch-20250805.txt /tmp/
