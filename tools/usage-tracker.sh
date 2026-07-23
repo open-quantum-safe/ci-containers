@@ -23,8 +23,8 @@ build_cur() {
   local generated images repos counts
   generated=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-  # ci-* images + last-published date. ponytail: one page; the namespace has
-  # <100 repos. Add ?page follow on .next if it ever grows past 100.
+  # ci-* images + last-published date. Fetched in a single page; the namespace
+  # has well under 100 repos. Follow the .next link too if it ever exceeds 100.
   images=$(curl -fsSL "https://hub.docker.com/v2/repositories/${NS}/?page_size=100" \
     | jq '[.results[] | select(.name | startswith("ci-")) | {name, last_updated}]')
 
