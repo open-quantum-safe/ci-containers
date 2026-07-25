@@ -128,3 +128,19 @@ ENV PATH="/opt/valgrind_varlat/bin:${PATH}"
 # set JAVA_HOME for liboqs-java builds
 ENV JAVA_HOME="/usr/lib/jvm/default-java"
 
+# point AddressSanitizer at binutils' addr2line for symbolization. The usual
+# symbolizer, llvm-symbolizer, ships only in the ~98MB llvm metapackage that
+# was dropped above; addr2line is a symbolizer compiler-rt supports natively
+# and gcc already pulls it in via binutils, so this costs 0MB. Without it,
+# sanitizer reports degrade to bare addresses -- no function, file or line.
+# See https://github.com/open-quantum-safe/ci-containers/pull/108 for the
+# measurements behind this.
+#
+# IMPORTANT: consumers needing their own ASan settings must APPEND to this
+# value rather than replace it, e.g.
+#     ASAN_OPTIONS="${ASAN_OPTIONS}:detect_leaks=0"
+# (":" and " " both separate flags). Overwriting ASAN_OPTIONS outright is
+# silent: the sanitizer still catches errors and jobs still fail correctly,
+# but the reports lose symbolization again with no warning of its own.
+ENV ASAN_OPTIONS="external_symbolizer_path=/usr/bin/addr2line"
+
