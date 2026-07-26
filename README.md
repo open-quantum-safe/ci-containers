@@ -27,7 +27,7 @@ This repository can open an issue on your project's repository whenever a new ve
 
 **How it works.** Each image's Dockerfile carries a `LABEL version="N"`. When a change to `main` bumps that label and the image is (re)published to Docker Hub, the [`Notify subscribers`](.github/workflows/notify.yml) workflow resolves the newly published multi-arch digest and opens an issue on every subscribed repository. Issues are posted by the [`oqs-bot`](https://github.com/oqs-bot) account and contain the new version, the `@sha256:...` digest to pin, and a link to verify it on Docker Hub.
 
-**Subscribing.** Subscriptions are limited to repositories in the [`open-quantum-safe`](https://github.com/open-quantum-safe) organization. To subscribe, open a pull request adding your project to [`subscribers.yml`](subscribers.yml); once it is merged, you will receive an issue the next time one of your watched images is republished.
+**Subscribing.** Subscriptions are limited to repositories in the [`open-quantum-safe`](https://github.com/open-quantum-safe) organization. Every non-archived organization repository that consumes these images is already listed in [`subscribers.yml`](subscribers.yml); to add or amend an entry, open a pull request against that file.
 
 ```yaml
 subscribers:
@@ -36,11 +36,13 @@ subscribers:
       - ci-ubuntu-latest
       - ci-ubuntu-jammy
       - ci-alpine-amd64
-    mention:                                # optional: usernames to @-mention
+    mention:                                # optional, see "Who gets mentioned" below
       - baentsch
 ```
 
 The watchable images are those this repository publishes: `ci-ubuntu-focal`, `ci-ubuntu-jammy`, `ci-ubuntu-latest`, and `ci-alpine-amd64`. A [validation workflow](.github/workflows/validate-subscribers.yml) checks your entry when you open the PR.
+
+**Who gets mentioned.** These issues ask a project to review and re-pin a digest, so they must reach whoever is accountable for that decision. A `mention` entry is therefore either a maintainer listed under _Current Maintainers_ in the subscribed repository's own `GOVERNANCE.md`, or, for repositories that do not carry a `GOVERNANCE.md`, an organization team written `open-quantum-safe/<team-slug>`.
 
 **Not part of `open-quantum-safe`?** This notifier is currently limited to the organization's own repositories. If there is demand to notify projects elsewhere, please open an issue or pull request to register your interest.
 

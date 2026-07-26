@@ -109,8 +109,10 @@ for dir in "${changed_dirs[@]}"; do
       continue
     fi
 
+    # Each mention is a username or an "open-quantum-safe/<team>" team slug;
+    # both are addressed with a leading '@'.
     mentions=$(yq e ".subscribers[$i].mention[]" "$SUBSCRIBERS_FILE" 2>/dev/null \
-                 | sed 's/^/@/' | paste -sd', ' - || true)
+                 | sed 's/^/@/' | paste -sd' ' - || true)
 
     body_file=$(mktemp)
     {

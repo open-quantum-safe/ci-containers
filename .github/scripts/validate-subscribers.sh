@@ -40,27 +40,46 @@ for ((i = 0; i < count; i++)); do
   fi
 
   images_tag=$(yq e ".subscribers[$i].images | tag" "$SUBSCRIBERS_FILE")
-  if [ "$images_tag" != "!!seq" ]; then
+  if [ "$images_tag" != "!!seq" ] ||
+     [ "$(yq e ".subscribers[$i].images | length" "$SUBSCRIBERS_FILE")" -eq 0 ]; then
     fail "subscribers[$i] ($repo): 'images' must be a non-empty list."
+  else
+    while IFS= read -r img; do
+      known=0
+      for k in "${KNOWN_IMAGES[@]}"; do
+        [ "$k" = "$img" ] && { known=1; break; }
+      done
+      if [ "$known" -eq 0 ]; then
+        fail "subscribers[$i] ($repo): unknown image '$img'. Known images: ${KNOWN_IMAGES[*]}"
+      fi
+    done < <(yq e ".subscribers[$i].images[]" "$SUBSCRIBERS_FILE")
+  fi
+
+  # 'mention' is optional, but when present each entry must be a bare GitHub
+  # username (a maintainer from the subscribed repository's GOVERNANCE.md) or an
+  # open-quantum-safe team, written 'open-quantum-safe/<team-slug>'. No leading
+  # '@': notify-subscribers.sh adds it.
+  mention_tag=$(yq e ".subscribers[$i].mention | tag" "$SUBSCRIBERS_FILE")
+  if [ "$mention_tag" = "!!null" ]; then
+    continue
+  elif [ "$mention_tag" != "!!seq" ]; then
+    fail "subscribers[$i] ($repo): 'mention' must be a list."
     continue
   fi
 
-  n_images=$(yq e ".subscribers[$i].images | length" "$SUBSCRIBERS_FILE")
-  if [ "$n_images" -eq 0 ]; then
-    fail "subscribers[$i] ($repo): 'images' must not be empty."
-    continue
-  fi
-
-  while IFS= read -r img; do
-    known=0
-    for k in "${KNOWN_IMAGES[@]}"; do
-      [ "$k" = "$img" ] && { known=1; break; }
-    done
-    if [ "$known" -eq 0 ]; then
-      fail "subscribers[$i] ($repo): unknown image '$img'. Known images: ${KNOWN_IMAGES[*]}"
+  while IFS= read -r who; do
+    if ! printf '%s' "$who" |
+         grep -qE '^([A-Za-z0-9]([A-Za-z0-9-]{0,37}[A-Za-z0-9])?|open-quantum-safe/[A-Za-z0-9._-]+)$'; then
+      fail "subscribers[$i] ($repo): mention '$who' must be a GitHub username or an open-quantum-safe team (open-quantum-safe/<team-slug>), without a leading '@'."
     fi
-  done < <(yq e ".subscribers[$i].images[]" "$SUBSCRIBERS_FILE")
+  done < <(yq e ".subscribers[$i].mention[]" "$SUBSCRIBERS_FILE")
 done
+
+# Two entries for the same repository would open duplicate issues.
+dupes=$(yq e '.subscribers[].repo' "$SUBSCRIBERS_FILE" | sort | uniq -d)
+if [ -n "$dupes" ]; then
+  fail "duplicate repo entries: $(printf '%s' "$dupes" | paste -sd' ' -)."
+fi
 
 if [ "$errors" -ne 0 ]; then
   echo "subscribers.yml validation failed with $errors error(s)."

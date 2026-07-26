@@ -9,10 +9,10 @@
 #   * the image digest (sha256) that consumers should pin, and
 #   * a link to verify it on Docker Hub.
 #
-# The goal is to help you stop depending on the mutable `:latest` tag — which is
-# a security risk, because the image behind it can change without notice — and
-# instead pin an immutable `@sha256:...` digest that you bump deliberately when
-# you receive one of these notifications.
+# The goal is to help you stop depending on the mutable `:latest` tag (a security
+# risk, because the image behind it can change without notice) and instead pin an
+# immutable `@sha256:...` digest that you bump deliberately when you receive one
+# of these notifications.
 #
 # ---------------------------------------------------------------------------
 # open-quantum-safe repositories only
@@ -24,7 +24,7 @@
 # pull request.
 #
 # Not part of open-quantum-safe but interested in these notifications? This
-# could be extended to other repositories if there is demand — please open a
+# could be extended to other repositories if there is demand.  Please open a
 # pull request or issue to register your interest.
 #
 # ---------------------------------------------------------------------------
@@ -35,8 +35,9 @@
 #     images:                     # (required) one or more images to watch,
 #       - <image>                 #            named WITHOUT the "openquantumsafe/"
 #       - <image>                 #            prefix (see the list below)
-#     mention:                    # (optional) GitHub usernames to @-mention
-#       - <github-username>       #            in the issue body
+#     mention:                    # (optional) who to @-mention in the issue body
+#       - <github-username>       #            see "Who to mention" below
+#       - open-quantum-safe/<team>
 #
 # Watchable images (these are the images CI publishes; keep in sync with
 # .github/workflows/push.yml):
@@ -44,13 +45,60 @@
 #   - ci-ubuntu-jammy
 #   - ci-ubuntu-latest
 #   - ci-alpine-amd64
+#
+# ---------------------------------------------------------------------------
+# Who to mention
+# ---------------------------------------------------------------------------
+# These issues ask a project to review and re-pin an image digest, so they need
+# to reach whoever is accountable for that decision. A `mention` entry must
+# therefore be either:
+#
+#   * a maintainer listed under "Current Maintainers" in the subscribed
+#     repository's own GOVERNANCE.md, or
+#   * an open-quantum-safe team, written `open-quantum-safe/<team-slug>`
+#     (e.g. open-quantum-safe/liboqs-java-maintainers), for repositories that
+#     do not carry a GOVERNANCE.md.
+#
+# Prefer a team where the repository has no GOVERNANCE.md: team membership is
+# maintained in one place and does not go stale here. Individuals who want the
+# notifications but hold neither role should watch this repository instead.
 # ---------------------------------------------------------------------------
 
 subscribers:
-  - repo: open-quantum-safe/oqs-provider   # must be an open-quantum-safe repository
+  # Every non-archived open-quantum-safe repository that consumes these images
+  # on its default branch. Mentions follow the "Who to mention" rule above.
+
+  - repo: open-quantum-safe/liboqs         # must be an open-quantum-safe repository
     images:
       - ci-ubuntu-latest
       - ci-ubuntu-jammy
       - ci-alpine-amd64
-    mention:
-      - jplomas
+    mention:                               # liboqs GOVERNANCE.md maintainers
+      - baentsch
+      - dstebila
+      - xuganyu96
+
+  - repo: open-quantum-safe/oqs-provider
+    images:
+      - ci-ubuntu-latest
+      - ci-ubuntu-jammy
+      - ci-alpine-amd64
+    mention:                               # oqs-provider GOVERNANCE.md maintainers
+      - baentsch
+      - ashman-p
+      - RodriM11
+
+  - repo: open-quantum-safe/liboqs-java
+    images:
+      - ci-ubuntu-latest
+    mention:                               # no GOVERNANCE.md in that repository
+      - open-quantum-safe/liboqs-java-maintainers
+
+  # openssh's ubuntu.yaml still runs on ci-ubuntu-focal-x86_64, which CI stopped
+  # publishing in 2024. ci-ubuntu-focal is its supported successor, so that is
+  # what is watched here.
+  - repo: open-quantum-safe/openssh
+    images:
+      - ci-ubuntu-focal
+    mention:                               # no GOVERNANCE.md in that repository
+      - open-quantum-safe/openssh-release-managers
