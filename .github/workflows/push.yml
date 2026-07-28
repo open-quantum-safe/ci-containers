@@ -1,81 +1,76 @@
 name: Build and push Docker images
 
+# Publishes every image in images.yml to Docker Hub. Nothing is built until the
+# pre-build checks pass, and nothing is pushed until it has passed the
+# vulnerability scan in .github/workflows/build-image.yml, where the steps live.
 on:
   push:
     branches: 'main'
 
+permissions:
+  contents: read
+
 jobs:
-  alpine-amd64:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        if: github.ref_name == 'main'
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push ci-alpine-amd64:latest
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          build-args: ARCH=amd64
-          tags: openquantumsafe/ci-alpine-amd64:latest
-          context: alpine
+  checks:
+    uses: ./.github/workflows/checks.yml
 
-  ubuntu-arm64:
-    strategy:
-      matrix:
-        distro:
-          - focal
-          - jammy
-          - latest
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push arm64 tag
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          build-args: ARCH=arm64
-          tags: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-arm64
-          context: ubuntu-${{ matrix.distro }}
-
-  ubuntu-x86_64:
-    needs: ubuntu-arm64
-    strategy:
-      matrix:
-        distro:
-          - focal
-          - jammy
-          - latest
+  discover:
+    name: Discover images
+    needs: checks
     runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.list.outputs.images }}
+      multiarch: ${{ steps.list.outputs.multiarch }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        if: github.ref_name == 'main'
-        uses: docker/login-action@v3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push x86_64 tag
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          build-args: ARCH=x86_64
-          tags: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-x86_64
-          context: ubuntu-${{ matrix.distro }}
-      - name: Create multiarch image
+          persist-credentials: false
+
+      - name: Read images.yml
+        id: list
         run: |
-          docker manifest create openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest \
-            --amend openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-x86_64 \
-            --amend openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-arm64 \
-            && docker manifest push openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest
+          {
+            echo "images=$(./.github/scripts/list-images.sh --matrix)"
+            echo "multiarch=$(./.github/scripts/list-images.sh --multiarch)"
+          } >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: discover
+    strategy:
+      matrix: ${{ fromJSON(needs.discover.outputs.images) }}
+    uses: ./.github/workflows/build-image.yml
+    with:
+      context: ${{ matrix.context }}
+      image: ${{ matrix.image }}
+      tag: ${{ matrix.tag }}
+      arch: ${{ matrix.arch }}
+      runner: ${{ matrix.runner }}
+      push: true
+    secrets:
+      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  # The per-architecture tags are published above; for an image built for more
+  # than one architecture, :latest is the manifest spanning them.
+  multiarch:
+    name: Manifest for ${{ matrix.image }}
+    needs: [discover, publish]
+    strategy:
+      matrix: ${{ fromJSON(needs.discover.outputs.multiarch) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish the multi-architecture manifest
+        env:
+          IMAGE: openquantumsafe/${{ matrix.image }}
+          ARCH_TAGS: ${{ matrix.tags }}
+        run: |
+          amend=()
+          for tag in $ARCH_TAGS; do amend+=(--amend "$IMAGE:$tag"); done
+          docker manifest create "$IMAGE:latest" "${amend[@]}"
+          docker manifest push "$IMAGE:latest"

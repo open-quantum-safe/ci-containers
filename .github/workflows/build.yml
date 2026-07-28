@@ -1,47 +1,40 @@
 name: Build Docker images
 
+# Builds and scans every image on a pull request, without publishing anything.
+# Which images exist comes from images.yml, and the steps live in
+# .github/workflows/build-image.yml, so neither is repeated here.
 on:
   pull_request:
   push:
     branches-ignore: 'main'
 
-jobs:
-  ubuntu:
-    strategy:
-      matrix:
-        arch:
-          - arm64
-          - x86_64
-        distro:
-          - focal
-          - jammy
-          - latest
-        include:
-          - arch: arm64
-            runner: ubuntu-24.04-arm
-          - arch: x86_64
-            runner: ubuntu-latest
-    runs-on: ${{ matrix.runner }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Build image
-        uses: docker/build-push-action@v6
-        with:
-          push: false
-          build-args: ARCH=${{ matrix.arch }}
-          tags: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest-${{ matrix.arch }}
-          context: ubuntu-${{ matrix.distro }}
+permissions:
+  contents: read
 
-  alpine-amd64:
+jobs:
+  discover:
+    name: Discover images
     runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.list.outputs.images }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Build ci-alpine-amd64:latest, do not push
-        uses: docker/build-push-action@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          push: false
-          build-args: ARCH=amd64
-          tags: openquantumsafe/ci-alpine-amd64:latest
-          context: alpine
+          persist-credentials: false
+
+      - name: Read images.yml
+        id: list
+        run: echo "images=$(./.github/scripts/list-images.sh --matrix)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: discover
+    strategy:
+      matrix: ${{ fromJSON(needs.discover.outputs.images) }}
+    uses: ./.github/workflows/build-image.yml
+    with:
+      context: ${{ matrix.context }}
+      image: ${{ matrix.image }}
+      tag: ${{ matrix.tag }}
+      arch: ${{ matrix.arch }}
+      runner: ${{ matrix.runner }}

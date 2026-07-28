@@ -1,0 +1,101 @@
+name: Pre-build checks
+
+# Cheap checks that run before an image is built or published: the Dockerfiles
+# lint clean, every image's `LABEL version` is well-formed and has been bumped
+# past the released one whenever its build context changes, and the shell and
+# workflow files that drive all of this are themselves linted and audited.
+#
+# Called by "Build and push Docker images", so a failure here stops publication,
+# and run directly on pull requests for fast feedback.
+on:
+  pull_request:
+  push:
+    branches-ignore: 'main'
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  dockerfiles:
+    name: Lint Dockerfiles with hadolint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run hadolint
+        # Accepted rules are configured in .hadolint.yaml, which hadolint reads
+        # from the working directory. Only the images in images.yml are linted;
+        # the retired directories nothing builds are left alone.
+        run: |
+          ./.github/scripts/list-images.sh --dirs | sed 's#$#/Dockerfile#' |
+            xargs docker run --rm -v "$PWD:/repo:ro" -w /repo \
+              ghcr.io/hadolint/hadolint:v2.14.0-alpine@sha256:7aba693c1442eb31c0b015c129697cb3b6cb7da589d85c7562f9deb435a6657c \
+              hadolint
+
+  images:
+    name: Check images.yml and image versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0 # the check diffs each build context against the base commit
+          persist-credentials: false
+
+      - name: Check images.yml against the repository layout
+        run: ./.github/scripts/list-images.sh --check
+
+      - name: Check the LABEL version of each published image
+        env:
+          # Empty on a push, where the script falls back to the previous commit.
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+        run: ./.github/scripts/check-image-versions.sh
+
+  shell:
+    name: Lint shell scripts with shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run shellcheck
+        # Preinstalled on the runner; no action needed.
+        run: git ls-files -z '*.sh' | xargs -0 shellcheck
+
+  workflows:
+    name: Check validity of GitHub workflows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint
+        # Upstream's own image, rather than the openquantumsafe/ci-ubuntu-latest
+        # one used elsewhere in the organization: this repository builds that
+        # image, and its checks should not depend on it being publishable.
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo \
+            rhysd/actionlint@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9 \
+            -color
+
+  zizmor:
+    name: Audit GitHub actions security with zizmor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Audit GitHub actions security with zizmor
+        uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
+        with:
+          advanced-security: false

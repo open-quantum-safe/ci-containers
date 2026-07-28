@@ -1,5 +1,5 @@
 FROM ubuntu:latest as base
-LABEL version="3"
+LABEL version="4"
 
 # actionlint - for GitHub workflow file validation
 # (version pinned to commit hash of v1.7.1)
@@ -37,7 +37,7 @@ COPY --from=build /usr/local/bin/actionlint /usr/local/bin/actionlint
 ARG ARCH
 ENV ARCH=${ARCH}
 
-RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
+RUN export DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
     apt-get update -qq && \
@@ -110,6 +110,9 @@ COPY valgrind-try-patch-20250805.txt /tmp/
 COPY valgrind-varlat-patch-20250805.txt /tmp/
 COPY valgrind-varlat-sup-block.txt /tmp/
 
+# WORKDIR would split this across layers, leaving the source tree and the build
+# objects in the image even though the rm at the end deletes them.
+# hadolint ignore=DL3003
 RUN git clone git://sourceware.org/git/valgrind.git /tmp/valgrind_varlat_src && \
     cd /tmp/valgrind_varlat_src && \
     git checkout 112f1080b7c21e37dfce0a2e589d0dc7aa115afa && \
