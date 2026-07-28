@@ -49,6 +49,12 @@ WORKDIR /doxygen/build
 RUN cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version
 WORKDIR /
 
-ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
+# Ubuntu names the JDK directory after the Debian architecture (amd64), not the
+# ARCH build-arg this image is passed (x86_64), so JAVA_HOME is resolved here
+# rather than interpolated. The javac check fails the build if the JDK moves,
+# instead of leaving a JAVA_HOME that silently points nowhere.
+RUN ln -sfn "/usr/lib/jvm/java-1.11.0-openjdk-$(dpkg --print-architecture)" /usr/lib/jvm/java-11 && \
+    [ -x /usr/lib/jvm/java-11/bin/javac ]
+ENV JAVA_HOME="/usr/lib/jvm/java-11"
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install

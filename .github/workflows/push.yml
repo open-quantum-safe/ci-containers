@@ -29,10 +29,14 @@ jobs:
 
       - name: Read images.yml
         id: list
+        # Assigned first so that a failure fails the step: inside `echo "x=$(…)"`
+        # the exit status would be echo's, and an empty value would reach fromJSON.
         run: |
+          images=$(./.github/scripts/list-images.sh --matrix)
+          multiarch=$(./.github/scripts/list-images.sh --multiarch)
           {
-            echo "images=$(./.github/scripts/list-images.sh --matrix)"
-            echo "multiarch=$(./.github/scripts/list-images.sh --multiarch)"
+            echo "images=$images"
+            echo "multiarch=$multiarch"
           } >> "$GITHUB_OUTPUT"
 
   publish:

@@ -11,8 +11,8 @@
 #   * an image whose build context changed since BASE_REF has had its version
 #     bumped past the one already released — republishing under a released
 #     version silently changes what consumers get; and
-#   * the label sits in the final build stage, so the published image actually
-#     carries it (a warning: ubuntu-latest currently does not).
+#   * that label sits in the image's final build stage, since only that stage
+#     reaches the published image.
 #
 # BASE_REF is the commit the change is measured against: the pull request base
 # on a PR, the previous commit otherwise. Needs full history (fetch-depth: 0).
@@ -29,12 +29,19 @@ errors=0
 fail() { echo "::error file=$1::$2"; errors=$((errors + 1)); }
 warn() { echo "::warning file=$1::$2"; }
 
-# version_of reads the first `LABEL version="N"` from a Dockerfile on stdin.
-# `sed -n 1s` rather than `head -1` so nothing closes the pipe early and trips
-# pipefail on an otherwise-passing file.
+# version_of prints the `LABEL version` of the *final* build stage of the
+# Dockerfile on stdin, which is the only one the published image carries: each
+# FROM starts a new stage and discards the labels of the one before it.
 version_of() {
-  grep -iE '^[[:space:]]*LABEL[[:space:]]+version=' |
-    sed -nE '1s/.*[Vv]ersion="?([^"[:space:]]+)"?.*/\1/p'
+  awk '
+    tolower($1) == "from" { version = "" }
+    tolower($1) == "label" && tolower($2) ~ /^version=/ {
+      version = $2
+      sub(/^[^=]*=/, "", version)
+      gsub(/"/, "", version)
+    }
+    END { if (version != "") print version }
+  '
 }
 
 is_version() { printf '%s' "$1" | grep -qE '^[1-9][0-9]*$'; }
@@ -45,7 +52,9 @@ base=""
 if [ -n "${BASE_REF:-}" ] && git rev-parse -q --verify "${BASE_REF}^{commit}" >/dev/null; then
   base=$(git merge-base "$BASE_REF" HEAD 2>/dev/null || printf '%s' "$BASE_REF")
 else
-  base=$(git rev-parse -q --verify 'HEAD^{commit}' || true)
+  # The parent commit: 'HEAD^' is that, whereas 'HEAD^{commit}' would only peel
+  # HEAD itself to a commit and compare it against itself.
+  base=$(git rev-parse -q --verify 'HEAD^' || true)
 fi
 if [ -z "$base" ]; then
   echo "No base commit available; checking the version format only."
@@ -61,21 +70,12 @@ for dir in "${IMAGES[@]}"; do
 
   version=$(version_of <"$file" || true)
   if [ -z "$version" ]; then
-    fail "$file" "no 'LABEL version=' found; every published image must carry one."
+    fail "$file" "no 'LABEL version=' in the final build stage, so the published image would not carry one. A label in an earlier stage does not reach it."
     continue
   fi
   if ! is_version "$version"; then
     fail "$file" "version '$version' is not a plain incrementing integer, e.g. version=\"4\"."
     continue
-  fi
-
-  # A label in an earlier stage is dropped from the published image, whatever
-  # the Dockerfile appears to say.
-  last_from=$(grep -niE '^[[:space:]]*FROM[[:space:]]' "$file" | tail -n1 | cut -d: -f1)
-  label_line=$(grep -niE '^[[:space:]]*LABEL[[:space:]]+version=' "$file" |
-                 sed -n 1p | cut -d: -f1)
-  if [ "$label_line" -lt "$last_from" ]; then
-    warn "$file" "'LABEL version' on line $label_line belongs to a build stage before the final FROM on line $last_from, so the published image does not carry it."
   fi
 
   [ -n "$base" ] || continue
@@ -85,9 +85,14 @@ for dir in "${IMAGES[@]}"; do
     continue
   fi
 
-  released=$(git show "$base:$file" 2>/dev/null | version_of || true)
-  if [ -z "$released" ]; then
+  if ! git cat-file -e "$base:$file" 2>/dev/null; then
     echo "$dir: version $version, new image."
+    continue
+  fi
+
+  released=$(git show "$base:$file" | version_of || true)
+  if [ -z "$released" ]; then
+    warn "$file" "the released Dockerfile at ${base:0:12} carries no 'LABEL version' in its final stage, so there is nothing to compare against."
     continue
   fi
   if ! is_version "$released"; then

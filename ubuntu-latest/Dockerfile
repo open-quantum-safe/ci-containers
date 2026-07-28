@@ -1,6 +1,3 @@
-FROM ubuntu:latest as base
-LABEL version="4"
-
 # actionlint - for GitHub workflow file validation
 # (version pinned to commit hash of v1.7.1)
 FROM golang:1.23 as build
@@ -31,6 +28,7 @@ RUN opam init --yes --auto-setup && \
 
 # copy built binary from build stage to final image
 FROM ubuntu:latest
+LABEL version="4"
 WORKDIR /root
 COPY --from=build /usr/local/bin/actionlint /usr/local/bin/actionlint
 
