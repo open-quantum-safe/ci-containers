@@ -1,0 +1,27 @@
+# The images this repository builds, scans and publishes to Docker Hub, and the
+# only place that set is written down: the build and publish matrices, the
+# linting and the version check all derive from it.
+#
+#   dir     directory holding the Dockerfile
+#   image   Docker Hub repository, without the openquantumsafe/ prefix
+#   arches  architectures, each built natively. One is published as :latest,
+#           several as :latest-<arch> spanned by a :latest manifest.
+#
+# A directory with a Dockerfile and no entry here is retired, and is not built.
+
+images:
+  - dir: alpine
+    image: ci-alpine-amd64
+    arches: [amd64]
+
+  - dir: ubuntu-focal
+    image: ci-ubuntu-focal
+    arches: [x86_64, arm64]
+
+  - dir: ubuntu-jammy
+    image: ci-ubuntu-jammy
+    arches: [x86_64, arm64]
+
+  - dir: ubuntu-latest
+    image: ci-ubuntu-latest
+    arches: [x86_64, arm64]

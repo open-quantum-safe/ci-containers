@@ -1,8 +1,8 @@
 FROM ubuntu:jammy
-LABEL version="3"
+LABEL version="4"
 ARG ARCH
 
-RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
+RUN export DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
     apt-get update -qq && \
@@ -44,7 +44,15 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        yamllint && \
      pip3 install tabulate jinja2
 
-RUN cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version 
-ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
+RUN git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git /doxygen
+WORKDIR /doxygen/build
+RUN cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version
+WORKDIR /
+
+# Ubuntu names the JDK directory after the Debian architecture (amd64), not the
+# ARCH build-arg (x86_64), so resolve it here; javac asserts it exists.
+RUN ln -sfn "/usr/lib/jvm/java-1.11.0-openjdk-$(dpkg --print-architecture)" /usr/lib/jvm/java-11 && \
+    [ -x /usr/lib/jvm/java-11/bin/javac ]
+ENV JAVA_HOME="/usr/lib/jvm/java-11"
 # Activate if we want to test specific OpenSSL3 versions:
 # RUN cd /root && git clone --depth 1 --branch openssl-3.0.7 https://github.com/openssl/openssl.git && cd openssl && LDFLAGS="-Wl,-rpath -Wl,/usr/local/openssl3/lib64"  ./config --prefix=/usr/local/openssl3 && make -j && make install

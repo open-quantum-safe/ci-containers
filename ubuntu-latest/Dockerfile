@@ -1,6 +1,3 @@
-FROM ubuntu:latest as base
-LABEL version="3"
-
 # actionlint - for GitHub workflow file validation
 # (version pinned to commit hash of v1.7.1)
 FROM golang:1.23 as build
@@ -31,13 +28,14 @@ RUN opam init --yes --auto-setup && \
 
 # copy built binary from build stage to final image
 FROM ubuntu:latest
+LABEL version="4"
 WORKDIR /root
 COPY --from=build /usr/local/bin/actionlint /usr/local/bin/actionlint
 
 ARG ARCH
 ENV ARCH=${ARCH}
 
-RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
+RUN export DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
     apt-get update -qq && \
@@ -110,6 +108,8 @@ COPY valgrind-try-patch-20250805.txt /tmp/
 COPY valgrind-varlat-patch-20250805.txt /tmp/
 COPY valgrind-varlat-sup-block.txt /tmp/
 
+# WORKDIR would split this across layers, keeping the source tree the rm drops.
+# hadolint ignore=DL3003
 RUN git clone git://sourceware.org/git/valgrind.git /tmp/valgrind_varlat_src && \
     cd /tmp/valgrind_varlat_src && \
     git checkout 112f1080b7c21e37dfce0a2e589d0dc7aa115afa && \
