@@ -51,7 +51,7 @@ RUN export DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
     npm -g install ajv ajv-cli && \
     pip3 install tabulate jinja2
 
-# WORKDIR cannot be made conditional, and this builds on amd64 only.
+# WORKDIR cannot be conditional.
 # hadolint ignore=DL3003
 RUN if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "x64" ] || [ "$ARCH" = "x86_64" ]; then cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version ; fi
 

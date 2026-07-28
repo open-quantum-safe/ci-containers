@@ -1,18 +1,13 @@
-# The images this repository builds, scans and publishes to Docker Hub.
+# The images this repository builds, scans and publishes to Docker Hub, and the
+# only place that set is written down: the build and publish matrices, the
+# linting and the version check all derive from it.
 #
-# This is the only place the image set is written down: the build and publish
-# matrices, the Dockerfile linting and the LABEL version check are all derived
-# from it, so adding or retiring an image is a change here and to its directory,
-# with no workflow to keep in step.
-#
-#   dir     directory holding the image's Dockerfile
+#   dir     directory holding the Dockerfile
 #   image   Docker Hub repository, without the openquantumsafe/ prefix
-#   arches  architectures to build, each natively on a runner of that
-#           architecture. A single architecture is published as :latest; several
-#           are published as :latest-<arch>, spanned by a :latest manifest.
+#   arches  architectures, each built natively. One is published as :latest,
+#           several as :latest-<arch> spanned by a :latest manifest.
 #
-# Directories with a Dockerfile that are absent from this list are not built:
-# they are the retired images kept for reference.
+# A directory with a Dockerfile and no entry here is retired, and is not built.
 
 images:
   - dir: alpine

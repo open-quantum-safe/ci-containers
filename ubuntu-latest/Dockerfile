@@ -108,8 +108,7 @@ COPY valgrind-try-patch-20250805.txt /tmp/
 COPY valgrind-varlat-patch-20250805.txt /tmp/
 COPY valgrind-varlat-sup-block.txt /tmp/
 
-# WORKDIR would split this across layers, leaving the source tree and the build
-# objects in the image even though the rm at the end deletes them.
+# WORKDIR would split this across layers, keeping the source tree the rm drops.
 # hadolint ignore=DL3003
 RUN git clone git://sourceware.org/git/valgrind.git /tmp/valgrind_varlat_src && \
     cd /tmp/valgrind_varlat_src && \

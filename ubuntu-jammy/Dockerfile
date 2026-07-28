@@ -50,9 +50,7 @@ RUN cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --versi
 WORKDIR /
 
 # Ubuntu names the JDK directory after the Debian architecture (amd64), not the
-# ARCH build-arg this image is passed (x86_64), so JAVA_HOME is resolved here
-# rather than interpolated. The javac check fails the build if the JDK moves,
-# instead of leaving a JAVA_HOME that silently points nowhere.
+# ARCH build-arg (x86_64), so resolve it here; javac asserts it exists.
 RUN ln -sfn "/usr/lib/jvm/java-1.11.0-openjdk-$(dpkg --print-architecture)" /usr/lib/jvm/java-11 && \
     [ -x /usr/lib/jvm/java-11/bin/javac ]
 ENV JAVA_HOME="/usr/lib/jvm/java-11"

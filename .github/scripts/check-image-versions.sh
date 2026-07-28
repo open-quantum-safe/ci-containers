@@ -10,11 +10,16 @@
 
 set -euo pipefail
 
-# The image set comes from images.yml.
+# The image set comes from images.yml. A process substitution swallows the exit
+# status, so an empty result would pass without checking anything.
 IMAGES=()
 while IFS= read -r dir; do
   IMAGES+=("$dir")
 done < <("$(dirname "$0")/list-images.sh" --dirs)
+if [ ${#IMAGES[@]} -eq 0 ]; then
+  echo "::error::list-images.sh returned no images; nothing was checked."
+  exit 1
+fi
 
 errors=0
 fail() { echo "::error file=$1::$2"; errors=$((errors + 1)); }
@@ -46,7 +51,7 @@ else
   base=$(git rev-parse -q --verify 'HEAD^' || true)
 fi
 if [ -z "$base" ]; then
-  echo "No base commit available; checking the version format only."
+  echo "::warning::No base commit available (a shallow checkout?); checking the version format only."
 fi
 
 for dir in "${IMAGES[@]}"; do

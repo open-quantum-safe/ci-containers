@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 #
-# Queries images.yml, the list of images this repository publishes, so that
-# everything needing to know the image set asks one place: the build and publish
-# matrices, the Dockerfile linting and the LABEL version check.
-#
-# Usage:
-#   list-images.sh --dirs        directories holding the images' Dockerfiles
-#   list-images.sh --matrix      Actions matrix: one entry per image and architecture
-#   list-images.sh --multiarch   Actions matrix of the images published as a manifest
-#   list-images.sh --check       check images.yml against the repository layout
+# Queries images.yml so that everything needing the image set asks one place:
+# the build and publish matrices, the linting and the version check.
 #
 # shellcheck disable=SC2016  # the $names in the jq programs below are jq's, not the shell's
 
@@ -16,8 +9,23 @@ set -euo pipefail
 
 IMAGES_FILE=images.yml
 
-# yq reads the YAML, jq does the work: both are preinstalled on the runners.
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  list-images.sh --dirs        directories holding the images' Dockerfiles
+  list-images.sh --matrix      Actions matrix: one entry per image and architecture
+  list-images.sh --multiarch   Actions matrix of the images published as a manifest
+  list-images.sh --check       check images.yml against the repository layout
+EOF
+  exit 2
+}
+
+# yq reads the YAML, jq does the work; both are preinstalled on the runners.
 query() { yq -o=json "$IMAGES_FILE" | jq "$@"; }
+
+# An empty matrix is skipped without complaint: a green run that built nothing.
+[ "$(query '.images | length')" -gt 0 ] ||
+  { echo "::error file=$IMAGES_FILE::no images are listed." >&2; exit 1; }
 
 case "${1:-}" in
   --dirs)
@@ -33,7 +41,10 @@ case "${1:-}" in
             image:   $i.image,
             arch:    .,
             tag:     (if $multiarch then "latest-\(.)" else "latest" end),
-            runner:  (if . == "arm64" then "ubuntu-24.04-arm" else "ubuntu-latest" end) }
+            # Erroring beats defaulting a new arch onto an x86 runner.
+            runner:  (if . == "arm64" then "ubuntu-24.04-arm"
+                      elif . == "amd64" or . == "x86_64" then "ubuntu-latest"
+                      else error("unknown architecture \(.); add a runner for it in list-images.sh") end) }
       ] | {include: .}'
     ;;
 
@@ -54,9 +65,8 @@ case "${1:-}" in
       }
     done < <(query -r '.images[].dir')
 
-    # A new image directory that nobody added to images.yml is silently never
-    # built, so name the unlisted ones rather than leaving that to be noticed
-    # later. The retired images are expected to be among them.
+    # An unlisted directory is silently never built, so name them. The
+    # retired images are expected to be among them.
     unlisted=""
     for dir in */; do
       dir=${dir%/}
@@ -71,7 +81,6 @@ case "${1:-}" in
     ;;
 
   *)
-    sed -n '3,11p' "$0" | sed 's/^# \{0,1\}//' >&2
-    exit 2
+    usage
     ;;
 esac

@@ -84,6 +84,11 @@ jobs:
           ignore-unfixed: true
           exit-code: 1
 
+      # So a green run on a fork's main is not read as having published.
+      - name: Skip publishing
+        if: ${{ !inputs.push && github.ref_name == 'main' }}
+        run: echo "::notice::Built and scanned only; this repository holds no Docker Hub credentials."
+
       - name: Login to Docker Hub
         if: inputs.push
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
