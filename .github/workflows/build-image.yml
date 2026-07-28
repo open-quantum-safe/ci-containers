@@ -1,11 +1,7 @@
 name: Container image
 
-# Builds one container image, scans it, and optionally publishes it.
-#
-# Both the pull-request build and the publish workflow call this, so the steps
-# live in one place: adding a container means adding a matrix entry there, not
-# copying this block. The scan runs between the build and the push, so an image
-# with a fixable critical vulnerability is never published.
+# Builds one image, scans it, optionally publishes it. Called by build.yml and
+# push.yml so the steps live in one place; the scan sits between the two.
 on:
   workflow_call:
     inputs:
@@ -55,8 +51,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # Loaded into the local daemon rather than pushed, so the scan below sees
-      # exactly the image that would be published.
+      # Loaded, not pushed: the scan sees exactly what would be published.
       - name: Build ${{ inputs.image }}:${{ inputs.tag }}
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
@@ -75,14 +70,16 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 0
 
-      # Only fixable findings block: an unfixed CVE in the upstream base image
-      # is not something a rebuild here can resolve, and is reported above.
+      # Narrower than the report above: only distribution packages, the ones a
+      # rebuild can fix. The Go toolchain these images ship carries stdlib CVEs
+      # marked fixed upstream that no distro package delivers.
       - name: Fail on fixable critical vulnerabilities
         if: inputs.scan
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: openquantumsafe/${{ inputs.image }}:${{ inputs.tag }}
           scanners: vuln
+          vuln-type: os # distribution packages only (TRIVY_PKG_TYPES)
           severity: CRITICAL
           ignore-unfixed: true
           exit-code: 1
@@ -96,8 +93,6 @@ jobs:
 
       - name: Push ${{ inputs.image }}:${{ inputs.tag }}
         if: inputs.push
-        env:
-          # Via the environment rather than expanded into the script, so the
-          # inputs cannot be read as shell.
+        env: # via the environment so the inputs cannot be read as shell
           IMAGE: openquantumsafe/${{ inputs.image }}:${{ inputs.tag }}
         run: docker push "$IMAGE"

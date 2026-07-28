@@ -1,8 +1,7 @@
 name: Build and push Docker images
 
-# Publishes every image in images.yml to Docker Hub. Nothing is built until the
-# pre-build checks pass, and nothing is pushed until it has passed the
-# vulnerability scan in .github/workflows/build-image.yml, where the steps live.
+# Publishes every image in images.yml. Nothing is built until the pre-build
+# checks pass, nothing pushed until it passes the scan in build-image.yml.
 on:
   push:
     branches: 'main'
@@ -29,8 +28,8 @@ jobs:
 
       - name: Read images.yml
         id: list
-        # Assigned first so that a failure fails the step: inside `echo "x=$(…)"`
-        # the exit status would be echo's, and an empty value would reach fromJSON.
+        # Assigned first: inside `echo "x=$(…)"` a failure would be echo's,
+        # leaving fromJSON an empty string.
         run: |
           images=$(./.github/scripts/list-images.sh --matrix)
           multiarch=$(./.github/scripts/list-images.sh --multiarch)
@@ -50,14 +49,16 @@ jobs:
       tag: ${{ matrix.tag }}
       arch: ${{ matrix.arch }}
       runner: ${{ matrix.runner }}
-      push: true
+      # Only this repository has the credentials; a fork builds and scans only.
+      push: ${{ github.repository == 'open-quantum-safe/ci-containers' }}
     secrets:
       dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  # The per-architecture tags are published above; for an image built for more
-  # than one architecture, :latest is the manifest spanning them.
+  # :latest is the manifest spanning the per-architecture tags published above.
   multiarch:
     name: Manifest for ${{ matrix.image }}
+    # Nothing was pushed on a fork, so there is nothing to span.
+    if: github.repository == 'open-quantum-safe/ci-containers'
     needs: [discover, publish]
     strategy:
       matrix: ${{ fromJSON(needs.discover.outputs.multiarch) }}

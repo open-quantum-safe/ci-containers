@@ -1,12 +1,7 @@
 name: Pre-build checks
 
-# Cheap checks that run before an image is built or published: the Dockerfiles
-# lint clean, every image's `LABEL version` is well-formed and has been bumped
-# past the released one whenever its build context changes, and the shell and
-# workflow files that drive all of this are themselves linted and audited.
-#
-# Called by "Build and push Docker images", so a failure here stops publication,
-# and run directly on pull requests for fast feedback.
+# Lints the Dockerfiles, checks each image's `LABEL version`, and lints the
+# shell and workflow files. Called by push.yml, so a failure stops publication.
 on:
   pull_request:
   push:
@@ -27,9 +22,8 @@ jobs:
           persist-credentials: false
 
       - name: Run hadolint
-        # Accepted rules are configured in .hadolint.yaml, which hadolint reads
-        # from the working directory. Only the images in images.yml are linted;
-        # the retired directories nothing builds are left alone.
+        # Accepted rules are in .hadolint.yaml. Only images.yml entries are
+        # linted; the retired directories are left alone.
         run: |
           ./.github/scripts/list-images.sh --dirs | sed 's#$#/Dockerfile#' |
             xargs docker run --rm -v "$PWD:/repo:ro" -w /repo \
@@ -78,9 +72,8 @@ jobs:
           persist-credentials: false
 
       - name: Run actionlint
-        # Upstream's own image, rather than the openquantumsafe/ci-ubuntu-latest
-        # one used elsewhere in the organization: this repository builds that
-        # image, and its checks should not depend on it being publishable.
+        # Upstream's image, not openquantumsafe/ci-ubuntu-latest: this
+        # repository builds that one, so its checks must not depend on it.
         run: |
           docker run --rm -v "$PWD:/repo:ro" -w /repo \
             rhysd/actionlint@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9 \
