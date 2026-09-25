@@ -27,7 +27,6 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        pkg-config \
                        python3 \
                        python3-pytest \
-                       python3-pytest-xdist \
                        python3-psutil \
                        python3-pip \
                        python3-requests \
@@ -42,7 +41,9 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich && \
                        graphviz \
                        golang \
                        yamllint && \
-     pip3 install tabulate jinja2
+     # apt's python3-pytest-xdist (2.5.0) predates --maxschedchunk; 3.5.0 is the
+     # newest release still compatible with jammy's python3-pytest (6.2.5)
+     pip3 install tabulate jinja2 pytest-xdist==3.5.0
 
 RUN cd / && git clone --depth 1 --branch Release_1_10_0 https://github.com/doxygen/doxygen.git && cd doxygen && mkdir build && cd build && cmake -G "Unix Makefiles" .. && make -j 4 && make install && doxygen --version 
 ENV JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-${ARCH}"
