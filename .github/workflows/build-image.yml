@@ -1,0 +1,103 @@
+name: Container image
+
+# Builds one image, scans it, optionally publishes it. Called by build.yml and
+# push.yml so the steps live in one place; the scan sits between the two.
+on:
+  workflow_call:
+    inputs:
+      context:
+        description: Directory holding the image's Dockerfile, e.g. ubuntu-jammy.
+        required: true
+        type: string
+      image:
+        description: Docker Hub repository, without the openquantumsafe/ prefix.
+        required: true
+        type: string
+      tag:
+        description: Tag to build, e.g. latest or latest-x86_64.
+        required: true
+        type: string
+      arch:
+        description: Value passed to the build as the ARCH build-arg.
+        required: true
+        type: string
+      runner:
+        description: Runner to build on; must match the architecture being built.
+        required: true
+        type: string
+      scan:
+        description: Scan the built image for known vulnerabilities.
+        default: true
+        type: boolean
+      push:
+        description: Publish the image to Docker Hub once it has passed the scan.
+        default: false
+        type: boolean
+    secrets:
+      dockerhub_token:
+        description: Docker Hub access token; required when push is true.
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: ${{ inputs.image }}:${{ inputs.tag }}
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # Loaded, not pushed: the scan sees exactly what would be published.
+      - name: Build ${{ inputs.image }}:${{ inputs.tag }}
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          push: false
+          load: true
+          context: ${{ inputs.context }}
+          build-args: ARCH=${{ inputs.arch }}
+          tags: openquantumsafe/${{ inputs.image }}:${{ inputs.tag }}
+
+      - name: Report known vulnerabilities
+        if: inputs.scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: openquantumsafe/${{ inputs.image }}:${{ inputs.tag }}
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      # Narrower than the report above: only distribution packages, the ones a
+      # rebuild can fix. The Go toolchain these images ship carries stdlib CVEs
+      # marked fixed upstream that no distro package delivers.
+      - name: Fail on fixable critical vulnerabilities
+        if: inputs.scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: openquantumsafe/${{ inputs.image }}:${{ inputs.tag }}
+          scanners: vuln
+          vuln-type: os # distribution packages only (TRIVY_PKG_TYPES)
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+
+      # So a green run on a fork's main is not read as having published.
+      - name: Skip publishing
+        if: ${{ !inputs.push && github.ref_name == 'main' }}
+        run: echo "::notice::Built and scanned only; this repository holds no Docker Hub credentials."
+
+      - name: Login to Docker Hub
+        if: inputs.push
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.dockerhub_token }}
+
+      - name: Push ${{ inputs.image }}:${{ inputs.tag }}
+        if: inputs.push
+        env: # via the environment so the inputs cannot be read as shell
+          IMAGE: openquantumsafe/${{ inputs.image }}:${{ inputs.tag }}
+        run: docker push "$IMAGE"

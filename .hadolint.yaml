@@ -1,0 +1,24 @@
+# hadolint configuration for the images CI builds and publishes.
+#
+# `ignored` rules are ones this project has deliberately decided against: these
+# are CI base images whose whole purpose is to provide current toolchains, so
+# the version-pinning rules work against them. Everything else stays enabled, so
+# a new class of warning fails the build (see .github/workflows/checks.yml).
+#
+# Findings that are real but not yet addressed or are potentially useful are demoted
+# to `info` rather than ignored, so they keep showing up in the lint output instead
+# of disappearing.  There should be a rationale recorded here for decisions made.
+
+failure-threshold: warning
+
+ignored:
+  - DL3007 # `FROM ubuntu:latest` | rationale: ci-ubuntu-latest tracks the newest Ubuntu by design.
+  - DL3008 # pin apt versions | rationale: would freeze the toolchains these images exist to provide.
+  - DL3013 # pin pip versions | rationale: as above.
+  - DL3016 # pin npm versions | rationale: as above.
+  - DL3018 # pin apk versions | rationale: as above.
+
+override:
+  info:
+    # pip cache left in the image | rationale: size debt, contrary to goals of PR#108
+    - DL3042
