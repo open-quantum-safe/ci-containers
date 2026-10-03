@@ -1,0 +1,48 @@
+name: Notify subscribers of new container versions
+
+# Runs after "Build and push Docker images" finishes on main. If the commit
+# that was built bumped an image's `LABEL version`, subscribers registered in
+# subscribers.yml are notified via a GitHub issue containing the new digest.
+on:
+  workflow_run:
+    workflows: ["Build and push Docker images"]
+    types: [completed]
+  # Manual re-announcement, e.g. to (re)notify a newly added subscriber.
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Image to force-notify (e.g. ci-ubuntu-latest)"
+        required: true
+      version:
+        description: "Version to announce (optional; read from the Dockerfile if empty)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    # Only for successful pushes to main, or a manual dispatch.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the built commit
+        uses: actions/checkout@v4
+        with:
+          # For workflow_run, check out the exact commit that was built so the
+          # HEAD^..HEAD diff reflects that push. fetch-depth 0 gives us HEAD^.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Notify subscribers
+        env:
+          GH_TOKEN: ${{ secrets.NOTIFY_TOKEN }}
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          FORCE_IMAGE: ${{ github.event.inputs.image }}
+          FORCE_VERSION: ${{ github.event.inputs.version }}
+        run: ./.github/scripts/notify-subscribers.sh
